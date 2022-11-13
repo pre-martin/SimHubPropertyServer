@@ -32,13 +32,17 @@ $ telnet localhost 18082
 >SimHub Property Server
 <subscribe GameData.StatusDataBase.EngineIgnitionOn
 >Property GameData.StatusDataBase.EngineIgnitionOn integer (null)
+<subscribe GameData.StatusDataBase.IsPitlimiterOrPitLane
+>Property GameData.StatusDataBase.IsPitlimiterOrPitLane boolean (null)
+
 >Property GameData.StatusDataBase.EngineIgnitionOn integer 0
+>Property GameData.StatusDataBase.IsPitlimiterOrPitLane boolean True
 >Property GameData.StatusDataBase.EngineIgnitionOn integer 1
 >Property GameData.StatusDataBase.EngineIgnitionOn integer 0
 <disconnect
 ```
 
-In this example, the client subscribed to the ignition property. Initially, as no game is running, the property has a value of `null`, transmitted as `(null)`. When a game is launched, the property changes to `0` and the client receives this change. Afterwards the ignition was toggled on and off in the game, before the client decided to `disconnect`.
+In this example, the client subscribes to the ignition property and to "IsPitLimiterOrPitLane". Initially, as no game is running, both properties have a value of `null`, transmitted as `(null)`. When a game is launched, the ignition property changes to `0`, the "pitlane" property to "True", and the client receives both changes. Afterwards the ignition is toggled on and off in the game, before the client decides to `disconnect`.
 
 
 ## Limitations
