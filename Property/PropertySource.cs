@@ -41,9 +41,9 @@ namespace SimHub.Plugins.PropertyServer.Property
             switch (propertySource)
             {
                 case PropertySource.GameData:
-                    return "GameData";
+                    return "gd";
                 case PropertySource.StatusDataBase:
-                    return "GameData.StatusDataBase";
+                    return "gd.sdb";
                 default:
                     throw new ArgumentException($"Unknown PropertySource {propertySource}");
             }

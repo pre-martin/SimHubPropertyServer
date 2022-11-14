@@ -30,15 +30,15 @@ The following shows an example of the communication. The characters `<` and `>` 
 ```
 $ telnet localhost 18082
 >SimHub Property Server
-<subscribe GameData.StatusDataBase.EngineIgnitionOn
->Property GameData.StatusDataBase.EngineIgnitionOn integer (null)
-<subscribe GameData.StatusDataBase.IsPitlimiterOrPitLane
->Property GameData.StatusDataBase.IsPitlimiterOrPitLane boolean (null)
+<subscribe gd.sdb.EngineIgnitionOn
+>Property gd.sdb.EngineIgnitionOn integer (null)
+<subscribe gd.sdb.IsPitlimiterOrPitLane
+>Property gd.sdb.IsPitlimiterOrPitLane boolean (null)
 
->Property GameData.StatusDataBase.EngineIgnitionOn integer 0
->Property GameData.StatusDataBase.IsPitlimiterOrPitLane boolean True
->Property GameData.StatusDataBase.EngineIgnitionOn integer 1
->Property GameData.StatusDataBase.EngineIgnitionOn integer 0
+>Property gd.sdb.EngineIgnitionOn integer 0
+>Property gd.sdb.IsPitlimiterOrPitLane boolean True
+>Property gd.sdb.EngineIgnitionOn integer 1
+>Property gd.sdb.EngineIgnitionOn integer 0
 <disconnect
 ```
 
@@ -54,4 +54,4 @@ At the moment, there are two limitations in effect:
 
 Limitation (1) was chosen because the plugin is not meant for real time communication. If real time is a requirement, then the UDP forwarding of SimHub should be used instead.
 
-Limitation (2) could be changed, if there are requirements to read other properties. It's just a matter of implementing other data types and maybe something like a "min delta" concept, so that not every tiny change in the decimal places of a double value will trigger a network transfer. 
+Limitation (2) could be changed, if there are requirements to read other properties. It's just a matter of implementing other data types and maybe something like a "min delta" concept, so that not every tiny change in the decimal places of a double value will trigger a network transfer.
