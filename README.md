@@ -55,3 +55,60 @@ At the moment, there are two limitations in effect:
 Limitation (1) was chosen because the plugin is not meant for real time communication. If real time is a requirement, then the UDP forwarding of SimHub should be used instead.
 
 Limitation (2) could be changed, if there are requirements to read other properties. It's just a matter of implementing other data types and maybe something like a "min delta" concept, so that not every tiny change in the decimal places of a double value will trigger a network transfer.
+
+
+## "Help"
+
+This is the current output of the command `help`:
+
+```
+Available properties:
+  gd.GameInMenu
+  gd.GamePaused
+  gd.GameReplay
+  gd.GameRunning
+  gd.sdb.ABSActive
+  gd.sdb.ABSLevel
+  gd.sdb.BestLapOpponentPosition
+  gd.sdb.CarSettings_FuelAlertActive
+  gd.sdb.CarSettings_FuelAlertEnabled
+  gd.sdb.CarSettings_MaxGears
+  gd.sdb.CarSettings_RPMRedLinePerGearOverride
+  gd.sdb.CompletedLaps
+  gd.sdb.CurrentLap
+  gd.sdb.CurrentSectorIndex
+  gd.sdb.DRSAvailable
+  gd.sdb.DRSEnabled
+  gd.sdb.EngineIgnitionOn
+  gd.sdb.EngineMap
+  gd.sdb.EngineStarted
+  gd.sdb.Flag_Black
+  gd.sdb.Flag_Blue
+  gd.sdb.Flag_Checkered
+  gd.sdb.Flag_Green
+  gd.sdb.Flag_Orange
+  gd.sdb.Flag_White
+  gd.sdb.Flag_Yellow
+  gd.sdb.IsInPit
+  gd.sdb.IsInPitLane
+  gd.sdb.IsLapValid
+  gd.sdb.MapAllowed
+  gd.sdb.OpponentsCount
+  gd.sdb.PitLimiterOn
+  gd.sdb.PlayerClassOpponentsCount
+  gd.sdb.Position
+  gd.sdb.RemainingLaps
+  gd.sdb.Spectating
+  gd.sdb.SpotterCarLeft
+  gd.sdb.SpotterCarRight
+  gd.sdb.TCActive
+  gd.sdb.TCLevel
+  gd.sdb.TotalLaps
+  gd.sdb.TurnIndicatorLeft
+  gd.sdb.TurnIndicatorRight
+  gd.Spectating
+Available commands:
+  subscribe propertyName
+  unsubscribe propertyName
+  disconnect
+```
