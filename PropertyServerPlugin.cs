@@ -52,7 +52,7 @@ namespace SimHub.Plugins.PropertyServer
             namespaceLogger.AddAppender(appender);
             namespaceLogger.Level = _settings.LogLevel.ToLog4Net();
 
-            Log.Info("Starting plugin");
+            Log.Info($"Starting plugin, version {ThisAssembly.AssemblyFileVersion}");
 
             // Move execution of server into a new task/thread (away from SimHub thread). The server is async, but we
             // do not want to put any unnecessary load onto the SimHub thread.
