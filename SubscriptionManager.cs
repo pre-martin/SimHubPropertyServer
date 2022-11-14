@@ -77,7 +77,7 @@ namespace SimHub.Plugins.PropertyServer
                 {
                     await property.RemoveSubscriber(eventHandler);
                     Log.Info($"Removed subscription from {propertyName} ({property.SubscriberCount} remaining)");
-                    if (!property.HasSubcribers)
+                    if (!property.HasSubscribers)
                     {
                         // No more active subscribers on this property: Remove it.
                         Log.Info($"Removing property {propertyName}, it has no more subscriptions");

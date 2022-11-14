@@ -39,7 +39,7 @@ namespace SimHub.Plugins.PropertyServer.Property
         public string Name { get; }
         public string Type => TypeToString(GetPropertyType());
         public string ValueAsString => _value != null ? _value.ToString() : "(null)";
-        public bool HasSubcribers => SubscriberCount > 0;
+        public bool HasSubscribers => SubscriberCount > 0;
         public int SubscriberCount => _subscribers.Count;
 
         public async Task AddSubscriber(Func<ValueChangedEventArgs, Task> callback)
