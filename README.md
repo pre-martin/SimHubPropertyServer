@@ -112,3 +112,10 @@ Available commands:
   unsubscribe propertyName
   disconnect
 ```
+
+
+## Building of the plugin
+
+```
+msbuild /p:Platform="Any CPU" /p:Configuration=Release
+```
