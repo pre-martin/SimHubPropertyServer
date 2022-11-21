@@ -89,6 +89,7 @@
   <ItemGroup>
     <None Include="COPYING" />
     <None Include="COPYING.LESSER" />
+    <None Include="doc\Release.md" />
     <Content Include="README.md" />
     <Content Include="properties.png" />
   </ItemGroup>
