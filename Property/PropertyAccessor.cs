@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using log4net;
 
@@ -111,9 +112,9 @@ namespace SimHub.Plugins.PropertyServer.Property
         /// <summary>
         /// Collects all properties, which can be subscribed.
         /// </summary>
-        public static async Task<List<string>> GetAvailableProperties()
+        public static async Task<List<SimHubProperty>> GetAvailableProperties()
         {
-            var result = new List<string>();
+            var result = new List<SimHubProperty>();
 
             var sources = Enum.GetValues(typeof(PropertySource)).Cast<PropertySource>();
             foreach (var source in sources)
@@ -125,7 +126,7 @@ namespace SimHub.Plugins.PropertyServer.Property
                         s => Task.CompletedTask, true);
                     if (property != null)
                     {
-                        result.Add($"{property.Name}");
+                        result.Add(property);
                     }
                 }
             }

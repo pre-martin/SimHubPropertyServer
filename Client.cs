@@ -127,9 +127,9 @@ namespace SimHub.Plugins.PropertyServer
         {
             var propertyList = await PropertyAccessor.GetAvailableProperties();
             await SendString("Available properties:");
-            foreach (var p in propertyList.OrderBy(s => s).ToList())
+            foreach (var p in propertyList.OrderBy(s => s.Name).ToList())
             {
-                await SendString($"  {p}");
+                await SendString($"  {p.Name} {p.Type}");
             }
 
             await SendString("Available commands:");
