@@ -47,8 +47,15 @@ namespace SimHub.Plugins.PropertyServer
             await SendString("SimHub Property Server");
             while (Running && !token.IsCancellationRequested)
             {
-                var line = await reader.ReadLineAsync();
-                await ReadCallback(line);
+                try
+                {
+                    var line = await reader.ReadLineAsync();
+                    await ReadCallback(line);
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Unhandled exception in client loop: {e}");
+                }
             }
         }
 
