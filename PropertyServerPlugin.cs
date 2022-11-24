@@ -26,7 +26,8 @@ namespace SimHub.Plugins.PropertyServer
         private Server _server;
         private long _lastDataUpdate;
         private readonly SubscriptionManager _subscriptionManager = new SubscriptionManager();
-        private int _unhandledExceptionCount = 0;
+        private readonly RawDataManager _rawDataManager = new RawDataManager();
+        private int _unhandledExceptionCount;
 
         public PluginManager PluginManager { get; set; }
 
@@ -80,7 +81,7 @@ namespace SimHub.Plugins.PropertyServer
                 }
                 catch (Exception e)
                 {
-                    // We are on the critical path of the SimHub thread. Writing exessive logs does not help and is I/O intensive.
+                    // We are on the critical path of the SimHub thread. Writing excessive logs does not help and is I/O intensive.
                     // So we stop reporting unhandled exceptions after a specific limit.
                     if (_unhandledExceptionCount < 50)
                     {
@@ -100,6 +101,9 @@ namespace SimHub.Plugins.PropertyServer
 
         private async void DataUpdateInternal(GameData data)
         {
+            var rawData = PluginManager.GetRawDataSample();
+            _rawDataManager.UpdateObjects(rawData);
+
             var properties = _subscriptionManager.GetProperties().Result;
             foreach (var simHubProperty in properties.Values)
             {
@@ -111,6 +115,12 @@ namespace SimHub.Plugins.PropertyServer
                         break;
                     case PropertySource.StatusDataBase:
                         await simHubProperty.UpdateFromObject(data?.NewData);
+                        break;
+                    case PropertySource.AccGraphics:
+                        await simHubProperty.UpdateFromObject(_rawDataManager.AccGraphics);
+                        break;
+                    case PropertySource.AccPhysics:
+                        await simHubProperty.UpdateFromObject(_rawDataManager.AccPhysics);
                         break;
                     default:
                         throw new ArgumentException($"Unknown PropertySource {simHubProperty.PropertySource}");

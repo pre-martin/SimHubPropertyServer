@@ -19,11 +19,26 @@ namespace SimHub.Plugins.PropertyServer.Property
         /// <summary>
         /// For properties which can be found in the class <c>GameReaderCommon.GameData.StatusDataBase</c>
         /// </summary>
-        StatusDataBase
+        StatusDataBase,
+
+        /// <summary>
+        /// Assetto Corsa Competizione - Rawdata "Graphics"
+        /// </summary>
+        AccGraphics,
+
+        /// <summary>
+        /// Assetto Corsa Competizione - Rawdata "Physics"
+        /// </summary>
+        AccPhysics
+
     }
 
     public static class PropertySourceEx
     {
+        /// <summary>
+        /// Determines the underlying <c>Type</c> of a given <c>PropertySource</c>.
+        /// </summary>
+        /// <returns>The <c>Type</c> or <c>null</c> if the underlying type cannot be found.</returns>
         public static Type GetPropertySourceType(this PropertySource propertySource)
         {
             switch (propertySource)
@@ -32,11 +47,18 @@ namespace SimHub.Plugins.PropertyServer.Property
                     return typeof(GameData);
                 case PropertySource.StatusDataBase:
                     return typeof(StatusDataBase);
+                case PropertySource.AccGraphics:
+                    return Type.GetType("ACSharedMemory.ACC.MMFModels.Graphics, ACSharedMemory");
+                case PropertySource.AccPhysics:
+                    return Type.GetType("ACSharedMemory.ACC.MMFModels.Physics, ACSharedMemory");
                 default:
                     throw new ArgumentException($"Unknown PropertySource {propertySource}");
             }
         }
 
+        /// <summary>
+        /// Determines the name prefix of a given <c>PropertySource</c>.
+        /// </summary>
         public static string GetPropertyPrefix(this PropertySource propertySource)
         {
             switch (propertySource)
@@ -45,6 +67,10 @@ namespace SimHub.Plugins.PropertyServer.Property
                     return "dcp"; // [DataCorePlugin.xyz]
                 case PropertySource.StatusDataBase:
                     return "dcp.gd"; // [DataCorePlugin.GameData.xyz]
+                case PropertySource.AccGraphics:
+                    return "acc.graphics";
+                case PropertySource.AccPhysics:
+                    return "acc.physics";
                 default:
                     throw new ArgumentException($"Unknown PropertySource {propertySource}");
             }
