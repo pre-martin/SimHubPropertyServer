@@ -125,7 +125,7 @@ namespace SimHub.Plugins.PropertyServer
 
         private async Task Help()
         {
-            var propertyList = await PropertyAccessor.GetAvailableProperties();
+            var propertyList = PropertyAccessor.GetAvailableProperties();
             await SendString("Available properties:");
             foreach (var p in propertyList.OrderBy(s => s.Name).ToList())
             {

@@ -92,6 +92,7 @@ Available properties:
   dcp.gd.IsInPit integer
   dcp.gd.IsInPitLane integer
   dcp.gd.IsLapValid boolean
+  dcp.gd.IsPitlimiterOrPitLane boolean
   dcp.gd.MapAllowed boolean
   dcp.gd.OpponentsCount integer
   dcp.gd.PitLimiterOn integer

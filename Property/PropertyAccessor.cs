@@ -60,22 +60,34 @@ namespace SimHub.Plugins.PropertyServer.Property
             return simHubProperty;
         }
 
+        private static bool IsPropertySupported(PropertyInfo pi)
+        {
+            return pi.PropertyType == typeof(int) || pi.PropertyType == typeof(bool);
+        }
+
+        private static bool IsMethodSupported(MethodInfo mi)
+        {
+            return !mi.Name.StartsWith("get_") &&
+                   mi.DeclaringType != typeof(object) &&
+                   mi.GetParameters().Length == 0 &&
+                   (mi.ReturnType == typeof(int) || mi.ReturnType == typeof(bool));
+        }
+
         /// <summary>
         /// Tries to create an instance of <c>SimHubProperty</c> from a given property name.
         /// </summary>
-        private static async Task<SimHubProperty> CreateProperty(PropertySource source, string name,
-            Func<string, Task> errorCallback, bool quiet = false)
+        private static async Task<SimHubProperty> CreateProperty(PropertySource source, string name, Func<string, Task> errorCallback)
         {
             // Is it a property of type "getter"?
-            if (!quiet) Log.Debug($"Trying to find property {name} in {source}");
+            Log.Debug($"Trying to find property {name} in {source}");
             var plainName = name.Contains('.') ? name.Substring(source.GetPropertyPrefix().Length + 1) : name;
             var propertyInfo = source.GetPropertySourceType().GetProperty(plainName);
             if (propertyInfo != null)
             {
-                if (propertyInfo.PropertyType != typeof(int) && propertyInfo.PropertyType != typeof(bool))
+                if (!IsPropertySupported(propertyInfo))
                 {
                     // Unsupported property type.
-                    if (!quiet) Log.Info($"Property {name} has an unsupported type");
+                    Log.Info($"Property {name} has an unsupported type");
                     await errorCallback.Invoke($"Property {name} has an unsupported type");
                     return null;
                 }
@@ -87,19 +99,11 @@ namespace SimHub.Plugins.PropertyServer.Property
             var methodInfo = source.GetPropertySourceType().GetMethod(plainName);
             if (methodInfo != null)
             {
-                if (methodInfo.GetParameters().Length != 0)
+                if (!IsMethodSupported(methodInfo))
                 {
-                    // Method requires parameters.
-                    if (!quiet) Log.Info($"Property {name} (which is a method) is not parameterless");
-                    await errorCallback.Invoke($"Property {name} (which is a method) is not parameterless");
-                    return null;
-                }
-
-                if (methodInfo.ReturnType != typeof(int) && methodInfo.ReturnType != typeof(bool))
-                {
-                    // Unsupported property type.
-                    if (!quiet) Log.Info($"Property {name} (which is a method) has an unsupported type");
-                    await errorCallback.Invoke($"Property {name} (which is a method) has an unsupported type");
+                    Log.Info($"Property {name} (which is a method) is not parameterless or hasn't a supported return type");
+                    await errorCallback.Invoke(
+                        $"Property {name} (which is a method) is not parameterless or hasn't a supported return type");
                     return null;
                 }
 
@@ -112,7 +116,7 @@ namespace SimHub.Plugins.PropertyServer.Property
         /// <summary>
         /// Collects all properties, which can be subscribed.
         /// </summary>
-        public static async Task<List<SimHubProperty>> GetAvailableProperties()
+        public static IEnumerable<SimHubProperty> GetAvailableProperties()
         {
             var result = new List<SimHubProperty>();
 
@@ -120,14 +124,15 @@ namespace SimHub.Plugins.PropertyServer.Property
             foreach (var source in sources)
             {
                 var availableProperties = source.GetPropertySourceType().GetProperties();
-                foreach (var p in availableProperties)
+                foreach (var p in availableProperties.Where(IsPropertySupported))
                 {
-                    var property = await CreateProperty(source, $"{source.GetPropertyPrefix()}.{p.Name}",
-                        s => Task.CompletedTask, true);
-                    if (property != null)
-                    {
-                        result.Add(property);
-                    }
+                    result.Add(new SimHubPropertyGetter(source, $"{source.GetPropertyPrefix()}.{p.Name}", p));
+                }
+
+                var availableMethods = source.GetPropertySourceType().GetMethods();
+                foreach (var m in availableMethods.Where(IsMethodSupported))
+                {
+                    result.Add(new SimHubPropertyMethod(source, $"{source.GetPropertyPrefix()}.{m.Name}", m));
                 }
             }
 
