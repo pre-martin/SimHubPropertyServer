@@ -63,50 +63,50 @@ This is the current output of the command `help`:
 
 ```
 Available properties:
-  gd.GameInMenu
-  gd.GamePaused
-  gd.GameReplay
-  gd.GameRunning
-  gd.sdb.ABSActive
-  gd.sdb.ABSLevel
-  gd.sdb.BestLapOpponentPosition
-  gd.sdb.CarSettings_FuelAlertActive
-  gd.sdb.CarSettings_FuelAlertEnabled
-  gd.sdb.CarSettings_MaxGears
-  gd.sdb.CarSettings_RPMRedLinePerGearOverride
-  gd.sdb.CompletedLaps
-  gd.sdb.CurrentLap
-  gd.sdb.CurrentSectorIndex
-  gd.sdb.DRSAvailable
-  gd.sdb.DRSEnabled
-  gd.sdb.EngineIgnitionOn
-  gd.sdb.EngineMap
-  gd.sdb.EngineStarted
-  gd.sdb.Flag_Black
-  gd.sdb.Flag_Blue
-  gd.sdb.Flag_Checkered
-  gd.sdb.Flag_Green
-  gd.sdb.Flag_Orange
-  gd.sdb.Flag_White
-  gd.sdb.Flag_Yellow
-  gd.sdb.IsInPit
-  gd.sdb.IsInPitLane
-  gd.sdb.IsLapValid
-  gd.sdb.MapAllowed
-  gd.sdb.OpponentsCount
-  gd.sdb.PitLimiterOn
-  gd.sdb.PlayerClassOpponentsCount
-  gd.sdb.Position
-  gd.sdb.RemainingLaps
-  gd.sdb.Spectating
-  gd.sdb.SpotterCarLeft
-  gd.sdb.SpotterCarRight
-  gd.sdb.TCActive
-  gd.sdb.TCLevel
-  gd.sdb.TotalLaps
-  gd.sdb.TurnIndicatorLeft
-  gd.sdb.TurnIndicatorRight
-  gd.Spectating
+  dcp.GameInMenu boolean
+  dcp.GamePaused boolean
+  dcp.GameReplay boolean
+  dcp.GameRunning boolean
+  dcp.gd.ABSActive integer
+  dcp.gd.ABSLevel integer
+  dcp.gd.BestLapOpponentPosition integer
+  dcp.gd.CarSettings_FuelAlertActive integer
+  dcp.gd.CarSettings_FuelAlertEnabled integer
+  dcp.gd.CarSettings_MaxGears integer
+  dcp.gd.CarSettings_RPMRedLinePerGearOverride integer
+  dcp.gd.CompletedLaps integer
+  dcp.gd.CurrentLap integer
+  dcp.gd.CurrentSectorIndex integer
+  dcp.gd.DRSAvailable integer
+  dcp.gd.DRSEnabled integer
+  dcp.gd.EngineIgnitionOn integer
+  dcp.gd.EngineMap integer
+  dcp.gd.EngineStarted integer
+  dcp.gd.Flag_Black integer
+  dcp.gd.Flag_Blue integer
+  dcp.gd.Flag_Checkered integer
+  dcp.gd.Flag_Green integer
+  dcp.gd.Flag_Orange integer
+  dcp.gd.Flag_White integer
+  dcp.gd.Flag_Yellow integer
+  dcp.gd.IsInPit integer
+  dcp.gd.IsInPitLane integer
+  dcp.gd.IsLapValid boolean
+  dcp.gd.MapAllowed boolean
+  dcp.gd.OpponentsCount integer
+  dcp.gd.PitLimiterOn integer
+  dcp.gd.PlayerClassOpponentsCount integer
+  dcp.gd.Position integer
+  dcp.gd.RemainingLaps integer
+  dcp.gd.Spectating boolean
+  dcp.gd.SpotterCarLeft integer
+  dcp.gd.SpotterCarRight integer
+  dcp.gd.TCActive integer
+  dcp.gd.TCLevel integer
+  dcp.gd.TotalLaps integer
+  dcp.gd.TurnIndicatorLeft integer
+  dcp.gd.TurnIndicatorRight integer
+  dcp.Spectating boolean
 Available commands:
   subscribe propertyName
   unsubscribe propertyName
