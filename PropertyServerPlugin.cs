@@ -39,7 +39,7 @@ namespace SimHub.Plugins.PropertyServer
             {
                 File = "logs/PropertyServer.log",
                 Name = "FileAppender",
-                MaxFileSize = 1024 * 1024 * 1024,
+                MaxFileSize = 1 * 1024 * 1024,
                 MaxSizeRollBackups = 5,
                 RollingStyle = RollingFileAppender.RollingMode.Size,
                 Layout = new PatternLayout(
