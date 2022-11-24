@@ -15,6 +15,7 @@ namespace SimHub.Plugins.PropertyServer.Property
         /// For properties which can be found in the class <c>GameReaderCommon.GameData</c>
         /// </summary>
         GameData,
+
         /// <summary>
         /// For properties which can be found in the class <c>GameReaderCommon.GameData.StatusDataBase</c>
         /// </summary>
@@ -41,9 +42,9 @@ namespace SimHub.Plugins.PropertyServer.Property
             switch (propertySource)
             {
                 case PropertySource.GameData:
-                    return "gd";
+                    return "dcp"; // [DataCorePlugin.xyz]
                 case PropertySource.StatusDataBase:
-                    return "gd.sdb";
+                    return "dcp.gd"; // [DataCorePlugin.GameData.xyz]
                 default:
                     throw new ArgumentException($"Unknown PropertySource {propertySource}");
             }
