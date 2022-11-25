@@ -47,19 +47,32 @@ namespace SimHub.Plugins.PropertyServer
             await SendString("SimHub Property Server");
             while (Running && !token.IsCancellationRequested)
             {
+                string line = null;
                 try
                 {
-                    var line = await reader.ReadLineAsync();
-                    await ReadCallback(line);
+                    line = await reader.ReadLineAsync();
                 }
-                catch (Exception e)
+                catch (IOException ioe)
                 {
-                    Log.Error($"Unhandled exception in client loop: {e}");
+                    Log.Warn($"IOException while waiting for client data. Probably the client closed the connection: {ioe.Message}");
+                    await Disconnect();
+                }
+
+                if (line != null)
+                {
+                    try
+                    {
+                        await HandleClientCommand(line);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error($"Unhandled exception while handling command from client: {e}");
+                    }
                 }
             }
         }
 
-        private async Task ReadCallback(string line)
+        private async Task HandleClientCommand(string line)
         {
             var lineItems = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             if (lineItems.Length == 0) return;
