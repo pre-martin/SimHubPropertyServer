@@ -21,7 +21,7 @@ namespace SimHub.Plugins.PropertyServer
         public object AccPhysics;
 
         /// <summary>
-        /// Has to be called by the game loop. Only after a call to this method, the properties in this class will return
+        /// Has to be called in the game loop. Only after a call to this method, the properties in this class will return
         /// valid data.
         /// </summary>
         public void UpdateObjects(object rawData)
@@ -46,6 +46,10 @@ namespace SimHub.Plugins.PropertyServer
                     Log.Info("New game is ACC");
                     _accGraphicsField = rawData.GetType().GetField("Graphics");
                     _accPhysicsField = rawData.GetType().GetField("Physics");
+                }
+                else
+                {
+                    Log.Info($"Don't know how to handle {rawDataType}. Access to raw data is not possible.");
                 }
             }
 
