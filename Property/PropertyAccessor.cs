@@ -65,6 +65,11 @@ namespace SimHub.Plugins.PropertyServer.Property
             return pi.PropertyType == typeof(int) || pi.PropertyType == typeof(bool);
         }
 
+        private static bool IsFieldSupported(FieldInfo fi)
+        {
+            return fi.FieldType == typeof(int) || fi.FieldType == typeof(bool);
+        }
+
         private static bool IsMethodSupported(MethodInfo mi)
         {
             return !mi.Name.StartsWith("get_") &&
@@ -87,12 +92,26 @@ namespace SimHub.Plugins.PropertyServer.Property
                 if (!IsPropertySupported(propertyInfo))
                 {
                     // Unsupported property type.
-                    Log.Info($"Property {name} has an unsupported type");
-                    await errorCallback.Invoke($"Property {name} has an unsupported type");
+                    Log.Info($"Property {name} is not supported");
+                    await errorCallback.Invoke($"Property {name} is not supported");
                     return null;
                 }
 
                 return new SimHubPropertyGetter(source, name, propertyInfo);
+            }
+
+            // Or is it a field?
+            var fieldInfo = source.GetPropertySourceType().GetField(plainName);
+            if (fieldInfo != null)
+            {
+                if (!IsFieldSupported(fieldInfo))
+                {
+                    Log.Info($"Property {name} (which is a field) is not supported");
+                    await errorCallback.Invoke($"Property {name} (which is a field) is not supported");
+                    return null;
+                }
+
+                return new SimHubPropertyField(source, name, fieldInfo);
             }
 
             // Maybe it is a method?
@@ -101,9 +120,8 @@ namespace SimHub.Plugins.PropertyServer.Property
             {
                 if (!IsMethodSupported(methodInfo))
                 {
-                    Log.Info($"Property {name} (which is a method) is not parameterless or hasn't a supported return type");
-                    await errorCallback.Invoke(
-                        $"Property {name} (which is a method) is not parameterless or hasn't a supported return type");
+                    Log.Info($"Property {name} (which is a method) is not supported");
+                    await errorCallback.Invoke($"Property {name} (which is a method) is not supported");
                     return null;
                 }
 
@@ -127,6 +145,12 @@ namespace SimHub.Plugins.PropertyServer.Property
                 foreach (var p in availableProperties.Where(IsPropertySupported))
                 {
                     result.Add(new SimHubPropertyGetter(source, $"{source.GetPropertyPrefix()}.{p.Name}", p));
+                }
+
+                var availableFields = source.GetPropertySourceType().GetFields();
+                foreach (var f in availableFields.Where(IsFieldSupported))
+                {
+                    result.Add(new SimHubPropertyField(source, $"{source.GetPropertyPrefix()}.{f.Name}", f));
                 }
 
                 var availableMethods = source.GetPropertySourceType().GetMethods();

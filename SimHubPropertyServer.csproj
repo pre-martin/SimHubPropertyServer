@@ -74,6 +74,7 @@
     <Compile Include="Property\PropertyAccessor.cs" />
     <Compile Include="Property\PropertySource.cs" />
     <Compile Include="Property\SimHubProperty.cs" />
+    <Compile Include="RawDataManager.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Settings\GeneralSettings.cs" />
     <Compile Include="Settings\LogLevelSetting.cs" />

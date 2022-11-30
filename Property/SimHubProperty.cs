@@ -135,14 +135,38 @@ namespace SimHub.Plugins.PropertyServer.Property
     }
 
     /// <summary>
+    /// Manages the access to a SimHub property which is a field.
+    /// </summary>
+    public class SimHubPropertyField : SimHubProperty
+    {
+        private readonly FieldInfo _fieldInfo;
+
+        public SimHubPropertyField(PropertySource propertySource, string propertyName, FieldInfo fieldInfo) :
+            base(propertySource, propertyName)
+        {
+            _fieldInfo = fieldInfo;
+        }
+
+        protected override object GetValue(object obj)
+        {
+            return _fieldInfo.GetValue(obj);
+        }
+
+        protected override Type GetPropertyType()
+        {
+            return _fieldInfo.FieldType;
+        }
+    }
+
+    /// <summary>
     /// Manages the access to a SimHub property, which is a parameterless method with return value.
     /// </summary>
     public class SimHubPropertyMethod : SimHubProperty
     {
         private readonly MethodInfo _methodInfo;
 
-        public SimHubPropertyMethod(PropertySource propertySource, string propertyName, MethodInfo methodInfo) : base(
-            propertySource, propertyName)
+        public SimHubPropertyMethod(PropertySource propertySource, string propertyName, MethodInfo methodInfo) :
+            base(propertySource, propertyName)
         {
             _methodInfo = methodInfo;
         }

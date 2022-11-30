@@ -2,6 +2,7 @@
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -26,7 +27,9 @@ namespace SimHub.Plugins.PropertyServer
         private Server _server;
         private long _lastDataUpdate;
         private readonly SubscriptionManager _subscriptionManager = new SubscriptionManager();
-        private int _unhandledExceptionCount = 0;
+        private FieldInfo _rawField;
+        private readonly RawDataManager _rawDataManager = new RawDataManager();
+        private int _unhandledExceptionCount;
 
         public PluginManager PluginManager { get; set; }
 
@@ -80,7 +83,7 @@ namespace SimHub.Plugins.PropertyServer
                 }
                 catch (Exception e)
                 {
-                    // We are on the critical path of the SimHub thread. Writing exessive logs does not help and is I/O intensive.
+                    // We are on the critical path of the SimHub thread. Writing excessive logs does not help and is I/O intensive.
                     // So we stop reporting unhandled exceptions after a specific limit.
                     if (_unhandledExceptionCount < 50)
                     {
@@ -100,6 +103,25 @@ namespace SimHub.Plugins.PropertyServer
 
         private async void DataUpdateInternal(GameData data)
         {
+            // Game raw data is not accessible for us:
+            // - "GameData<T> : GameData" has a property "StatusData<T> GameNewData" (where "StatusData<T> : StatusDataBase")
+            // - "StatusData<T>" has a Field "T Raw".
+            // We would like to get this "Raw" field, which would be of type "ACSharedMemory.ACC.Reader.ACCRawData". But we only
+            // get "GameData" and not "GameData<T>".
+            // So we use reflection, but we query the reflection data only once and save it in an instance variable.
+            if (_rawField == null && data?.NewData != null)
+            {
+                _rawField = data.NewData.GetType().GetField("Raw");
+            }
+
+            // Now get the "Raw" data with reflection.
+            object rawData = null;
+            if (_rawField != null && data?.NewData != null)
+            {
+                rawData = _rawField.GetValue(data.NewData);
+            }
+            _rawDataManager.UpdateObjects(rawData);
+
             var properties = _subscriptionManager.GetProperties().Result;
             foreach (var simHubProperty in properties.Values)
             {
@@ -111,6 +133,12 @@ namespace SimHub.Plugins.PropertyServer
                         break;
                     case PropertySource.StatusDataBase:
                         await simHubProperty.UpdateFromObject(data?.NewData);
+                        break;
+                    case PropertySource.AccGraphics:
+                        await simHubProperty.UpdateFromObject(_rawDataManager.AccGraphics);
+                        break;
+                    case PropertySource.AccPhysics:
+                        await simHubProperty.UpdateFromObject(_rawDataManager.AccPhysics);
                         break;
                     default:
                         throw new ArgumentException($"Unknown PropertySource {simHubProperty.PropertySource}");
