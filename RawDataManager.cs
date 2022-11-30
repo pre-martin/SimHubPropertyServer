@@ -36,8 +36,8 @@ namespace SimHub.Plugins.PropertyServer
             if (rawDataType != null && rawDataType != _currentRawDataType)
             {
                 // Type of raw data has changed. We have a new game, so configure the access via reflection now.
-                _currentRawDataType = rawDataType;
                 Reset();
+                _currentRawDataType = rawDataType;
                 Log.Info("Detected a new game");
 
                 if (rawDataType.EndsWith("ACCRawData"))
@@ -59,6 +59,7 @@ namespace SimHub.Plugins.PropertyServer
 
         private void Reset()
         {
+            _currentRawDataType = null;
             _accGraphicsField = null;
             _accPhysicsField = null;
             AccGraphics = null;
