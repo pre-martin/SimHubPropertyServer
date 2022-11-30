@@ -30,19 +30,21 @@ The following shows an example of the communication. The characters `<` and `>` 
 ```
 $ telnet localhost 18082
 >SimHub Property Server
-<subscribe gd.sdb.EngineIgnitionOn
->Property gd.sdb.EngineIgnitionOn integer (null)
-<subscribe gd.sdb.IsPitlimiterOrPitLane
->Property gd.sdb.IsPitlimiterOrPitLane boolean (null)
+<subscribe dcp.gd.EngineIgnitionOn
+>Property dcp.gd.EngineIgnitionOn integer (null)
+<subscribe dcp.gd.IsPitlimiterOrPitLane
+>Property dcp.gd.IsPitlimiterOrPitLane boolean (null)
 
->Property gd.sdb.EngineIgnitionOn integer 0
->Property gd.sdb.IsPitlimiterOrPitLane boolean True
->Property gd.sdb.EngineIgnitionOn integer 1
->Property gd.sdb.EngineIgnitionOn integer 0
+>Property dcp.gd.EngineIgnitionOn integer 0
+>Property dcp.gd.IsPitlimiterOrPitLane boolean True
+>Property dcp.gd.EngineIgnitionOn integer 1
+>Property dcp.gd.EngineIgnitionOn integer 0
 <disconnect
 ```
 
 In this example, the client subscribes to the ignition property and to "IsPitLimiterOrPitLane". Initially, as no game is running, both properties have a value of `null`, transmitted as `(null)`. When a game is launched, the ignition property changes to `0`, the "pitlane" property to "True", and the client receives both changes. Afterwards the ignition is toggled on and off in the game, before the client decides to `disconnect`.
+
+Property names follow the convention of SimHub, e.g. `[DataCorePlugin.GameRunning]` is called `dcp.GameRunning` in this plugin, or `[DataCorePlugin.GameData.ABSLevel]` is called `dcp.gd.ABSLevel` in this plugin.
 
 
 ## Limitations
