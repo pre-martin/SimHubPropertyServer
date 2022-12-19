@@ -8,6 +8,8 @@
 4. Create a tag and push it afterwards:
     - `nbgv tag`
     - `git push origin v1.2`
-5. Build the plugin.
-6. Create a release in GitHub from the tag and attach the file `PropertyServer.dll`.
+5. Build the plugin:
+    - `msbuild -t:restore -p:RestorePackagesConfig=true -p:Configuration=Release -p:Platform="Any CPU"`
+    - `msbuild -p:Configuration=Release -p:Platform="Any CPU"`
+6. Create a release in GitHub from the tag and attach the file `PropertyServer.dll`
 7. Push the main branch.
