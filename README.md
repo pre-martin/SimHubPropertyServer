@@ -196,12 +196,4 @@ Available commands:
 
 ## Building of the plugin
 
-1. Copy required DLLs from SimHub to the local directory `SimHub`
-   - SimHub.Plugins.dll
-   - GameReaderCommon.dll
-   - log4net.dll
-   - Newtonsoft.Json.dll
-2. Restore NuGet packages:  
-   `msbuild -t:restore -p:Platform="Any CPU" -p:RestorePackagesConfig=true`
-3. Build the project:  
-   `msbuild -p:Platform="Any CPU" -p:Configuration=Release`
+See [Building.md](doc/Building.md).
