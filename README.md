@@ -6,6 +6,7 @@ This is a plugin for [SimHub](https://www.simhubdash.com/). It allows access to 
 
 Clients can subscribe for property changes. They will then receive updates each time, when the value of a subscribed property changes. 
 
+One use case is the project [StreamDeckSimHubPlugin](https://github.com/pre-martin/StreamDeckSimHubPlugin), which allows updating the state of Stream Deck keys via SimHub properties.
 
 ## Installation
 
