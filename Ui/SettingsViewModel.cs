@@ -40,6 +40,7 @@ namespace SimHub.Plugins.PropertyServer.Ui
         {
         }
 
+        public string Version => "Version " + ThisAssembly.AssemblyFileVersion;
         public int Port { get; set; }
         public List<LogLevelSetting> LogLevels { get; set; }
         public LogLevelSetting SelectedLogLevel { get; set; }
