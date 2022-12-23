@@ -19,7 +19,7 @@ namespace SimHub.Plugins.PropertyServer
 {
     [PluginName("Property Server")]
     [PluginAuthor("Martin Renner")]
-    [PluginDescription("Provides a network server for read access to game properties - v" + ThisAssembly.AssemblyVersion)]
+    [PluginDescription("Provides a network server for read access to game properties - v" + ThisAssembly.AssemblyFileVersion)]
     public class PropertyServerPlugin : IDataPlugin, IWPFSettingsV2
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PropertyServerPlugin));
