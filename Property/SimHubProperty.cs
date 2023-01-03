@@ -104,6 +104,10 @@ namespace SimHub.Plugins.PropertyServer.Property
                     return "integer";
                 case "System.Int64":
                     return "long";
+                case "System.Single":
+                    return "double";
+                case "System.Double":
+                    return "double";
                 default:
                     return "(unknown)";
             }

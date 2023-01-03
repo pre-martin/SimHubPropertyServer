@@ -62,12 +62,16 @@ namespace SimHub.Plugins.PropertyServer.Property
 
         private static bool IsPropertySupported(PropertyInfo pi)
         {
-            return pi.PropertyType == typeof(int) || pi.PropertyType == typeof(bool);
+            return pi.PropertyType == typeof(int) || pi.PropertyType == typeof(long) ||
+                   pi.PropertyType == typeof(bool) ||
+                   pi.PropertyType == typeof(float) || pi.PropertyType == typeof(double);
         }
 
         private static bool IsFieldSupported(FieldInfo fi)
         {
-            return fi.FieldType == typeof(int) || fi.FieldType == typeof(bool);
+            return fi.FieldType == typeof(int) || fi.FieldType == typeof(long) ||
+                   fi.FieldType == typeof(bool) ||
+                   fi.FieldType == typeof(float) || fi.FieldType == typeof(double);
         }
 
         private static bool IsMethodSupported(MethodInfo mi)
@@ -75,7 +79,10 @@ namespace SimHub.Plugins.PropertyServer.Property
             return !mi.Name.StartsWith("get_") &&
                    mi.DeclaringType != typeof(object) &&
                    mi.GetParameters().Length == 0 &&
-                   (mi.ReturnType == typeof(int) || mi.ReturnType == typeof(bool));
+                   (mi.ReturnType == typeof(int) || mi.ReturnType == typeof(long) ||
+                    mi.ReturnType == typeof(bool) ||
+                    mi.ReturnType == typeof(float) || mi.ReturnType == typeof(double)
+                   );
         }
 
         /// <summary>
