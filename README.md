@@ -8,16 +8,22 @@ Clients can subscribe for property changes. They will then receive updates each 
 
 One use case is the project [StreamDeckSimHubPlugin](https://github.com/pre-martin/StreamDeckSimHubPlugin), which allows updating the state of Stream Deck keys via SimHub properties.
 
+## Note
+
+Always read the **correct version** of the documentation, which matches the version of the plugin that you have installed. To do so, use the dropdown in the top left, which usually contains the value "main". Select the "tag" that matches your installed version.
+
 ## Installation
 
 Simply copy the file `PropertyServer.dll` into the root directory of your SimHub installation. After having launched SimHub, the plugin has to be activated under "_Settings - Plugins_" (usually SimHub will autodetect the plugin and ask at startup, if the plugin shall be activated).
 
-Optionally, the checkbox "_Show in left menu_" can be activated. This will show an entry named "_Property Server_" in the left menu bar. This entry allows to adjust the settings of the plugin.
+Optionally, the checkbox "_Show in left menu_" can be activated. This will show an entry named "_Property Server_" in the left menu bar, which allows to adjust the settings of the plugin. If "_Show in left menu_" is not enabled, the settings of the plugin can be found under "_Additional Plugins_ - _Property Server_".
+
+After installation, the checkbox "_Show in left menu_" can be found under "_Settings_ - _Plugins_". 
 
 
 ## Usage
 
-Open a telnet connection to `localhost` on port `18082` (or whatever port has been set in the settings). The property will respond with its name:
+Open a telnet connection to `localhost` on port `18082` (or whatever port has been set in the settings). The Property Server will respond with its name:
 
 ```
 $ telnet localhost 18082
@@ -53,11 +59,11 @@ Property names follow the convention of SimHub, e.g. `[DataCorePlugin.GameRunnin
 At the moment, there are two limitations in effect:
 
 1. The plugin will send data only at a rate of 10 Hz.
-2. Only properties of type `bool` and `int` are supported.
+2. Only properties of type `bool`, `int`, `long`, `float` and `double` are supported. No arrays are supported.
 
 Limitation (1) was chosen because the plugin is not meant for real time communication. If real time is a requirement, then the UDP forwarding of SimHub should be used instead.
 
-Limitation (2) could be changed, if there are requirements to read other properties. It's just a matter of implementing other data types and maybe something like a "min delta" concept, so that not every tiny change in the decimal places of a double value will trigger a network transfer.
+Limitation (2) could be changed, if there are requirements to read other properties. It's just a matter of implementing other data types.
 
 
 ## "Help"
