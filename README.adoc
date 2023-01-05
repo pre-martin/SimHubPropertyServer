@@ -1,40 +1,41 @@
-﻿# SimHub Property Server
+﻿= SimHub Property Server
+:toc:
 
-## About
+== About
 
-This is a plugin for [SimHub](https://www.simhubdash.com/). It allows access to SimHub properties via a tcp connection.
+This is a plugin for https://www.simhubdash.com/[SimHub]. It allows access to SimHub properties via a tcp connection.
 
 Clients can subscribe for property changes. They will then receive updates each time, when the value of a subscribed property changes. 
 
-One use case is the project [StreamDeckSimHubPlugin](https://github.com/pre-martin/StreamDeckSimHubPlugin), which allows updating the state of Stream Deck keys via SimHub properties.
+One use case is the project https://github.com/pre-martin/StreamDeckSimHubPlugin[StreamDeckSimHubPlugin], which allows updating the state of Stream Deck keys via SimHub properties.
 
-## Note
+== Note
 
-Always read the **correct version** of the documentation, which matches the version of the plugin that you have installed. To do so, use the dropdown in the top left, which usually contains the value "main". Select the "tag" that matches your installed version.
+Always read the *correct version* of the documentation, which matches the version of the plugin that you have installed. To do so, use the dropdown in the top left, which usually contains the value "main". Select the "tag" that matches your installed version.
 
-## Installation
+== Installation
 
-Simply copy the file `PropertyServer.dll` into the root directory of your SimHub installation. After having launched SimHub, the plugin has to be activated under "_Settings - Plugins_" (usually SimHub will autodetect the plugin and ask at startup, if the plugin shall be activated).
+Simply copy the file `PropertyServer.dll` into the root directory of your SimHub installation. After having launched SimHub, the plugin has to be activated under "_Settings_ > _Plugins_" (usually SimHub will autodetect the plugin and ask at startup, if the plugin shall be activated).
 
-Optionally, the checkbox "_Show in left menu_" can be activated. This will show an entry named "_Property Server_" in the left menu bar, which allows to adjust the settings of the plugin. If "_Show in left menu_" is not enabled, the settings of the plugin can be found under "_Additional Plugins_ - _Property Server_".
+Optionally, the checkbox "_Show in left menu_" can be activated. This will show an entry named "_Property Server_" in the left menu bar, which allows to adjust the settings of the plugin. If "_Show in left menu_" is not enabled, the settings of the plugin can be found under "_Additional Plugins_ > _Property Server_".
 
-After installation, the checkbox "_Show in left menu_" can be found under "_Settings_ - _Plugins_". 
+After installation, the checkbox "_Show in left menu_" can be found under "_Settings_ > _Plugins_". 
 
 
-## Usage
+== Usage
 
 Open a telnet connection to `localhost` on port `18082` (or whatever port has been set in the settings). The Property Server will respond with its name:
 
-```
+----
 $ telnet localhost 18082
 SimHub Property Server
-```
+----
 
 Now simply send `help` in order to receive a list of subscribable properties and a list of supported commands.
 
 The following shows an example of the communication. The characters `<` and `>` are not part of the communication, they are just used in this example to illustrate what has been sent by the server (`>`) and what has been sent by the client (`<`):
 
-```
+----
 $ telnet localhost 18082
 >SimHub Property Server
 <subscribe dcp.gd.EngineIgnitionOn
@@ -47,30 +48,30 @@ $ telnet localhost 18082
 >Property dcp.gd.EngineIgnitionOn integer 1
 >Property dcp.gd.EngineIgnitionOn integer 0
 <disconnect
-```
+----
 
 In this example, the client subscribes to the ignition property and to "IsPitLimiterOrPitLane". Initially, as no game is running, both properties have a value of `null`, transmitted as `(null)`. When a game is launched, the ignition property changes to `0`, the "pitlane" property to "True", and the client receives both changes. Afterwards the ignition is toggled on and off in the game, before the client decides to `disconnect`.
 
 Property names follow the convention of SimHub, e.g. `[DataCorePlugin.GameRunning]` is called `dcp.GameRunning` in this plugin, or `[DataCorePlugin.GameData.ABSLevel]` is called `dcp.gd.ABSLevel` in this plugin.
 
 
-## Limitations
+== Limitations
 
 At the moment, there are two limitations in effect:
 
-1. The plugin will send data only at a rate of 10 Hz.
-2. Only properties of type `bool`, `int`, `long`, `float` and `double` are supported. No arrays are supported.
+. The plugin will send data only at a rate of 10 Hz.
+. Only properties of type `bool`, `int`, `long`, `float` and `double` are supported. No arrays are supported.
 
 Limitation (1) was chosen because the plugin is not meant for real time communication. If real time is a requirement, then the UDP forwarding of SimHub should be used instead.
 
 Limitation (2) could be changed, if there are requirements to read other properties. It's just a matter of implementing other data types.
 
 
-## "Help"
+== "Help"
 
 This is the current output of the command `help`:
 
-```
+----
 Available properties:
   acc.graphics.ABS integer
   acc.graphics.CarCount integer
@@ -373,9 +374,9 @@ Available commands:
   subscribe propertyName
   unsubscribe propertyName
   disconnect
-```
+----
 
 
-## Building of the plugin
+== Building of the plugin
 
-See [Building.md](doc/Building.md).
+See link:doc/Building.adoc[Building.adoc].
