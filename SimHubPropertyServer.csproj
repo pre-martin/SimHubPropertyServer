@@ -90,9 +90,9 @@
   <ItemGroup>
     <None Include="COPYING" />
     <None Include="COPYING.LESSER" />
-    <None Include="doc\Release.md" />
-    <None Include="doc\Building.md" />
-    <Content Include="README.md" />
+    <None Include="doc\Release.adoc" />
+    <None Include="doc\Building.adoc" />
+    <Content Include="README.adoc" />
     <Content Include="properties.png" />
   </ItemGroup>
   <ItemGroup>
