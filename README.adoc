@@ -1,5 +1,14 @@
 ﻿= SimHub Property Server
 :toc:
+ifdef::env-github[]
+:tip-caption: :bulb:
+endif::[]
+ifndef::env-github[]
+:tip-caption: 💡
+endif::[]
+
+TIP: Always read the *correct version* of the documentation, which matches the version of the plugin that you have installed. To do so, use the dropdown in the top left, which usually contains the value "main". Select the "tag" that matches your installed version.
+
 
 == About
 
@@ -9,9 +18,6 @@ Clients can subscribe for property changes. They will then receive updates each 
 
 One use case is the project https://github.com/pre-martin/StreamDeckSimHubPlugin[StreamDeckSimHubPlugin], which allows updating the state of Stream Deck keys via SimHub properties.
 
-== Note
-
-Always read the *correct version* of the documentation, which matches the version of the plugin that you have installed. To do so, use the dropdown in the top left, which usually contains the value "main". Select the "tag" that matches your installed version.
 
 == Installation
 
