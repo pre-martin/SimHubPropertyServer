@@ -22,6 +22,7 @@ namespace SimHub.Plugins.PropertyServer.Comm
         private TcpListener _tcpListener;
         private long _running;
         private readonly List<Client> _clients = new List<Client>();
+        private readonly ISimHub _simHub;
         private readonly SubscriptionManager _subscriptionManager;
         private readonly int _port;
 
@@ -31,8 +32,9 @@ namespace SimHub.Plugins.PropertyServer.Comm
             set => Interlocked.Exchange(ref _running, Convert.ToInt64(value));
         }
 
-        public Server(SubscriptionManager subscriptionManager, int port)
+        public Server(ISimHub simHub, SubscriptionManager subscriptionManager, int port)
         {
+            _simHub = simHub;
             _subscriptionManager = subscriptionManager;
             _port = port;
         }
@@ -54,7 +56,7 @@ namespace SimHub.Plugins.PropertyServer.Comm
                     var tcpClient = await _tcpListener.AcceptTcpClientAsync();
                     LogicalThreadContext.Properties["client"] = Interlocked.Increment(ref _clientId);
                     Log.Info($"New connection from client {tcpClient.Client.RemoteEndPoint}");
-                    var client = new Client(_subscriptionManager, tcpClient);
+                    var client = new Client(_simHub, _subscriptionManager, tcpClient);
                     _clients.Add(client);
                     var clientTask = client.Start(_cts.Token);
 
