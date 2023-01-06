@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.props" Condition="Exists('packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.props')" />
+  <Import Project="..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.props" Condition="Exists('..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,6 +12,8 @@
     <AssemblyName>PropertyServer</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,24 +49,23 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="GameReaderCommon">
-      <HintPath>SimHub\GameReaderCommon.dll</HintPath>
+      <HintPath>..\SimHub\GameReaderCommon.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="log4net">
-      <HintPath>SimHub\log4net.dll</HintPath>
+      <HintPath>..\SimHub\log4net.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="SimHub.Plugins">
-      <HintPath>SimHub\SimHub.Plugins.dll</HintPath>
+      <HintPath>..\SimHub\SimHub.Plugins.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="SimHub.Plugins">
-      <HintPath>SimHub\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\SimHub\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -75,7 +76,8 @@
     <Compile Include="Property\PropertySource.cs" />
     <Compile Include="Property\SimHubProperty.cs" />
     <Compile Include="RawDataManager.cs" />
-    <Compile Include="Server.cs" />
+    <Compile Include="Comm\Client.cs" />
+    <Compile Include="Comm\Server.cs" />
     <Compile Include="Settings\GeneralSettings.cs" />
     <Compile Include="Settings\LogLevelSetting.cs" />
     <Compile Include="SubscriptionManager.cs" />
@@ -88,11 +90,7 @@
     <Page Include="Ui\SettingsControl.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="COPYING" />
-    <None Include="COPYING.LESSER" />
-    <None Include="doc\Release.adoc" />
-    <None Include="doc\Building.adoc" />
-    <Content Include="README.adoc" />
+    <Content Include=".gitignore" />
     <Content Include="properties.png" />
   </ItemGroup>
   <ItemGroup>
@@ -106,8 +104,8 @@
     <PropertyGroup>
       <ErrorText>Dieses Projekt verweist auf mindestens ein NuGet-Paket, das auf diesem Computer fehlt. Verwenden Sie die Wiederherstellung von NuGet-Paketen, um die fehlenden Dateien herunterzuladen. Weitere Informationen finden Sie unter "http://go.microsoft.com/fwlink/?LinkID=322105". Die fehlende Datei ist "{0}".</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.props'))" />
-    <Error Condition="!Exists('packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.targets'))" />
+    <Error Condition="!Exists('..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.props'))" />
+    <Error Condition="!Exists('..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.targets'))" />
   </Target>
-  <Import Project="packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.targets" Condition="Exists('packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.targets')" />
+  <Import Project="..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.targets')" />
 </Project>

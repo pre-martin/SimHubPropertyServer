@@ -11,6 +11,7 @@ using log4net;
 using log4net.Appender;
 using log4net.Layout;
 using log4net.Repository.Hierarchy;
+using SimHub.Plugins.PropertyServer.Comm;
 using SimHub.Plugins.PropertyServer.Property;
 using SimHub.Plugins.PropertyServer.Settings;
 using SimHub.Plugins.PropertyServer.Ui;

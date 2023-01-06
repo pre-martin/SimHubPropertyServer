@@ -1,8 +1,7 @@
-/bin
-/obj
-/packages
 /.idea
+/*.DotSettings.user
+
+/packages
 
 /SimHub
-/SimHubPropertyServer.sln.DotSettings.user
 /*.bat
