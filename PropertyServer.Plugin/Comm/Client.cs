@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using log4net;
 using SimHub.Plugins.PropertyServer.Property;
 
-namespace SimHub.Plugins.PropertyServer
+namespace SimHub.Plugins.PropertyServer.Comm
 {
     /// <summary>
     /// This class represents a connected client.

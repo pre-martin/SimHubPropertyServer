@@ -9,8 +9,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using log4net;
 
-namespace SimHub.Plugins.PropertyServer
+namespace SimHub.Plugins.PropertyServer.Comm
 {
+    /// <summary>
+    /// Server listening for TCP connections and dispatching them to <c>Client</c> objects.
+    /// </summary>
     public class Server
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(Server));
