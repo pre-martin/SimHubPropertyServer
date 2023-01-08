@@ -30,6 +30,7 @@ namespace SimHub.Plugins.PropertyServer
         private readonly SubscriptionManager _subscriptionManager = new SubscriptionManager();
         private FieldInfo _rawField;
         private readonly RawDataManager _rawDataManager = new RawDataManager();
+        private readonly ShakeItBassAccessor _shakeItBassAccessor = new ShakeItBassAccessor();
         private int _unhandledExceptionCount;
 
         public PluginManager PluginManager { get; set; }
@@ -57,6 +58,8 @@ namespace SimHub.Plugins.PropertyServer
             namespaceLogger.Level = _settings.LogLevel.ToLog4Net();
 
             Log.Info($"Starting plugin, version {ThisAssembly.AssemblyFileVersion}");
+
+            _shakeItBassAccessor.Init(pluginManager);
 
             // Move execution of server into a new task/thread (away from SimHub thread). The server is async, but we
             // do not want to put any unnecessary load onto the SimHub thread.
@@ -122,6 +125,8 @@ namespace SimHub.Plugins.PropertyServer
                 rawData = _rawField.GetValue(data.NewData);
             }
             _rawDataManager.UpdateObjects(rawData);
+
+            var currentProfile = _shakeItBassAccessor.CurrentProfile();
 
             var properties = _subscriptionManager.GetProperties().Result;
             foreach (var simHubProperty in properties.Values)

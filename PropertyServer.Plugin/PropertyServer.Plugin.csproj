@@ -80,6 +80,7 @@
     <Compile Include="Comm\Server.cs" />
     <Compile Include="Settings\GeneralSettings.cs" />
     <Compile Include="Settings\LogLevelSetting.cs" />
+    <Compile Include="ShakeItBassAccessor.cs" />
     <Compile Include="SubscriptionManager.cs" />
     <Compile Include="Ui\IpPortValidationRule.cs" />
     <Compile Include="Ui\RelayCommand.cs" />
