@@ -379,6 +379,7 @@ Available properties:
 Available commands:
   subscribe propertyName
   unsubscribe propertyName
+  trigger-input inputName
   disconnect
 ----
 
