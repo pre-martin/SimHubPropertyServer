@@ -21,7 +21,7 @@ namespace SimHub.Plugins.PropertyServer
     [PluginName("Property Server")]
     [PluginAuthor("Martin Renner")]
     [PluginDescription("Provides a network server for read access to game properties - v" + ThisAssembly.AssemblyFileVersion)]
-    public class PropertyServerPlugin : IDataPlugin, IWPFSettingsV2
+    public class PropertyServerPlugin : IDataPlugin, IWPFSettingsV2, ISimHub, IInputPlugin
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PropertyServerPlugin));
         private GeneralSettings _settings = new GeneralSettings();
@@ -60,7 +60,7 @@ namespace SimHub.Plugins.PropertyServer
 
             // Move execution of server into a new task/thread (away from SimHub thread). The server is async, but we
             // do not want to put any unnecessary load onto the SimHub thread.
-            _server = new Server(_subscriptionManager, _settings.Port);
+            _server = new Server(this, _subscriptionManager, _settings.Port);
             Task.Run(_server.Start);
         }
 
@@ -168,5 +168,11 @@ namespace SimHub.Plugins.PropertyServer
         public ImageSource PictureIcon => this.ToIcon(Properties.Resources.properties);
 
         public string LeftMenuTitle => "Property Server";
+
+        public void TriggerInput(string inputName)
+        {
+            Log.Info($"Sending trigger input: {inputName}");
+            PluginManager.TriggerInput(inputName, typeof(PropertyServerPlugin), PressType.Default);
+        }
     }
 }
