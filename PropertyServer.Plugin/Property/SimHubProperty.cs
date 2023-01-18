@@ -108,6 +108,8 @@ namespace SimHub.Plugins.PropertyServer.Property
                     return "double";
                 case "System.Double":
                     return "double";
+                case "System.Object":
+                    return "object";
                 default:
                     return "(unknown)";
             }
@@ -183,6 +185,30 @@ namespace SimHub.Plugins.PropertyServer.Property
         protected override Type GetPropertyType()
         {
             return _methodInfo.ReturnType;
+        }
+    }
+
+    /// <summary>
+    /// This is a simple delegate that tries to retrieve the property value directly from the PluginManager.
+    /// </summary>
+    /// <remarks>
+    /// This method is much slower than the other property implementations. Use it only if the property is not available through
+    /// the other implementations.
+    /// </remarks>
+    public class SimHubPropertyGeneric : SimHubProperty
+    {
+        public SimHubPropertyGeneric(string propertyName) : base(PropertySource.Generic, propertyName)
+        {
+        }
+
+        protected override object GetValue(object obj)
+        {
+            return obj is PluginManager pm ? pm.GetPropertyValue(Name) : null;
+        }
+
+        protected override Type GetPropertyType()
+        {
+            return typeof(object);
         }
     }
 }
