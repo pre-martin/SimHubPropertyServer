@@ -1,5 +1,6 @@
 ﻿= SimHub Property Server
 :toc:
+:sectnums:
 ifdef::env-github[]
 :tip-caption: :bulb:
 endif::[]
@@ -14,7 +15,7 @@ TIP: Always read the *correct version* of the documentation, which matches the v
 
 This is a plugin for https://www.simhubdash.com/[SimHub]. It allows access to SimHub properties via a tcp connection.
 
-Clients can subscribe for property changes. They will then receive updates each time, when the value of a subscribed property changes. 
+Clients can subscribe for property changes. They will then receive updates each time, when the value of a subscribed property changes.
 
 One use case is the project https://github.com/pre-martin/StreamDeckSimHubPlugin[StreamDeckSimHubPlugin], which allows updating the state of Stream Deck keys via SimHub properties.
 
@@ -25,10 +26,14 @@ Simply copy the file `PropertyServer.dll` into the root directory of your SimHub
 
 Optionally, the checkbox "_Show in left menu_" can be activated. This will show an entry named "_Property Server_" in the left menu bar, which allows to adjust the settings of the plugin. If "_Show in left menu_" is not enabled, the settings of the plugin can be found under "_Additional Plugins_ > _Property Server_".
 
-After installation, the checkbox "_Show in left menu_" can be found under "_Settings_ > _Plugins_". 
+After installation, the checkbox "_Show in left menu_" can be found under "_Settings_ > _Plugins_".
 
 
 == Usage
+
+If you are an end user, you can skip this section and jump to the https://github.com/pre-martin/StreamDeckSimHubPlugin[StreamDeckSimHubPlugin]. But make sure you read the section <<available-props-help>>, because it contains important information about the SimHub properties you can use.
+
+=== Connection
 
 Open a telnet connection to `localhost` on port `18082` (or whatever port has been set in the settings). The Property Server will respond with its name:
 
@@ -38,6 +43,8 @@ SimHub Property Server
 ----
 
 Now simply send `help` in order to receive a list of subscribable properties and a list of supported commands.
+
+=== Example
 
 The following shows an example of the communication. The characters `<` and `>` are not part of the communication, they are just used in this example to illustrate what has been sent by the server (`>`) and what has been sent by the client (`<`):
 
@@ -66,14 +73,61 @@ Property names follow the convention of SimHub, e.g. `[DataCorePlugin.GameRunnin
 At the moment, there are two limitations in effect:
 
 . The plugin will send data only at a rate of 10 Hz.
-. Only properties of type `bool`, `int`, `long`, `float` and `double` are supported. No arrays are supported.
+. Only properties of the types `bool`, `int`, `long`, `float` and `double` are supported. No compound types and no arrays.
 
 Limitation (1) was chosen because the plugin is not meant for real time communication. If real time is a requirement, then the UDP forwarding of SimHub should be used instead.
 
 Limitation (2) could be changed, if there are requirements to read other properties. It's just a matter of implementing other data types.
 
 
-== "Help"
+[#available-props-help]
+== Available properties and "Help"
+
+=== Different sources of data
+
+This plugin allows access to SimHub properties of different sources. These sources are distinguished by property name prefixes:
+
+==== Prefix `dcp.*`
+
+This prefix is mapped to a subset of the SimHub properties found in SimHub under "Available properties" in the section "DataCorePlugin". The available properties are listed in the section <<help>>.
+
+This is the best performing option and the properties are returned in a typed manner (e.g. as `int` or `double`). This option should be preferred over the "generic" properties (see below).
+
+To make the property names even shorter, the prefix `dcp.gd.\*` must be used to access properties which start with `DataCorePlugin.GameData.*`.
+
+- Example 1: `dcp.GameRunning` must be used to access the SimHub property `DataCorePlugin.GameRunning` +
+- Example 2: `dcp.gd.Brake` must be used to access the SimHub property `DataCorePlugin.GameData.Brake`
+
+==== Prefix `acc.*`
+
+This prefix is mapped to raw data properties from Assetto Corsa Competizione. The available properties are listed below in the section <<help>>.
+
+Properties with this prefix perform as well as properties with the prefix `dcp` and they are also typed - just as `dcp` properties.
+
+==== No prefix, also known as "Generic" properties
+
+If a property name does not start with one of the prefixes listed above, then a generic access is used. This allows access to almost all properties of SimHub.
+
+The number of available properties depends on the plugins that are enabled in SimHub, but in a usual setup there should be around 2000 properties available - including custom properties exported by NCalc scripts.
+
+These properties are not listed in the section <<help>>! Just search the properties you are interested in in SimHub under "Available properties" and use the "Copy name" function from the context menu.
+
+The downsides of generic properties are:
+
+- Access is a little bit slower (but that shouldn't be a problem - it's fractions of a millisecond)
+- These properties are not typed - they are just returned as `object`.
+
+The consequence of this second point is that client applications have to take care of the interpretation of the values themselves. Therefore the other prefixes should be used, if possible.
+
+- Example 1: `ShakeItWindPlugin.DynamicGain` allows access to just this property
+- Example 2: `SystemInfoPlugin.CPULoadPercent` allows access to just this property
+- Example 3: Of course, names like `DataCorePlugin.GameData.Brake` can be used. But consider using `dcp.gd.Brake` instead (for the reasons mentioned above)
+- Example 4: Your SimHub installation contains an NCalc script example in the file `<SimHub>\NCalcScripts\samples.ini`, which exports the properties `DataCorePlugin.ExternalScript.BlinkingGear` and `DataCorePlugin.ExternalScript.BlinkingGearUP`. These custom properties can be accessed just by exactly these names. +
+  This allows you to convert values inside of SimHub with the help of NCalc for usage in external applications.
+
+
+[#help,reftext=Help]
+=== "Help"
 
 This is the current output of the command `help`:
 

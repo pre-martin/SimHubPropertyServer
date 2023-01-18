@@ -29,8 +29,12 @@ namespace SimHub.Plugins.PropertyServer.Property
         /// <summary>
         /// Assetto Corsa Competizione - Rawdata "Physics"
         /// </summary>
-        AccPhysics
+        AccPhysics,
 
+        /// <summary>
+        /// Generic access to a property via PluginManager.
+        /// </summary>
+        Generic
     }
 
     public static class PropertySourceEx
@@ -51,6 +55,8 @@ namespace SimHub.Plugins.PropertyServer.Property
                     return Type.GetType("ACSharedMemory.ACC.MMFModels.Graphics, ACSharedMemory");
                 case PropertySource.AccPhysics:
                     return Type.GetType("ACSharedMemory.ACC.MMFModels.Physics, ACSharedMemory");
+                case PropertySource.Generic:
+                    return typeof(PluginManager);
                 default:
                     throw new ArgumentException($"Unknown PropertySource {propertySource}");
             }
@@ -71,6 +77,8 @@ namespace SimHub.Plugins.PropertyServer.Property
                     return "acc.graphics";
                 case PropertySource.AccPhysics:
                     return "acc.physics";
+                case PropertySource.Generic:
+                    return "";
                 default:
                     throw new ArgumentException($"Unknown PropertySource {propertySource}");
             }
