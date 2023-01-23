@@ -43,9 +43,10 @@ namespace SimHub.Plugins.PropertyServer.Property
 
             if (source == null)
             {
-                Log.Info($"Property {propertyName} does not start with a known source prefix");
-                await errorCallback.Invoke($"Property {propertyName} does not start with a known source prefix");
-                return null;
+                Log.Info($"Property {propertyName} does not start with a known source prefix. Treating as generic property.");
+                // We do not check if this property really exists (e.g. PluginManager.GetAllPropertyNames()), because properties
+                // can be added and removed dynamically.
+                return new SimHubPropertyGeneric(propertyName);
             }
 
             var simHubProperty = await CreateProperty(source.Value, propertyName, errorCallback);
@@ -93,6 +94,7 @@ namespace SimHub.Plugins.PropertyServer.Property
             // Is it a property of type "getter"?
             Log.Debug($"Trying to find property {name} in {source}");
             var plainName = name.Contains('.') ? name.Substring(source.GetPropertyPrefix().Length + 1) : name;
+
             var propertyInfo = source.GetPropertySourceType().GetProperty(plainName);
             if (propertyInfo != null)
             {
@@ -145,7 +147,9 @@ namespace SimHub.Plugins.PropertyServer.Property
         {
             var result = new List<SimHubProperty>();
 
-            var sources = Enum.GetValues(typeof(PropertySource)).Cast<PropertySource>();
+            // Iterate over all known PropertySources and determine the accessible properties.
+            // But we really don't want to iterate on Generic properties.
+            var sources = Enum.GetValues(typeof(PropertySource)).Cast<PropertySource>().Where(source => source != PropertySource.Generic);
             foreach (var source in sources)
             {
                 var availableProperties = source.GetPropertySourceType().GetProperties();

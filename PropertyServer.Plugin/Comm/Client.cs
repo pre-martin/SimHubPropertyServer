@@ -19,6 +19,7 @@ namespace SimHub.Plugins.PropertyServer.Comm
     public class Client
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(Client));
+        private readonly ISimHub _simHub;
         private readonly SubscriptionManager _subscriptionManager;
         private readonly HashSet<string> _mySubscriptions = new HashSet<string>();
         private readonly TcpClient _tcpClient;
@@ -31,10 +32,11 @@ namespace SimHub.Plugins.PropertyServer.Comm
             set => Interlocked.Exchange(ref _running, Convert.ToInt64(value));
         }
 
-        public Client(SubscriptionManager subscriptionManager, TcpClient tcpClient)
+        public Client(ISimHub simHub, SubscriptionManager subscriptionManager, TcpClient tcpClient)
         {
+            _simHub = simHub;
             _subscriptionManager = subscriptionManager;
-            this._tcpClient = tcpClient;
+            _tcpClient = tcpClient;
         }
 
         public async Task Start(CancellationToken token)
@@ -104,6 +106,15 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
                     await Unsubscribe(lineItems[1]);
                     return;
+                case "trigger-input":
+                    if (lineItems.Length != 2)
+                    {
+                        Log.Warn($"Invalid 'trigger-input' command, wrong number of arguments: {line}");
+                        await SendError("Invalid 'trigger-input' command, wrong number of arguments");
+                        return;
+                    }
+                    TriggerInput(lineItems[1]);
+                    return;
                 case "help":
                     await Help();
                     return;
@@ -136,6 +147,11 @@ namespace SimHub.Plugins.PropertyServer.Comm
             }
         }
 
+        private void TriggerInput(string inputName)
+        {
+            _simHub.TriggerInput(inputName);
+        }
+
         private async Task Help()
         {
             var propertyList = PropertyAccessor.GetAvailableProperties();
@@ -148,6 +164,7 @@ namespace SimHub.Plugins.PropertyServer.Comm
             await SendString("Available commands:");
             await SendString("  subscribe propertyName");
             await SendString("  unsubscribe propertyName");
+            await SendString("  trigger-input inputName");
             await SendString("  disconnect");
         }
 
