@@ -2,6 +2,7 @@
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -14,6 +15,7 @@ using log4net.Repository.Hierarchy;
 using SimHub.Plugins.PropertyServer.Comm;
 using SimHub.Plugins.PropertyServer.Property;
 using SimHub.Plugins.PropertyServer.Settings;
+using SimHub.Plugins.PropertyServer.ShakeIt;
 using SimHub.Plugins.PropertyServer.Ui;
 
 namespace SimHub.Plugins.PropertyServer
@@ -126,8 +128,6 @@ namespace SimHub.Plugins.PropertyServer
             }
             _rawDataManager.UpdateObjects(rawData);
 
-            var currentProfile = _shakeItBassAccessor.CurrentProfile();
-
             var properties = _subscriptionManager.GetProperties().Result;
             foreach (var simHubProperty in properties.Values)
             {
@@ -181,6 +181,11 @@ namespace SimHub.Plugins.PropertyServer
         {
             Log.Info($"Sending trigger input: {inputName}");
             PluginManager.TriggerInput(inputName, typeof(PropertyServerPlugin), PressType.Default);
+        }
+
+        public IEnumerable<Profile> ShakeItBassStructure()
+        {
+            return _shakeItBassAccessor.Profiles();
         }
     }
 }
