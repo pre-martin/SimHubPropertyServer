@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using log4net;
+using SimHub.Plugins.PropertyServer.ShakeIt;
 
 namespace SimHub.Plugins.PropertyServer.Property
 {
@@ -209,6 +211,65 @@ namespace SimHub.Plugins.PropertyServer.Property
         protected override Type GetPropertyType()
         {
             return typeof(object);
+        }
+    }
+
+    /// <summary>
+    /// A property which is mapped on a special view of all available ShakeIt Bass effect groups and effects.
+    /// </summary>
+    /// <remarks>
+    /// The special view is defined by the classes in the namespace <see cref="ShakeIt"/>.
+    /// </remarks>
+    public class SimHubPropertyShakeItBass : SimHubProperty
+    {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(SimHubPropertyShakeItBass));
+        private readonly Guid _guid;
+        private readonly Property _property;
+
+        public enum Property
+        {
+            Gain,
+            IsMuted
+        }
+
+        public SimHubPropertyShakeItBass(string propertyName, Guid guid, Property property) : base(PropertySource.ShakeItBass, propertyName)
+        {
+            _guid = guid;
+            _property = property;
+        }
+
+        protected override object GetValue(object obj)
+        {
+            if (obj is ShakeItBassAccessor accessor)
+            {
+                var effect = accessor.FindEffect(_guid);
+                if (effect == null) return null;
+
+                switch (_property)
+                {
+                    case Property.Gain:
+                        return effect.Gain;
+                    case Property.IsMuted:
+                        return effect.IsMuted;
+                    default:
+                        return null;
+                }
+            }
+
+            return null;
+        }
+
+        protected override Type GetPropertyType()
+        {
+            switch (_property)
+            {
+                case Property.Gain:
+                    return typeof(double);
+                case Property.IsMuted:
+                    return typeof(bool);
+                default:
+                    return typeof(object);
+            }
         }
     }
 }

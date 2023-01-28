@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace SimHub.Plugins.PropertyServer.ShakeIt
 {
     /// <summary>
-    /// View on the class ShakeIt Bass GroupContainer.
+    /// View on the class ShakeIt Bass Profile.
     /// </summary>
     public class Profile
     {

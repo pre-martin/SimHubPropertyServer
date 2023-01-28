@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -50,14 +51,6 @@ namespace SimHub.Plugins.PropertyServer.Property
             }
 
             var simHubProperty = await CreateProperty(source.Value, propertyName, errorCallback);
-            if (simHubProperty == null)
-            {
-                // Property does not exist.
-                Log.Info($"Property {propertyName} is unknown");
-                await errorCallback.Invoke($"Property {propertyName} is unknown");
-                return null;
-            }
-
             return simHubProperty;
         }
 
@@ -91,10 +84,58 @@ namespace SimHub.Plugins.PropertyServer.Property
         /// </summary>
         private static async Task<SimHubProperty> CreateProperty(PropertySource source, string name, Func<string, Task> errorCallback)
         {
-            // Is it a property of type "getter"?
-            Log.Debug($"Trying to find property {name} in {source}");
+            // TODO this method is too complex. Refactor me, please!
+
+            Log.Debug($"Creating property instance for property {name} in {source}");
             var plainName = name.Contains('.') ? name.Substring(source.GetPropertyPrefix().Length + 1) : name;
 
+            // Is it a "ShakeIt Bass" property?
+            if (source == PropertySource.ShakeItBass)
+            {
+                // Format of "name" is <prefix>.<guid>.<property>
+                var propertyOffset = plainName.IndexOf('.');
+                if (propertyOffset < 0 || propertyOffset + 1 >= plainName.Length)
+                {
+                    Log.Info($"Property {name} is not in the expected format {source.GetPropertyPrefix()}.<guid>.<property>");
+                    await errorCallback.Invoke($"Property {name} is not in the expected format");
+                    return null;
+                }
+
+                // Guid
+                var guidStr = plainName.Substring(0, propertyOffset);
+                Guid guid;
+                try
+                {
+                    guid = new Guid(guidStr);
+                }
+                catch (Exception)
+                {
+                    Log.Info($"Property {name} does not contain a valid Guid");
+                    await errorCallback.Invoke($"Property {name} does not contain a valud Guid");
+                    return null;
+                }
+
+                // Property
+                var shakeItPropertyName = plainName.Substring(propertyOffset + 1);
+                SimHubPropertyShakeItBass.Property shakeItProperty;
+                switch (shakeItPropertyName.ToLower(CultureInfo.InvariantCulture))
+                {
+                    case "gain":
+                        shakeItProperty = SimHubPropertyShakeItBass.Property.Gain;
+                        break;
+                    case "ismuted":
+                        shakeItProperty = SimHubPropertyShakeItBass.Property.IsMuted;
+                        break;
+                    default:
+                        Log.Info("$Unknown ShakeIt Bass property in {name}");
+                        await errorCallback.Invoke($"Unknown ShakeIt Bass property in {name}");
+                        return null;
+                }
+
+                return new SimHubPropertyShakeItBass(name, guid, shakeItProperty);
+            }
+
+            // Is it a property of type "getter"?
             var propertyInfo = source.GetPropertySourceType().GetProperty(plainName);
             if (propertyInfo != null)
             {
@@ -137,6 +178,9 @@ namespace SimHub.Plugins.PropertyServer.Property
                 return new SimHubPropertyMethod(source, name, methodInfo);
             }
 
+            // Property does not exist.
+            Log.Info($"Property {name} is unknown");
+            await errorCallback.Invoke($"Property {name} is unknown");
             return null;
         }
 
@@ -148,8 +192,9 @@ namespace SimHub.Plugins.PropertyServer.Property
             var result = new List<SimHubProperty>();
 
             // Iterate over all known PropertySources and determine the accessible properties.
-            // But we really don't want to iterate on Generic properties.
-            var sources = Enum.GetValues(typeof(PropertySource)).Cast<PropertySource>().Where(source => source != PropertySource.Generic);
+            // But we really don't want to iterate on Generic properties or on ShakeItBass properties.
+            var sources = Enum.GetValues(typeof(PropertySource)).Cast<PropertySource>()
+                .Where(source => source != PropertySource.Generic && source != PropertySource.ShakeItBass);
             foreach (var source in sources)
             {
                 var availableProperties = source.GetPropertySourceType().GetProperties();

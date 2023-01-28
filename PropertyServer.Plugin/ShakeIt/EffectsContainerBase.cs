@@ -8,6 +8,10 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
     /// <summary>
     /// View on the class ShakeIt Bass EffectsContainerBase.
     /// </summary>
+    /// <remarks>
+    /// The corresponding SimHub class is abstract and has subclasses for each concrete effect. As we are not interested in the concrete
+    /// effects, we use this class also for the effects, as it already contains all the data we are interested in.
+    /// </remarks>
     public class EffectsContainerBase
     {
         public Guid ContainerId { get; set; }

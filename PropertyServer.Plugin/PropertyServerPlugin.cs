@@ -149,6 +149,9 @@ namespace SimHub.Plugins.PropertyServer
                     case PropertySource.Generic:
                         await simHubProperty.UpdateFromObject(PluginManager);
                         break;
+                    case PropertySource.ShakeItBass:
+                        await simHubProperty.UpdateFromObject(_shakeItBassAccessor);
+                        break;
                     default:
                         throw new ArgumentException($"Unknown PropertySource {simHubProperty.PropertySource}");
                 }

@@ -73,7 +73,7 @@ Property names follow the convention of SimHub, e.g. `[DataCorePlugin.GameRunnin
 At the moment, there are two limitations in effect:
 
 . The plugin will send data only at a rate of 10 Hz.
-. Only properties of the types `bool`, `int`, `long`, `float` and `double` are supported. No compound types and no arrays.
+. No compound types or arrays are supported.
 
 Limitation (1) was chosen because the plugin is not meant for real time communication. If real time is a requirement, then the UDP forwarding of SimHub should be used instead.
 
@@ -103,6 +103,32 @@ To make the property names even shorter, the prefix `dcp.gd.\*` must be used to 
 This prefix is mapped to raw data properties from Assetto Corsa Competizione. The available properties are listed below in the section <<help>>.
 
 Properties with this prefix perform as well as properties with the prefix `dcp` and they are also typed - just as `dcp` properties.
+
+==== Prefix `sib.*`
+
+Access to ShakeIt Bass profiles (effect groups and effects) is possible with this prefix. This prefix requires a very specific syntax:
+
+----
+sib.<guid>.gain|ismuted
+----
+
+* `<guid>` is the unique id of the effect group or effect. See output of the command `shakeit-bass-structure`: It will list all profiles, their effect groups and effects, including their guid.
+* `gain` or `ismuted` specify, which property of the effect group or effect shall be addressed.
+
+Example:
+
+----
+$ telnet localhost 18082
+>SimHub Property Server
+<shake-it-bass-structure
+>[output omitted]
+<subscribe sib.ff17edcb-c7b3-47e4-905c-a0d314447eab.gain
+>Property sib.ff17edcb-c7b3-47e4-905c-a0d314447eab.gain double 100
+<subscribe sib.ff17edcb-c7b3-47e4-905c-a0d314447eab.ismuted
+>Property sib.ff17edcb-c7b3-47e4-905c-a0d314447eab.ismuted boolean False
+----
+
+In this example, the client retrieves the structure of all ShakeIt Bass profile, their effect groups and effects. Then it subscribes to one specific entry to the value "Gain" and "IsMuted". The SimHub Property server will now send "Property" messages when these values change.
 
 ==== No prefix, also known as "Generic" properties
 

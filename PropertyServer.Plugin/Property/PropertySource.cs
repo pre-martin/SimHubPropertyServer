@@ -3,6 +3,7 @@
 
 using System;
 using GameReaderCommon;
+using SimHub.Plugins.PropertyServer.ShakeIt;
 
 namespace SimHub.Plugins.PropertyServer.Property
 {
@@ -32,9 +33,14 @@ namespace SimHub.Plugins.PropertyServer.Property
         AccPhysics,
 
         /// <summary>
-        /// Generic access to a property via PluginManager.
+        /// Generic access to a property via PluginManager. These are all properties listed in SimHub under "Available properties".
         /// </summary>
-        Generic
+        Generic,
+
+        /// <summary>
+        /// Access to a (small) subset of ShakeIt Bass data.
+        /// </summary>
+        ShakeItBass
     }
 
     public static class PropertySourceEx
@@ -57,6 +63,8 @@ namespace SimHub.Plugins.PropertyServer.Property
                     return Type.GetType("ACSharedMemory.ACC.MMFModels.Physics, ACSharedMemory");
                 case PropertySource.Generic:
                     return typeof(PluginManager);
+                case PropertySource.ShakeItBass:
+                    return typeof(ShakeItBassAccessor);
                 default:
                     throw new ArgumentException($"Unknown PropertySource {propertySource}");
             }
@@ -79,6 +87,8 @@ namespace SimHub.Plugins.PropertyServer.Property
                     return "acc.physics";
                 case PropertySource.Generic:
                     return "";
+                case PropertySource.ShakeItBass:
+                    return "sib"; // ShakeItBass
                 default:
                     throw new ArgumentException($"Unknown PropertySource {propertySource}");
             }

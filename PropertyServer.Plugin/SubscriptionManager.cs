@@ -63,7 +63,7 @@ namespace SimHub.Plugins.PropertyServer
         }
 
         /// <summary>
-        /// Ubsubscribes from a SimHub property.
+        /// Unsubscribes from a SimHub property.
         /// </summary>
         /// <param name="propertyName">The name of the SimHub property.</param>
         /// <param name="eventHandler">The handler that shall be removed from the property.</param>
