@@ -460,6 +460,7 @@ Available commands:
   subscribe propertyName
   unsubscribe propertyName
   trigger-input inputName
+  shakeit-bass-structure
   disconnect
 ----
 

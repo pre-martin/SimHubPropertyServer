@@ -194,6 +194,7 @@ namespace SimHub.Plugins.PropertyServer.Comm
             await SendString("  subscribe propertyName");
             await SendString("  unsubscribe propertyName");
             await SendString("  trigger-input inputName");
+            await SendString("  shakeit-bass-structure");
             await SendString("  disconnect");
         }
 
