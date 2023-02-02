@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using log4net;
 using SimHub.Plugins.PropertyServer.Property;
+using SimHub.Plugins.PropertyServer.ShakeIt;
 
 namespace SimHub.Plugins.PropertyServer.Comm
 {
@@ -115,6 +116,9 @@ namespace SimHub.Plugins.PropertyServer.Comm
                     }
                     TriggerInput(lineItems[1]);
                     return;
+                case "shakeit-bass-structure":
+                    await ShakeItBassStructure();
+                    return;
                 case "help":
                     await Help();
                     return;
@@ -152,6 +156,31 @@ namespace SimHub.Plugins.PropertyServer.Comm
             _simHub.TriggerInput(inputName);
         }
 
+        private async Task ShakeItBassStructure()
+        {
+            await SendString("ShakeIt Bass structure");
+            var profiles = _simHub.ShakeItBassStructure();
+            // Send structure, profile by profile.
+            foreach (var profile in profiles)
+            {
+                await SendString($"0: {profile.Id} {profile.GetType().Name} {profile.Name}");
+                await SendEffects(1, profile.EffectsContainers);
+            }
+        }
+
+        private async Task SendEffects(int depth, IEnumerable<EffectsContainerBase> profileEffectsContainers)
+        {
+            foreach (var ecb in profileEffectsContainers)
+            {
+                var indent = new string(' ', depth * 2);
+                await SendString($"{indent}{depth}: {ecb.ContainerId} {ecb.GetType().Name} {ecb.FullName()}");
+                if (ecb is GroupContainer groupContainer)
+                {
+                    await SendEffects(depth + 1, groupContainer.EffectsContainers);
+                }
+            }
+        }
+
         private async Task Help()
         {
             var propertyList = PropertyAccessor.GetAvailableProperties();
@@ -165,6 +194,7 @@ namespace SimHub.Plugins.PropertyServer.Comm
             await SendString("  subscribe propertyName");
             await SendString("  unsubscribe propertyName");
             await SendString("  trigger-input inputName");
+            await SendString("  shakeit-bass-structure");
             await SendString("  disconnect");
         }
 

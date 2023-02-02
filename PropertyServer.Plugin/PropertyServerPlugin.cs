@@ -2,6 +2,7 @@
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -14,6 +15,7 @@ using log4net.Repository.Hierarchy;
 using SimHub.Plugins.PropertyServer.Comm;
 using SimHub.Plugins.PropertyServer.Property;
 using SimHub.Plugins.PropertyServer.Settings;
+using SimHub.Plugins.PropertyServer.ShakeIt;
 using SimHub.Plugins.PropertyServer.Ui;
 
 namespace SimHub.Plugins.PropertyServer
@@ -30,6 +32,7 @@ namespace SimHub.Plugins.PropertyServer
         private readonly SubscriptionManager _subscriptionManager = new SubscriptionManager();
         private FieldInfo _rawField;
         private readonly RawDataManager _rawDataManager = new RawDataManager();
+        private readonly ShakeItBassAccessor _shakeItBassAccessor = new ShakeItBassAccessor();
         private int _unhandledExceptionCount;
 
         public PluginManager PluginManager { get; set; }
@@ -57,6 +60,8 @@ namespace SimHub.Plugins.PropertyServer
             namespaceLogger.Level = _settings.LogLevel.ToLog4Net();
 
             Log.Info($"Starting plugin, version {ThisAssembly.AssemblyFileVersion}");
+
+            _shakeItBassAccessor.Init(pluginManager);
 
             // Move execution of server into a new task/thread (away from SimHub thread). The server is async, but we
             // do not want to put any unnecessary load onto the SimHub thread.
@@ -144,6 +149,9 @@ namespace SimHub.Plugins.PropertyServer
                     case PropertySource.Generic:
                         await simHubProperty.UpdateFromObject(PluginManager);
                         break;
+                    case PropertySource.ShakeItBass:
+                        await simHubProperty.UpdateFromObject(_shakeItBassAccessor);
+                        break;
                     default:
                         throw new ArgumentException($"Unknown PropertySource {simHubProperty.PropertySource}");
                 }
@@ -176,6 +184,11 @@ namespace SimHub.Plugins.PropertyServer
         {
             Log.Info($"Sending trigger input: {inputName}");
             PluginManager.TriggerInput(inputName, typeof(PropertyServerPlugin), PressType.Default);
+        }
+
+        public IEnumerable<Profile> ShakeItBassStructure()
+        {
+            return _shakeItBassAccessor.Profiles();
         }
     }
 }

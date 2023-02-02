@@ -81,6 +81,11 @@
     <Compile Include="Comm\Server.cs" />
     <Compile Include="Settings\GeneralSettings.cs" />
     <Compile Include="Settings\LogLevelSetting.cs" />
+    <Compile Include="ShakeIt\Converter.cs" />
+    <Compile Include="ShakeIt\EffectsContainerBase.cs" />
+    <Compile Include="ShakeIt\GroupContainer.cs" />
+    <Compile Include="ShakeIt\Profile.cs" />
+    <Compile Include="ShakeIt\ShakeItBassAccessor.cs" />
     <Compile Include="SubscriptionManager.cs" />
     <Compile Include="Ui\IpPortValidationRule.cs" />
     <Compile Include="Ui\RelayCommand.cs" />
