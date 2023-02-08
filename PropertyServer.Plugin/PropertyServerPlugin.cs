@@ -186,7 +186,7 @@ namespace SimHub.Plugins.PropertyServer
             PluginManager.TriggerInput(inputName, typeof(PropertyServerPlugin), PressType.Default);
         }
 
-        public IEnumerable<Profile> ShakeItBassStructure()
+        public ICollection<Profile> ShakeItBassStructure()
         {
             return _shakeItBassAccessor.Profiles();
         }
