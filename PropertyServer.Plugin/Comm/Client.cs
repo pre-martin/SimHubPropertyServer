@@ -166,6 +166,8 @@ namespace SimHub.Plugins.PropertyServer.Comm
                 await SendString($"0: {profile.Id} {profile.GetType().Name} {profile.Name}");
                 await SendEffects(1, profile.EffectsContainers);
             }
+            await SendString("End");
+            Log.Info($"Sent ShakeIt Bass structure with {profiles.Count()} profiles to client");
         }
 
         private async Task SendEffects(int depth, IEnumerable<EffectsContainerBase> profileEffectsContainers)

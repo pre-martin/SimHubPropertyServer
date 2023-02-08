@@ -63,7 +63,7 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
         /// We convert the ShakeIt Bass internal classes into our own view, in order to be independent of ShakeIt Bass implementation
         /// details. The returned view is not bound to the underlying objects, so calling "setters" will not reflect the changes.
         /// </remarks>
-        public IEnumerable<Profile> Profiles()
+        public ICollection<Profile> Profiles()
         {
             var simHubProfiles = SimHubProfiles();
             return simHubProfiles.Select(ConvertProfile).ToList();

@@ -19,6 +19,6 @@ namespace SimHub.Plugins.PropertyServer
         /// <summary>
         /// Returns the structure of the ShakeIt Bass configuration (profiles with effect groups and effects).
         /// </summary>
-        IEnumerable<Profile> ShakeItBassStructure();
+        ICollection<Profile> ShakeItBassStructure();
     }
 }
