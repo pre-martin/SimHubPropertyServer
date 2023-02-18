@@ -120,7 +120,11 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
 
                 if (simHubEffectsContainerBase is DataPlugins.ShakeItV3.EffectsContainers.GroupContainer simHubGroupContainer)
                 {
-                    return FindEffect(simHubGroupContainer.EffectsContainers, guid);
+                    var result = FindEffect(simHubGroupContainer.EffectsContainers, guid);
+                    if (result != null)
+                    {
+                        return result;
+                    }
                 }
 
             }
