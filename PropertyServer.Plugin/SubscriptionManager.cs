@@ -26,8 +26,8 @@ namespace SimHub.Plugins.PropertyServer
         /// <param name="propertyName">The name of the SimHub property. See class <c>GameReaderCommon.StatusDataBase</c>.</param>
         /// <param name="eventHandler">This handler will be called when the value of the property has changed.</param>
         /// <param name="errorCallback">Will be called if the subscription was not possible.</param>
-        /// <returns><c>true</c> if the subscription was successful.</returns>
-        public async Task<bool> Subscribe(
+        /// <returns>An existing or a newly created instance of SimHubProperty, or <c>null</c>.</returns>
+        public async Task<SimHubProperty> Subscribe(
             string propertyName,
             Func<ValueChangedEventArgs, Task> eventHandler,
             Func<string, Task> errorCallback)
@@ -42,19 +42,19 @@ namespace SimHub.Plugins.PropertyServer
                     Log.Info(
                         $"Added subscription to existing property {propertyName} (has now {property.SubscriberCount} subscriptions)");
                     await eventHandler.Invoke(new ValueChangedEventArgs(property));
-                    return true;
+                    return property;
                 }
 
                 // Create a new property instance.
                 property = await PropertyAccessor.CreateProperty(propertyName, errorCallback);
-                if (property == null) return false;
+                if (property == null) return null;
 
                 Log.Info($"Created new property {propertyName}");
                 await property.AddSubscriber(eventHandler);
                 _properties[propertyName] = property;
                 // Send "null" to client. If no sim is running, the first regular update could take some time.
                 await eventHandler.Invoke(new ValueChangedEventArgs(property));
-                return true;
+                return property;
             }
             finally
             {

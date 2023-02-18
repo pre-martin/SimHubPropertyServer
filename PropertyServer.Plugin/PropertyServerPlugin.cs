@@ -190,5 +190,10 @@ namespace SimHub.Plugins.PropertyServer
         {
             return _shakeItBassAccessor.Profiles();
         }
+
+        public EffectsContainerBase FindShakeItBassEffect(Guid id)
+        {
+            return _shakeItBassAccessor.FindEffect(id);
+        }
     }
 }
