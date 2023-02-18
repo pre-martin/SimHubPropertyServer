@@ -132,6 +132,7 @@ namespace SimHub.Plugins.PropertyServer.Property
                         return null;
                 }
 
+                // We do not check, if this property really exists!
                 return new SimHubPropertyShakeItBass(name, guid, shakeItProperty);
             }
 

@@ -223,7 +223,7 @@ namespace SimHub.Plugins.PropertyServer.Property
     public class SimHubPropertyShakeItBass : SimHubProperty
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(SimHubPropertyShakeItBass));
-        private readonly Guid _guid;
+        public Guid Guid { get; }
         private readonly Property _property;
 
         public enum Property
@@ -234,7 +234,7 @@ namespace SimHub.Plugins.PropertyServer.Property
 
         public SimHubPropertyShakeItBass(string propertyName, Guid guid, Property property) : base(PropertySource.ShakeItBass, propertyName)
         {
-            _guid = guid;
+            Guid = guid;
             _property = property;
         }
 
@@ -242,7 +242,7 @@ namespace SimHub.Plugins.PropertyServer.Property
         {
             if (obj is ShakeItBassAccessor accessor)
             {
-                var effect = accessor.FindEffect(_guid);
+                var effect = accessor.FindEffect(Guid);
                 if (effect == null) return null;
 
                 switch (_property)

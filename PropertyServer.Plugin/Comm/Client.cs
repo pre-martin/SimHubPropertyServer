@@ -133,8 +133,17 @@ namespace SimHub.Plugins.PropertyServer.Comm
         {
             if (_mySubscriptions.Contains(propertyName)) return;
 
-            var result = await _subscriptionManager.Subscribe(propertyName, ValueChanged, SendError);
-            if (result)
+            var property = await _subscriptionManager.Subscribe(propertyName, ValueChanged, SendError);
+            // We have to check here (outside the SubscriptionManager) if the ShakeIt Bass element exists.
+            if (property is SimHubPropertyShakeItBass bassProp)
+            {
+                if (_simHub.FindShakeItBassEffect(bassProp.Guid) == null)
+                {
+                    Log.Warn($"ShakeIt Bass effect or effect group with {bassProp.Guid} does not exist");
+                }
+            }
+
+            if (property != null)
             {
                 _mySubscriptions.Add(propertyName);
             }
