@@ -26,7 +26,7 @@
         <local-Util:BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
     </simplechildwindow:ChildWindow.Resources>
 
-    <Grid Width="600" Height="650" Margin="8">
+    <Grid Width="800" MinHeight="450" MaxHeight="650" Margin="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
@@ -67,14 +67,14 @@
                 <GroupStyle>
                     <GroupStyle.HeaderTemplate>
                         <DataTemplate>
-                            <Label Content="{Binding Name}"></Label>
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
                         </DataTemplate>
                     </GroupStyle.HeaderTemplate>
                 </GroupStyle>
             </ItemsControl.GroupStyle>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Label Content="{Binding RecursiveName}"></Label>
+                    <TextBlock Text="{Binding RecursiveName}"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ListBox>

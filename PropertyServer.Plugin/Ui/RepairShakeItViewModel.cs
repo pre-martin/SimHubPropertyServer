@@ -42,10 +42,11 @@ namespace SimHub.Plugins.PropertyServer.Ui
         {
             _guidToEffectsData = ShakeItBassAccessor.GroupEffectsByGuid();
 
-            IList<EffectsContainerBase> duplicates =
-                _guidToEffectsData.Where(pair => pair.Value.Count > 1).SelectMany(pair => pair.Value).ToList();
+            var duplicates = _guidToEffectsData.Where(pair => pair.Value.Count > 1).SelectMany(pair => pair.Value)
+                .Select(ecb => new EffectsHolder(ecb)).ToList();
 
             var duplicatesCollectionView = CollectionViewSource.GetDefaultView(duplicates);
+            //duplicatesCollectionView.GroupDescriptions.Add(new PropertyGroupDescription("Profile"));
             duplicatesCollectionView.GroupDescriptions.Add(new PropertyGroupDescription("ContainerId"));
             Duplicates = duplicatesCollectionView;
         }
@@ -64,5 +65,33 @@ namespace SimHub.Plugins.PropertyServer.Ui
 
             FindShakeItBassDuplicates();
         }
+    }
+
+    public class EffectsHolder
+    {
+        private readonly EffectsContainerBase _effectsContainerBase;
+
+        public EffectsHolder(EffectsContainerBase effectsContainerBase)
+        {
+            _effectsContainerBase = effectsContainerBase;
+        }
+
+        public string Profile
+        {
+            get
+            {
+                TreeElement current = _effectsContainerBase;
+                while (current.Parent != null)
+                {
+                    current = current.Parent;
+                }
+
+                return current.RecursiveName;
+            }
+        }
+
+        public Guid ContainerId => _effectsContainerBase.ContainerId;
+
+        public string RecursiveName => _effectsContainerBase.RecursiveName;
     }
 }

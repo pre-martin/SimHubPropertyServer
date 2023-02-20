@@ -16,7 +16,7 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
         /// <summary>
         /// Parent of this element or <c>null</c> if this element is at the root.
         /// </summary>
-        protected TreeElement Parent { get; }
+        public TreeElement Parent { get; }
 
         /// <summary>
         /// Returns the name of this element, including all names of all parent elements.
