@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Martin Renner
+// Copyright (C) 2023 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using SimHub.Plugins.PropertyServer.Settings;
+using SimHub.Plugins.PropertyServer.Ui.Util;
 
 namespace SimHub.Plugins.PropertyServer.Ui
 {

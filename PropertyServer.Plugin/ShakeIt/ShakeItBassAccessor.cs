@@ -18,7 +18,6 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
     {
         private PluginManager _pluginManager;
         private FieldInfo _shakeItSettingsField;
-        private readonly Converter _converter = new Converter();
 
         /// <summary>
         /// Initialises the accessor. Calls to subsequent methods of this class will only be successful, if this method was called once.
@@ -43,6 +42,9 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
         /// <summary>
         /// Returns all known profiles of the plugin "ShakeIt Bass Shakers".
         /// </summary>
+        /// <remarks>
+        /// This returns the original data structure of the ShakeIt Bass internals! Be careful when modifying the data.
+        /// </remarks>
         private IEnumerable<ShakeItProfile> SimHubProfiles()
         {
             if (_shakeItSettingsField == null) return Enumerable.Empty<ShakeItProfile>();
@@ -60,13 +62,12 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
         /// Returns a view on all known profiles of the plugin "ShakeIt Bass Shakers".
         /// </summary>
         /// <remarks>
-        /// We convert the ShakeIt Bass internal classes into our own view, in order to be independent of ShakeIt Bass implementation
-        /// details. The returned view is not bound to the underlying objects, so calling "setters" will not reflect the changes.
+        /// We wrap the ShakeIt Bass internal classes into our own model, in order to be independent of ShakeIt Bass implementation details.
         /// </remarks>
         public ICollection<Profile> Profiles()
         {
             var simHubProfiles = SimHubProfiles();
-            return simHubProfiles.Select(ConvertProfile).ToList();
+            return simHubProfiles.Select(simHubProfile => new Profile(simHubProfile)).ToList();
         }
 
         /// <summary>
@@ -82,31 +83,14 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
             return simHubProfiles.Select(simHubProfile => FindEffect(simHubProfile.EffectsContainers, guid)).FirstOrDefault(result => result != null);
         }
 
-        private Profile ConvertProfile(ShakeItProfile simHubProfile)
+        /// <summary>
+        /// Groups all effect groups and effects by their Guid.
+        /// </summary>
+        public Dictionary<Guid, List<EffectsContainerBase>> GroupEffectsByGuid()
         {
-            var profile = new Profile { Id = simHubProfile.ProfileId, Name = simHubProfile.Name };
-            ConvertEffectsContainers(simHubProfile.EffectsContainers, profile.EffectsContainers);
-            return profile;
-        }
-
-        private void ConvertEffectsContainers(
-            IEnumerable<DataPlugins.ShakeItV3.EffectsContainers.EffectsContainerBase> simHubEffectsContainerBases,
-            ICollection<EffectsContainerBase> effectsContainerBases)
-        {
-            foreach (var simHubEffectsContainerBase in simHubEffectsContainerBases)
-            {
-                if (simHubEffectsContainerBase is DataPlugins.ShakeItV3.EffectsContainers.GroupContainer simHubGroupContainer)
-                {
-                    var groupContainer = _converter.Convert(simHubGroupContainer);
-                    effectsContainerBases.Add(groupContainer);
-                    ConvertEffectsContainers(simHubGroupContainer.EffectsContainers, groupContainer.EffectsContainers);
-                }
-                else
-                {
-                    var effectsContainerBase = _converter.Convert(simHubEffectsContainerBase);
-                    effectsContainerBases.Add(effectsContainerBase);
-                }
-            }
+            var profiles = Profiles();
+            var effectsContainerCollector = new EffectsContainerCollector();
+            return effectsContainerCollector.ByGuid(profiles);
         }
 
         private EffectsContainerBase FindEffect(IEnumerable<DataPlugins.ShakeItV3.EffectsContainers.EffectsContainerBase> simHubEffectsContainerBases, Guid guid)
@@ -115,7 +99,7 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
             {
                 if (simHubEffectsContainerBase.ContainerId == guid)
                 {
-                    return _converter.Convert(simHubEffectsContainerBase);
+                    return Converter.Convert(null, simHubEffectsContainerBase);
                 }
 
                 if (simHubEffectsContainerBase is DataPlugins.ShakeItV3.EffectsContainers.GroupContainer simHubGroupContainer)

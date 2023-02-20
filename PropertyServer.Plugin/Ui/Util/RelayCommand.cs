@@ -1,10 +1,10 @@
-﻿// Copyright (C) 2022 Martin Renner
+﻿// Copyright (C) 2023 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
 using System.Windows.Input;
 
-namespace SimHub.Plugins.PropertyServer.Ui
+namespace SimHub.Plugins.PropertyServer.Ui.Util
 {
     public class RelayCommand<T> : ICommand
     {
