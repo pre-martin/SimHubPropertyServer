@@ -6,11 +6,24 @@ using System.Collections.Generic;
 namespace SimHub.Plugins.PropertyServer.ShakeIt
 {
     /// <summary>
-    /// View on the class ShakeIt Bass GroupContainer.
+    /// Wrapper for the SimHub class "GroupContainer".
     /// </summary>
+    /// <remarks>
+    /// Modifications to the structure are not supported! Most properties are read-only.
+    /// </remarks>
     public class GroupContainer : EffectsContainerBase
     {
-        public IList<EffectsContainerBase> EffectsContainers { get; } = new List<EffectsContainerBase>();
+        private readonly DataPlugins.ShakeItV3.EffectsContainers.GroupContainer _simHubGroupContainer;
+        private readonly List<EffectsContainerBase> _effectsContainers = new List<EffectsContainerBase>();
+
+        public GroupContainer(TreeElement parent, DataPlugins.ShakeItV3.EffectsContainers.GroupContainer simHubGroupContainer)
+            : base(parent, simHubGroupContainer)
+        {
+            _simHubGroupContainer = simHubGroupContainer;
+            Converter.Convert(this, simHubGroupContainer.EffectsContainers, _effectsContainers);
+        }
+
+        public IList<EffectsContainerBase> EffectsContainers => _effectsContainers.AsReadOnly();
 
         public override string FullName() => Description;
     }

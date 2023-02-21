@@ -1,0 +1,122 @@
+<!--
+// Copyright (C) 2023 Martin Renner
+// LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
+-->
+
+<simpleChildWindow:ChildWindow
+    x:Class="SimHub.Plugins.PropertyServer.Ui.RepairShakeItWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:styles="clr-namespace:SimHub.Plugins.Styles;assembly=SimHub.Plugins"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SimHub.Plugins.PropertyServer.Ui"
+    xmlns:localUtil="clr-namespace:SimHub.Plugins.PropertyServer.Ui.Util"
+    xmlns:simpleChildWindow="clr-namespace:MahApps.Metro.SimpleChildWindow;assembly=MahApps.Metro.SimpleChildWindow"
+    GlowBrush="Black"
+    ShowTitleBar="False"
+    BorderThickness="1"
+    BorderBrush="{DynamicResource AccentColorBrush}">
+
+    <simpleChildWindow:ChildWindow.OverlayBrush>
+        <SolidColorBrush Opacity="0.8" Color="Black"/>
+    </simpleChildWindow:ChildWindow.OverlayBrush>
+
+    <simpleChildWindow:ChildWindow.DataContext>
+        <local:RepairShakeItViewModel />
+    </simpleChildWindow:ChildWindow.DataContext>
+
+    <simpleChildWindow:ChildWindow.Resources>
+        <localUtil:BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
+    </simpleChildWindow:ChildWindow.Resources>
+
+    <Grid Width="800" Height="650" Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Row 0: Explanation -->
+        <StackPanel Grid.Row="0" Margin="0, 0, 0, 8">
+            <Label>
+                <Label.Content>
+                    <AccessText TextWrapping="WrapWithOverflow">
+                        Press the "Scan" button. The list below will then show all elements with duplicate Guids, grouped by Profile and Guid.
+                    </AccessText>
+                </Label.Content>
+            </Label>
+            <Label>
+                <Label.Content>
+                    <AccessText TextWrapping="WrapWithOverflow">
+                        If the list has any entries, they can be repaired automatically by selecting a Profile (with the radiobutton on the
+                        far right) and using the "Repair" button below. The first entry will keep its Guid, following entries will get a new one.
+                    </AccessText>
+                </Label.Content>
+            </Label>
+            <Label FontWeight="Bold">Caution: This may have side effects. Be sure to have a backup of all of your profiles.</Label>
+        </StackPanel>
+
+        <!-- Row 1: Top button line -->
+        <StackPanel HorizontalAlignment="Left" Grid.Row="1" Orientation="Horizontal" Margin="0, 8, 0, 8">
+            <styles:SHButtonPrimary MinWidth="100" Command="{Binding ScanShakeItBassCommand}">Scan ShakeIt Bass</styles:SHButtonPrimary>
+        </StackPanel>
+
+        <!-- Row 2: Duplicate list -->
+        <ScrollViewer Grid.Row="2"
+                      Visibility="{Binding ShowDuplicatesList, Converter={StaticResource BooleanToVisibility}}"
+                      Margin="0, 16">
+            <ItemsControl ItemsSource="{Binding Profiles}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Expander HorizontalContentAlignment="Stretch">
+                            <Expander.Header>
+                                <DockPanel>
+                                    <RadioButton GroupName="ProfileGroup" IsChecked="{Binding IsChecked}"
+                                                 DockPanel.Dock="Right" Margin="5 2" />
+                                    <TextBlock Text="{Binding Name}" Margin="5 2"/>
+                                </DockPanel>
+                            </Expander.Header>
+                            <ItemsControl ItemsSource="{Binding Duplicates}">
+                                <ItemsControl.GroupStyle>
+                                    <GroupStyle>
+                                        <GroupStyle.HeaderTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name, StringFormat='Duplicates for Guid {0}'}"
+                                                           FontWeight="Bold"/>
+                                            </DataTemplate>
+                                        </GroupStyle.HeaderTemplate>
+                                    </GroupStyle>
+                                </ItemsControl.GroupStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding RecursiveName}" Margin="10, 0, 0, 0" TextWrapping="WrapWithOverflow"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Expander>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <Label Grid.Row="2"
+               Visibility="{Binding ShowScanHint, Converter={StaticResource BooleanToVisibility}}"
+               HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16">
+            Press "Scan" to see results.
+        </Label>
+        <Label Grid.Row="2"
+               Visibility="{Binding ShowNoResults, Converter={StaticResource BooleanToVisibility}}"
+               HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16">
+            You are lucky: No duplicates found.
+        </Label>
+
+        <!-- Row 3: Bottom button line -->
+        <StackPanel HorizontalAlignment="Right" Grid.Row="3" Orientation="Horizontal" Margin="0, 8, 0, 0">
+            <styles:SHButtonPrimary MinWidth="100" Command="{Binding RepairCommand}">Repair</styles:SHButtonPrimary>
+
+            <styles:SHButtonSecondary Click="CloseButton_Click" MinWidth="100">Close</styles:SHButtonSecondary>
+        </StackPanel>
+    </Grid>
+
+</simpleChildWindow:ChildWindow>

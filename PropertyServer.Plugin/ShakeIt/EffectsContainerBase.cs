@@ -6,23 +6,51 @@ using System;
 namespace SimHub.Plugins.PropertyServer.ShakeIt
 {
     /// <summary>
-    /// View on the class ShakeIt Bass EffectsContainerBase.
+    /// Wrapper on the class ShakeIt Bass EffectsContainerBase.
     /// </summary>
     /// <remarks>
     /// The corresponding SimHub class is abstract and has subclasses for each concrete effect. As we are not interested in the concrete
     /// effects, we use this class also for the effects, as it already contains all the data we are interested in.
+    /// <p/>
+    /// Most properties are read-only.
     /// </remarks>
-    public class EffectsContainerBase
+    public class EffectsContainerBase : TreeElement
     {
-        public Guid ContainerId { get; set; }
-        public string ContainerName { get; set; }
-        public string Description { get; set; }
-        public double Gain { get; set; }
-        public bool IsMuted { get; set; }
+        private readonly DataPlugins.ShakeItV3.EffectsContainers.EffectsContainerBase _simHubEffectsContainerBase;
+
+        public EffectsContainerBase(TreeElement parent,
+            DataPlugins.ShakeItV3.EffectsContainers.EffectsContainerBase simHubEffectsContainerBase) : base(parent)
+        {
+            _simHubEffectsContainerBase = simHubEffectsContainerBase;
+        }
+
+        public Guid ContainerId
+        {
+            get => _simHubEffectsContainerBase.ContainerId;
+            set => _simHubEffectsContainerBase.ContainerId = value;
+        }
+
+        public string ContainerName => _simHubEffectsContainerBase.ContainerName;
+        public string Description => _simHubEffectsContainerBase.Description;
+        public double Gain => _simHubEffectsContainerBase.Gain;
+        public bool IsMuted => _simHubEffectsContainerBase.IsMuted;
 
         public virtual string FullName()
         {
             return string.IsNullOrWhiteSpace(Description) ? ContainerName : ContainerName + $" ({Description})";
+        }
+
+        public override string RecursiveName
+        {
+            get
+            {
+                if (Parent == null)
+                {
+                    return Description.Trim();
+                }
+
+                return Parent.RecursiveName + " / " + Description;
+            }
         }
     }
 }

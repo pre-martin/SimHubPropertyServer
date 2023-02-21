@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022 Martin Renner
+﻿// Copyright (C) 2023 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
@@ -173,7 +173,7 @@ namespace SimHub.Plugins.PropertyServer
                 GetNamespaceLogger().Level = _settings.LogLevel.ToLog4Net();
                 this.SaveCommonSettings("GeneralSettings", _settings);
             };
-            return new SettingsControl { DataContext = settingsViewModel };
+            return new SettingsControl { DataContext = settingsViewModel, PluginManager = pluginManager };
         }
 
         public ImageSource PictureIcon => this.ToIcon(Properties.Resources.properties);

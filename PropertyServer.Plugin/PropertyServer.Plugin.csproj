@@ -60,9 +60,15 @@
       <HintPath>..\SimHub\SimHub.Plugins.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="SimHub.Plugins">
+    <Reference Include="Newtonsoft.Json">
       <HintPath>..\SimHub\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="MahApps.Metro">
+      <HintPath>..\SimHub\MahApps.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.SimpleChildWindow">
+      <HintPath>..\SimHub\MahApps.Metro.SimpleChildWindow.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -82,18 +88,27 @@
     <Compile Include="Settings\GeneralSettings.cs" />
     <Compile Include="Settings\LogLevelSetting.cs" />
     <Compile Include="ShakeIt\Converter.cs" />
+    <Compile Include="ShakeIt\EffectsContainerCollector.cs" />
     <Compile Include="ShakeIt\EffectsContainerBase.cs" />
     <Compile Include="ShakeIt\GroupContainer.cs" />
     <Compile Include="ShakeIt\Profile.cs" />
     <Compile Include="ShakeIt\ShakeItBassAccessor.cs" />
+    <Compile Include="ShakeIt\TreeElement.cs" />
     <Compile Include="SubscriptionManager.cs" />
     <Compile Include="Ui\IpPortValidationRule.cs" />
-    <Compile Include="Ui\RelayCommand.cs" />
-    <Compile Include="Ui\SettingsControl.xaml.cs" />
-    <Compile Include="Ui\SettingsViewModel.cs" />
-  </ItemGroup>
-  <ItemGroup>
+    <Compile Include="Ui\RepairShakeItViewModel.cs" />
+    <Page Include="Ui\RepairShakeItWindow.xaml"/>
+    <Compile Include="Ui\RepairShakeItWindow.xaml.cs">
+      <DependentUpon>RepairShakeItWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="Ui\SettingsControl.xaml" />
+    <Compile Include="Ui\SettingsControl.xaml.cs">
+      <DependentUpon>SettingsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Ui\SettingsViewModel.cs" />
+    <Compile Include="Ui\Util\Converters.cs" />
+    <Compile Include="Ui\Util\NotifyPropertyChanges.cs" />
+    <Compile Include="Ui\Util\RelayCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />

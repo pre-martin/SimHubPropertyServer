@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022 Martin Renner
+﻿// Copyright (C) 2023 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
@@ -172,7 +172,7 @@ namespace SimHub.Plugins.PropertyServer.Comm
             // Send structure, profile by profile.
             foreach (var profile in profiles)
             {
-                await SendString($"0: {profile.Id} {profile.GetType().Name} {profile.Name}");
+                await SendString($"0: {profile.ProfileId} {profile.GetType().Name} {profile.Name}");
                 await SendEffects(1, profile.EffectsContainers);
             }
             await SendString("End");

@@ -1,31 +1,36 @@
 ﻿// Copyright (C) 2023 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
 namespace SimHub.Plugins.PropertyServer.ShakeIt
 {
     /// <summary>
-    /// Class responsible for converting from the SimHub internal data model into our independent model.
+    /// Class responsible for converting from the SimHub internal data model into our wrapped model.
     /// </summary>
-    public class Converter
+    public abstract class Converter
     {
-        public GroupContainer Convert(DataPlugins.ShakeItV3.EffectsContainers.GroupContainer simHubGroupContainer)
+
+        public static void Convert(TreeElement parent, ObservableCollection<DataPlugins.ShakeItV3.EffectsContainers.EffectsContainerBase> simHubEffectsContainers, IList<EffectsContainerBase> effectsContainers)
         {
-            return new GroupContainer
+            foreach (var simHubEffectsContainer in simHubEffectsContainers)
             {
-                ContainerId = simHubGroupContainer.ContainerId, ContainerName = simHubGroupContainer.ContainerName,
-                Description = simHubGroupContainer.Description, Gain = simHubGroupContainer.Gain,
-                IsMuted = simHubGroupContainer.IsMuted
-            };
+                var effectsContainer = Convert(parent, simHubEffectsContainer);
+                effectsContainers.Add(effectsContainer);
+            }
         }
 
-        public EffectsContainerBase Convert(DataPlugins.ShakeItV3.EffectsContainers.EffectsContainerBase simHubEffectsContainerBase)
+        public static EffectsContainerBase Convert(TreeElement parent, DataPlugins.ShakeItV3.EffectsContainers.EffectsContainerBase simHubEffectsContainer)
         {
-            return new EffectsContainerBase
+            if (simHubEffectsContainer is DataPlugins.ShakeItV3.EffectsContainers.GroupContainer simHubGroupContainer)
             {
-                ContainerId = simHubEffectsContainerBase.ContainerId, ContainerName = simHubEffectsContainerBase.ContainerName,
-                Description = simHubEffectsContainerBase.Description, Gain = simHubEffectsContainerBase.Gain,
-                IsMuted = simHubEffectsContainerBase.IsMuted
-            };
+                var groupContainer = new GroupContainer(parent, simHubGroupContainer);
+                return groupContainer;
+            }
+
+            var effectsContainerBase = new EffectsContainerBase(parent, simHubEffectsContainer);
+            return effectsContainerBase;
         }
     }
 }
