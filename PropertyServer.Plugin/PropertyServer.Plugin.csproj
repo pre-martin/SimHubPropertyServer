@@ -66,9 +66,11 @@
     </Reference>
     <Reference Include="MahApps.Metro">
       <HintPath>..\SimHub\MahApps.Metro.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MahApps.Metro.SimpleChildWindow">
       <HintPath>..\SimHub\MahApps.Metro.SimpleChildWindow.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -6,6 +6,8 @@
   - GameReaderCommon.dll
   - log4net.dll
   - Newtonsoft.Json.dll
+  - MahApps.Metro.dll
+  - MahApps.Metro.SimpleChildWindow.dll
 . Restore NuGet packages: +
   `msbuild -t:restore -p:Platform="Any CPU" -p:RestorePackagesConfig=true`
 . Build the project: +
