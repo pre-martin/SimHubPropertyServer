@@ -97,16 +97,18 @@
     <Compile Include="SubscriptionManager.cs" />
     <Compile Include="Ui\IpPortValidationRule.cs" />
     <Compile Include="Ui\RepairShakeItViewModel.cs" />
-    <Compile Include="Ui\RepairShakeItWindow.xaml.cs" />
-    <Compile Include="Ui\SettingsControl.xaml.cs" />
+    <Page Include="Ui\RepairShakeItWindow.xaml"/>
+    <Compile Include="Ui\RepairShakeItWindow.xaml.cs">
+      <DependentUpon>RepairShakeItWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Ui\SettingsControl.xaml" />
+    <Compile Include="Ui\SettingsControl.xaml.cs">
+      <DependentUpon>SettingsControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Ui\SettingsViewModel.cs" />
     <Compile Include="Ui\Util\Converters.cs" />
     <Compile Include="Ui\Util\NotifyPropertyChanges.cs" />
     <Compile Include="Ui\Util\RelayCommand.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Ui\RepairShakeItWindow.xaml" />
-    <Page Include="Ui\SettingsControl.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />

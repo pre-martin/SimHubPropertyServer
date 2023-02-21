@@ -84,13 +84,12 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
         }
 
         /// <summary>
-        /// Groups all effect groups and effects by their Guid.
+        /// Groups all effect groups and effects of a given profile by their Guid.
         /// </summary>
-        public Dictionary<Guid, List<EffectsContainerBase>> GroupEffectsByGuid()
+        public Dictionary<Guid, List<EffectsContainerBase>> GroupEffectsByGuid(Profile profile)
         {
-            var profiles = Profiles();
             var effectsContainerCollector = new EffectsContainerCollector();
-            return effectsContainerCollector.ByGuid(profiles);
+            return effectsContainerCollector.ByGuid(profile);
         }
 
         private EffectsContainerBase FindEffect(IEnumerable<DataPlugins.ShakeItV3.EffectsContainers.EffectsContainerBase> simHubEffectsContainerBases, Guid guid)

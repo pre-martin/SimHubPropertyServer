@@ -68,8 +68,11 @@
                     <Border Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" BorderThickness="0,0,0,1" Margin="0,2,0,5"
                             BorderBrush="#FF3A3A3A" />
 
-                    <Label Grid.Row="6" Grid.Column="0">Repair ShakeIt Profiles</Label>
-                    <styles:SHButtonPrimary Grid.Row="6" Grid.Column="1" Click="RepairButton_Click">Repair</styles:SHButtonPrimary>
+                    <StackPanel Grid.Row="6" Grid.Column="0">
+                        <Label>Repair ShakeIt Profiles</Label>
+                        <Label FontSize="11" Padding="5,0,5,5">Detects duplicate Guids in ShakeIt profiles and optionally repairs them</Label>
+                    </StackPanel>
+                    <styles:SHButtonPrimary Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" Click="RepairButton_Click">Repair</styles:SHButtonPrimary>
 
                     <Border Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" BorderThickness="0,0,0,1" Margin="0,2,0,5"
                             BorderBrush="#FF3A3A3A" />

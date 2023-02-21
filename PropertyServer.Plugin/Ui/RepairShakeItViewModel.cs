@@ -1,5 +1,9 @@
-﻿using System;
+﻿// Copyright (C) 2023 Martin Renner
+// LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
+
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
@@ -17,54 +21,89 @@ namespace SimHub.Plugins.PropertyServer.Ui
         public ShakeItBassAccessor ShakeItBassAccessor { get; set; }
         public ICommand ScanShakeItBassCommand { get; }
         public ICommand RepairCommand { get; }
-        public bool ShowDuplicatesList => Duplicates == null || !Duplicates.IsEmpty;
+        public bool ShowScanHint => Profiles == null;
+        public bool ShowDuplicatesList => Profiles != null && Profiles.Count > 0;
+        public bool ShowNoResults => Profiles != null && Profiles.Count == 0;
 
-        private Dictionary<Guid, List<EffectsContainerBase>> _guidToEffectsData;
-        private ICollectionView _duplicates;
+        private ObservableCollection<ProfileHolder> _profiles;
 
-        public ICollectionView Duplicates
+        public ObservableCollection<ProfileHolder> Profiles
         {
-            get => _duplicates;
+            get => _profiles;
             private set
             {
-                SetField(ref _duplicates, value);
+                SetField(ref _profiles, value);
+                OnPropertyChanged(nameof(ShowScanHint));
                 OnPropertyChanged(nameof(ShowDuplicatesList));
+                OnPropertyChanged(nameof(ShowNoResults));
             }
         }
 
         public RepairShakeItViewModel()
         {
             ScanShakeItBassCommand = new RelayCommand<object>(o => FindShakeItBassDuplicates());
-            RepairCommand = new RelayCommand<object>(e => Duplicates != null && !Duplicates.IsEmpty, o => Repair());
+            RepairCommand = new RelayCommand<object>(
+                e => Profiles != null && Profiles.Any(p => p.IsChecked),
+                o => Repair()
+            );
         }
 
         private void FindShakeItBassDuplicates()
         {
-            _guidToEffectsData = ShakeItBassAccessor.GroupEffectsByGuid();
+            var tempProfiles = new ObservableCollection<ProfileHolder>();
+            var profiles = ShakeItBassAccessor.Profiles();
+            foreach (var profile in profiles)
+            {
+                var guidToEffects = ShakeItBassAccessor.GroupEffectsByGuid(profile);
+                var duplicates = guidToEffects.Where(kv => kv.Value.Count > 1).SelectMany(kv => kv.Value).ToList();
+                if (duplicates.Count > 0)
+                {
+                    var profileHolder = new ProfileHolder(profile.Name, guidToEffects, duplicates);
+                    tempProfiles.Add(profileHolder);
+                }
+            }
 
-            var duplicates = _guidToEffectsData.Where(pair => pair.Value.Count > 1).SelectMany(pair => pair.Value)
-                .Select(ecb => new EffectsHolder(ecb)).ToList();
-
-            var duplicatesCollectionView = CollectionViewSource.GetDefaultView(duplicates);
-            //duplicatesCollectionView.GroupDescriptions.Add(new PropertyGroupDescription("Profile"));
-            duplicatesCollectionView.GroupDescriptions.Add(new PropertyGroupDescription("ContainerId"));
-            Duplicates = duplicatesCollectionView;
+            Profiles = tempProfiles;
         }
 
         private void Repair()
         {
-            if (_guidToEffectsData == null) return;
+            var profile = Profiles?.FirstOrDefault(p => p.IsChecked);
+            if (profile == null) return;
 
-            foreach (var pair in _guidToEffectsData.Where(pair => pair.Value.Count > 1))
+            var guidToEffects = profile.GuidToEffects;
+            foreach (var kv in guidToEffects.Where(kv => kv.Value.Count > 1))
             {
-                for (var i = 1; i < pair.Value.Count; i++)
+                for (var i = 1; i < kv.Value.Count; i++)
                 {
-                    pair.Value[i].ContainerId = Guid.NewGuid();
+                    kv.Value[i].ContainerId = Guid.NewGuid();
                 }
             }
 
             FindShakeItBassDuplicates();
         }
+    }
+
+    public class ProfileHolder
+    {
+        public Dictionary<Guid, List<EffectsContainerBase>> GuidToEffects { get; }
+
+        public ProfileHolder(string name, Dictionary<Guid, List<EffectsContainerBase>> guidToEffects, List<EffectsContainerBase> duplicates)
+        {
+            Name = name;
+            GuidToEffects = guidToEffects;
+
+            var duplicatesHolder = duplicates.Select(ecb => new EffectsHolder(ecb)).ToList();
+            var duplicatesCollectionView = CollectionViewSource.GetDefaultView(duplicatesHolder);
+            duplicatesCollectionView.GroupDescriptions.Add(new PropertyGroupDescription("ContainerId"));
+            Duplicates = duplicatesCollectionView;
+        }
+
+        public bool IsChecked { get; set; }
+
+        public string Name { get; set; }
+
+        public ICollectionView Duplicates { get; set; }
     }
 
     public class EffectsHolder
@@ -74,20 +113,6 @@ namespace SimHub.Plugins.PropertyServer.Ui
         public EffectsHolder(EffectsContainerBase effectsContainerBase)
         {
             _effectsContainerBase = effectsContainerBase;
-        }
-
-        public string Profile
-        {
-            get
-            {
-                TreeElement current = _effectsContainerBase;
-                while (current.Parent != null)
-                {
-                    current = current.Parent;
-                }
-
-                return current.RecursiveName;
-            }
         }
 
         public Guid ContainerId => _effectsContainerBase.ContainerId;

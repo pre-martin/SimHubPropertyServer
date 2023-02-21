@@ -3,7 +3,7 @@
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 -->
 
-<simplechildwindow:ChildWindow
+<simpleChildWindow:ChildWindow
     x:Class="SimHub.Plugins.PropertyServer.Ui.RepairShakeItWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:styles="clr-namespace:SimHub.Plugins.Styles;assembly=SimHub.Plugins"
@@ -11,22 +11,26 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SimHub.Plugins.PropertyServer.Ui"
-    xmlns:local-Util="clr-namespace:SimHub.Plugins.PropertyServer.Ui.Util"
-    xmlns:simplechildwindow="clr-namespace:MahApps.Metro.SimpleChildWindow;assembly=MahApps.Metro.SimpleChildWindow"
+    xmlns:localUtil="clr-namespace:SimHub.Plugins.PropertyServer.Ui.Util"
+    xmlns:simpleChildWindow="clr-namespace:MahApps.Metro.SimpleChildWindow;assembly=MahApps.Metro.SimpleChildWindow"
     GlowBrush="Black"
     ShowTitleBar="False"
     BorderThickness="1"
     BorderBrush="{DynamicResource AccentColorBrush}">
 
-    <simplechildwindow:ChildWindow.DataContext>
+    <simpleChildWindow:ChildWindow.OverlayBrush>
+        <SolidColorBrush Opacity="0.8" Color="Black"/>
+    </simpleChildWindow:ChildWindow.OverlayBrush>
+
+    <simpleChildWindow:ChildWindow.DataContext>
         <local:RepairShakeItViewModel />
-    </simplechildwindow:ChildWindow.DataContext>
+    </simpleChildWindow:ChildWindow.DataContext>
 
-    <simplechildwindow:ChildWindow.Resources>
-        <local-Util:BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
-    </simplechildwindow:ChildWindow.Resources>
+    <simpleChildWindow:ChildWindow.Resources>
+        <localUtil:BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
+    </simpleChildWindow:ChildWindow.Resources>
 
-    <Grid Width="800" MinHeight="450" MaxHeight="650" Margin="8">
+    <Grid Width="800" Height="650" Margin="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
@@ -39,19 +43,19 @@
             <Label>
                 <Label.Content>
                     <AccessText TextWrapping="WrapWithOverflow">
-                        Press the "Scan" button. The list below will then show all elements with duplicate Guids, grouped by Guid.
+                        Press the "Scan" button. The list below will then show all elements with duplicate Guids, grouped by Profile and Guid.
                     </AccessText>
                 </Label.Content>
             </Label>
             <Label>
                 <Label.Content>
                     <AccessText TextWrapping="WrapWithOverflow">
-                        If the list has any entries, they can be repaired automatically by using the "Repair" button below. The first entry
-                        will keep its Guid, following entries will get a new one.
+                        If the list has any entries, they can be repaired automatically by selecting a Profile (with the radiobutton on the
+                        far right) and using the "Repair" button below. The first entry will keep its Guid, following entries will get a new one.
                     </AccessText>
                 </Label.Content>
             </Label>
-            <Label>Caution: This may have side effects. Be sure to have a backup of all of your profiles.</Label>
+            <Label FontWeight="Bold">Caution: This may have side effects. Be sure to have a backup of all of your profiles.</Label>
         </StackPanel>
 
         <!-- Row 1: Top button line -->
@@ -60,26 +64,49 @@
         </StackPanel>
 
         <!-- Row 2: Duplicate list -->
-        <ListBox Grid.Row="2" ItemsSource="{Binding Duplicates}"
-                 Visibility="{Binding ShowDuplicatesList, Converter={StaticResource BooleanToVisibility}}"
-                 Margin="0,16,0,16">
-            <ItemsControl.GroupStyle>
-                <GroupStyle>
-                    <GroupStyle.HeaderTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
-                        </DataTemplate>
-                    </GroupStyle.HeaderTemplate>
-                </GroupStyle>
-            </ItemsControl.GroupStyle>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding RecursiveName}"/>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ListBox>
+        <ScrollViewer Grid.Row="2"
+                      Visibility="{Binding ShowDuplicatesList, Converter={StaticResource BooleanToVisibility}}"
+                      Margin="0, 16">
+            <ItemsControl ItemsSource="{Binding Profiles}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Expander HorizontalContentAlignment="Stretch">
+                            <Expander.Header>
+                                <DockPanel>
+                                    <RadioButton GroupName="ProfileGroup" IsChecked="{Binding IsChecked}"
+                                                 DockPanel.Dock="Right" Margin="5 2" />
+                                    <TextBlock Text="{Binding Name}" Margin="5 2"/>
+                                </DockPanel>
+                            </Expander.Header>
+                            <ItemsControl ItemsSource="{Binding Duplicates}">
+                                <ItemsControl.GroupStyle>
+                                    <GroupStyle>
+                                        <GroupStyle.HeaderTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name, StringFormat='Duplicates for Guid {0}'}"
+                                                           FontWeight="Bold"/>
+                                            </DataTemplate>
+                                        </GroupStyle.HeaderTemplate>
+                                    </GroupStyle>
+                                </ItemsControl.GroupStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding RecursiveName}" Margin="10, 0, 0, 0" TextWrapping="WrapWithOverflow"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Expander>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
         <Label Grid.Row="2"
-               Visibility="{Binding ShowDuplicatesList, Converter={StaticResource BooleanToVisibility}, ConverterParameter='negate'}"
+               Visibility="{Binding ShowScanHint, Converter={StaticResource BooleanToVisibility}}"
+               HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16">
+            Press "Scan" to see results.
+        </Label>
+        <Label Grid.Row="2"
+               Visibility="{Binding ShowNoResults, Converter={StaticResource BooleanToVisibility}}"
                HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16">
             You are lucky: No duplicates found.
         </Label>
@@ -92,4 +119,4 @@
         </StackPanel>
     </Grid>
 
-</simplechildwindow:ChildWindow>
+</simpleChildWindow:ChildWindow>

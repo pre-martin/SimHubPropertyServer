@@ -14,18 +14,14 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
         private Dictionary<Guid, List<EffectsContainerBase>> GuidToEffect { get; } = new Dictionary<Guid, List<EffectsContainerBase>>();
 
         /// <summary>
-        /// Groups all effect groups and effects by their Guid.
+        /// Groups all effect groups and effects of a given profile by their Guid.
         /// </summary>
         /// <remarks>
         /// In theory, there should be no duplicates (i.e. more than one element for a given Guid). Practically, this happens.
         /// </remarks>
-        public Dictionary<Guid, List<EffectsContainerBase>> ByGuid(IEnumerable<Profile> profiles)
+        public Dictionary<Guid, List<EffectsContainerBase>> ByGuid(Profile profile)
         {
-            foreach (var profile in profiles)
-            {
-                CollectByGuid(profile.EffectsContainers);
-            }
-
+            CollectByGuid(profile.EffectsContainers);
             return GuidToEffect;
         }
 
