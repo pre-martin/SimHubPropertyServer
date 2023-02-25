@@ -465,6 +465,26 @@ Available commands:
 ----
 
 
+== How to repair "ShakeIt" profiles
+
+ShakeIt properties are accessed by this plugin through an unique id (called "GUID"), which is managed by SimHub. Unfortunately, SimHub does not enforce that these Guids are really unique. So it can happen, that you are affected by problems caused by duplicate Guids: **You address one effect, but actually get the value of another effect.**
+
+You have to repair these duplicated Guids. If you are responsible for a profile, you should repair the profile before distributing it. If you import a profile from another maintainer, you can test the profile. If it has duplicate Guids, you should inform the maintainer and ask him to repair the profile.
+
+This is done as follows:
+
+image::doc/Repair-ShakeIt.png[Repair profiles]
+
+. Open the settings of this plugin. If "show in left menu" is enabled for this plugin, just click on "Property Server" in the left menu, otherwise go via "Additional plugins" - "Property Server".
+. Click on the button labeled "Repair" (in the background of the screenshot above).
+. The window shown above appears.
+. Press on "Scan" in the upper area of the window.
+.. If a message appears, that there a no duplicates: Everything is fine.
+.. If you get a list as in the screenshot above: Please continue.
+. The list displays all elements with duplicate Guids. Select the profile that you want to repair with the radiobutton on the far right.
+. Click on "Repair".
+
+
 == Building of the plugin
 
 See link:doc/Building.adoc[Building.adoc].
