@@ -182,8 +182,17 @@ namespace SimHub.Plugins.PropertyServer
 
         public void TriggerInput(string inputName)
         {
-            Log.Info($"Sending trigger input: {inputName}");
             PluginManager.TriggerInput(inputName, typeof(PropertyServerPlugin), PressType.Default);
+        }
+
+        public void TriggerInputPressed(string inputName)
+        {
+            PluginManager.TriggerInputPress(inputName, typeof(PropertyServerPlugin));
+        }
+
+        public void TriggerInputReleased(string inputName)
+        {
+            PluginManager.TriggerInputRelease(inputName, typeof(PropertyServerPlugin));
         }
 
         public ICollection<Profile> ShakeItBassStructure()

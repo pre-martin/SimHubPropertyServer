@@ -116,6 +116,24 @@ namespace SimHub.Plugins.PropertyServer.Comm
                     }
                     TriggerInput(lineItems[1]);
                     return;
+                case "trigger-input-pressed":
+                    if (lineItems.Length != 2)
+                    {
+                        Log.Warn($"Invalid 'trigger-input-pressed' command, wrong number of arguments: {line}");
+                        await SendError("Invalid 'trigger-input-pressed' command, wrong number of arguments");
+                        return;
+                    }
+                    TriggerInputPressed(lineItems[1]);
+                    return;
+                case "trigger-input-released":
+                    if (lineItems.Length != 2)
+                    {
+                        Log.Warn($"Invalid 'trigger-input-release' command, wrong number of arguments: {line}");
+                        await SendError("Invalid 'trigger-input-release' command, wrong number of arguments");
+                        return;
+                    }
+                    TriggerInputReleased(lineItems[1]);
+                    return;
                 case "shakeit-bass-structure":
                     await ShakeItBassStructure();
                     return;
@@ -165,6 +183,16 @@ namespace SimHub.Plugins.PropertyServer.Comm
             _simHub.TriggerInput(inputName);
         }
 
+        private void TriggerInputPressed(string inputName)
+        {
+            _simHub.TriggerInputPressed(inputName);
+        }
+
+        private void TriggerInputReleased(string inputName)
+        {
+            _simHub.TriggerInputReleased(inputName);
+        }
+
         private async Task ShakeItBassStructure()
         {
             await SendString("ShakeIt Bass structure");
@@ -205,6 +233,8 @@ namespace SimHub.Plugins.PropertyServer.Comm
             await SendString("  subscribe propertyName");
             await SendString("  unsubscribe propertyName");
             await SendString("  trigger-input inputName");
+            await SendString("  trigger-input-pressed inputName");
+            await SendString("  trigger-input-released inputName");
             await SendString("  shakeit-bass-structure");
             await SendString("  disconnect");
         }

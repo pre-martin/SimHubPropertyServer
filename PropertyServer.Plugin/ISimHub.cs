@@ -18,6 +18,16 @@ namespace SimHub.Plugins.PropertyServer
         void TriggerInput(string inputName);
 
         /// <summary>
+        /// Triggers the start of an input in SimHub.
+        /// </summary>
+        void TriggerInputPressed(string inputName);
+
+        /// <summary>
+        /// Triggers the end of an input in SimHub.
+        /// </summary>
+        void TriggerInputReleased(string inputName);
+
+        /// <summary>
         /// Returns the structure of the ShakeIt Bass configuration (profiles with effect groups and effects).
         /// </summary>
         ICollection<Profile> ShakeItBassStructure();
