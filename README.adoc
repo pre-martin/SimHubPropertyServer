@@ -3,9 +3,11 @@
 :sectnums:
 ifdef::env-github[]
 :tip-caption: :bulb:
+:warning-caption: :warning:
 endif::[]
 ifndef::env-github[]
 :tip-caption: 💡
+:warning-caption: ⚠️
 endif::[]
 
 TIP: Always read the *correct version* of the documentation, which matches the version of the plugin that you have installed. To do so, use the dropdown in the top left, which usually contains the value "main". Select the "tag" that matches your installed version.
@@ -21,6 +23,9 @@ One use case is the project https://github.com/pre-martin/StreamDeckSimHubPlugin
 
 
 == Installation
+
+WARNING: To download, do not use the green button! Instead click on "Releases" on the right side and download the file `PropertyServer.dll`.
+
 
 Simply copy the file `PropertyServer.dll` into the root directory of your SimHub installation. After having launched SimHub, the plugin has to be activated under "_Settings_ > _Plugins_" (usually SimHub will autodetect the plugin and ask at startup, if the plugin shall be activated).
 
