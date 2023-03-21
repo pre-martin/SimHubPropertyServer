@@ -89,8 +89,8 @@ namespace SimHub.Plugins.PropertyServer.Property
             Log.Debug($"Creating property instance for property {name} in {source}");
             var plainName = name.Contains('.') ? name.Substring(source.GetPropertyPrefix().Length + 1) : name;
 
-            // Is it a "ShakeIt Bass" property?
-            if (source == PropertySource.ShakeItBass)
+            // Is it a "ShakeIt Bass" or a "ShakeIt Motors" property?
+            if (source == PropertySource.ShakeItBass || source == PropertySource.ShakeItMotors)
             {
                 // Format of "name" is <prefix>.<guid>.<property>
                 var propertyOffset = plainName.IndexOf('.');
@@ -111,29 +111,38 @@ namespace SimHub.Plugins.PropertyServer.Property
                 catch (Exception)
                 {
                     Log.Info($"Property {name} does not contain a valid Guid");
-                    await errorCallback.Invoke($"Property {name} does not contain a valud Guid");
+                    await errorCallback.Invoke($"Property {name} does not contain a valid Guid");
                     return null;
                 }
 
                 // Property
                 var shakeItPropertyName = plainName.Substring(propertyOffset + 1);
-                SimHubPropertyShakeItBass.Property shakeItProperty;
+                SimHubPropertyShakeItBase.Property shakeItProperty;
                 switch (shakeItPropertyName.ToLower(CultureInfo.InvariantCulture))
                 {
                     case "gain":
-                        shakeItProperty = SimHubPropertyShakeItBass.Property.Gain;
+                        shakeItProperty = SimHubPropertyShakeItBase.Property.Gain;
                         break;
                     case "ismuted":
-                        shakeItProperty = SimHubPropertyShakeItBass.Property.IsMuted;
+                        shakeItProperty = SimHubPropertyShakeItBase.Property.IsMuted;
                         break;
                     default:
-                        Log.Info("$Unknown ShakeIt Bass property in {name}");
-                        await errorCallback.Invoke($"Unknown ShakeIt Bass property in {name}");
+                        Log.Info($"Unknown ShakeIt property in {name}");
+                        await errorCallback.Invoke($"Unknown ShakeIt property in {name}");
                         return null;
                 }
 
-                // We do not check, if this property really exists!
-                return new SimHubPropertyShakeItBass(name, guid, shakeItProperty);
+                switch (source)
+                {
+                    // We do not check, if the property really exists!
+                    case PropertySource.ShakeItBass:
+                        return new SimHubPropertyShakeItBass(name, guid, shakeItProperty);
+                    case PropertySource.ShakeItMotors:
+                        return new SimHubPropertyShakeItMotors(name, guid, shakeItProperty);
+                }
+
+                // We should not reach this line
+                return null;
             }
 
             // Is it a property of type "getter"?
@@ -193,9 +202,11 @@ namespace SimHub.Plugins.PropertyServer.Property
             var result = new List<SimHubProperty>();
 
             // Iterate over all known PropertySources and determine the accessible properties.
-            // But we really don't want to iterate on Generic properties or on ShakeItBass properties.
+            // But we really don't want to iterate on Generic properties or on ShakeIt properties.
             var sources = Enum.GetValues(typeof(PropertySource)).Cast<PropertySource>()
-                .Where(source => source != PropertySource.Generic && source != PropertySource.ShakeItBass);
+                .Where(source => source != PropertySource.Generic &&
+                                 source != PropertySource.ShakeItBass &&
+                                 source != PropertySource.ShakeItMotors);
             foreach (var source in sources)
             {
                 var availableProperties = source.GetPropertySourceType().GetProperties();

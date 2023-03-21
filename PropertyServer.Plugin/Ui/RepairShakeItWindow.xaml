@@ -61,6 +61,7 @@
         <!-- Row 1: Top button line -->
         <StackPanel HorizontalAlignment="Left" Grid.Row="1" Orientation="Horizontal" Margin="0, 8, 0, 8">
             <styles:SHButtonPrimary MinWidth="100" Command="{Binding ScanShakeItBassCommand}">Scan ShakeIt Bass</styles:SHButtonPrimary>
+            <styles:SHButtonPrimary MinWidth="100" Command="{Binding ScanShakeItMotorsCommand}">Scan ShakeIt Motors</styles:SHButtonPrimary>
         </StackPanel>
 
         <!-- Row 2: Duplicate list -->

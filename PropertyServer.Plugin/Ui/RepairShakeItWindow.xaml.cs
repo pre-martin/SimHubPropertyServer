@@ -10,11 +10,11 @@ namespace SimHub.Plugins.PropertyServer.Ui
     {
         public RepairShakeItWindow(PluginManager pluginManager)
         {
-            var shakeItBassAccessor = new ShakeItBassAccessor();
+            var shakeItBassAccessor = new ShakeItAccessor();
             shakeItBassAccessor.Init(pluginManager);
 
             InitializeComponent();
-            ((RepairShakeItViewModel)DataContext).ShakeItBassAccessor = shakeItBassAccessor;
+            ((RepairShakeItViewModel)DataContext).ShakeItAccessor = shakeItBassAccessor;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

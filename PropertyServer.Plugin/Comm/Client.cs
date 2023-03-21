@@ -137,6 +137,9 @@ namespace SimHub.Plugins.PropertyServer.Comm
                 case "shakeit-bass-structure":
                     await ShakeItBassStructure();
                     return;
+                case "shakeit-motors-structure":
+                    await ShakeItMotorsStructure();
+                    return;
                 case "help":
                     await Help();
                     return;
@@ -153,12 +156,14 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
             var property = await _subscriptionManager.Subscribe(propertyName, ValueChanged, SendError);
             // We have to check here (outside the SubscriptionManager) if the ShakeIt Bass element exists.
-            if (property is SimHubPropertyShakeItBass bassProp)
+            if (property is SimHubPropertyShakeItBass bassProp && _simHub.FindShakeItBassEffect(bassProp.Guid) == null)
             {
-                if (_simHub.FindShakeItBassEffect(bassProp.Guid) == null)
-                {
-                    Log.Warn($"ShakeIt Bass effect or effect group with {bassProp.Guid} does not exist");
-                }
+                Log.Warn($"ShakeIt Bass effect or effect group with {bassProp.Guid} does not exist");
+            }
+            // Same for ShakeIt Motors.
+            if (property is SimHubPropertyShakeItMotors motorsProp && _simHub.FindShakeItMotorsEffect(motorsProp.Guid) == null)
+            {
+                Log.Warn($"ShakeIt Motors effect or effect group with {motorsProp.Guid} does not exist");
             }
 
             if (property != null)
@@ -196,7 +201,17 @@ namespace SimHub.Plugins.PropertyServer.Comm
         private async Task ShakeItBassStructure()
         {
             await SendString("ShakeIt Bass structure");
-            var profiles = _simHub.ShakeItBassStructure();
+            await ShakeItStructure(_simHub.ShakeItBassStructure(), "Bass");
+        }
+
+        private async Task ShakeItMotorsStructure()
+        {
+            await SendString("ShakeIt Motors structure");
+            await ShakeItStructure(_simHub.ShakeItMotorsStructure(), "Motors");
+        }
+
+        private async Task ShakeItStructure(ICollection<Profile> profiles, string loggingName)
+        {
             // Send structure, profile by profile.
             foreach (var profile in profiles)
             {
@@ -204,7 +219,7 @@ namespace SimHub.Plugins.PropertyServer.Comm
                 await SendEffects(1, profile.EffectsContainers);
             }
             await SendString("End");
-            Log.Info($"Sent ShakeIt Bass structure with {profiles.Count()} profiles to client");
+            Log.Info($"Sent ShakeIt {loggingName} structure with {profiles.Count()} profiles to client");
         }
 
         private async Task SendEffects(int depth, IEnumerable<EffectsContainerBase> profileEffectsContainers)
@@ -236,6 +251,7 @@ namespace SimHub.Plugins.PropertyServer.Comm
             await SendString("  trigger-input-pressed inputName");
             await SendString("  trigger-input-released inputName");
             await SendString("  shakeit-bass-structure");
+            await SendString("  shakeit-motor-structure");
             await SendString("  disconnect");
         }
 

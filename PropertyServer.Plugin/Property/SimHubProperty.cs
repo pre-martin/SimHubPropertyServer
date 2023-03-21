@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using log4net;
 using SimHub.Plugins.PropertyServer.ShakeIt;
 
 namespace SimHub.Plugins.PropertyServer.Property
@@ -215,14 +214,13 @@ namespace SimHub.Plugins.PropertyServer.Property
     }
 
     /// <summary>
-    /// A property which is mapped on a special view of all available ShakeIt Bass effect groups and effects.
+    /// A property which is mapped on a special view of all available ShakeIt Bass and ShakeIt Motors effect groups and effects.
     /// </summary>
     /// <remarks>
     /// The special view is defined by the classes in the namespace <see cref="ShakeIt"/>.
     /// </remarks>
-    public class SimHubPropertyShakeItBass : SimHubProperty
+    public abstract class SimHubPropertyShakeItBase : SimHubProperty
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(SimHubPropertyShakeItBass));
         public Guid Guid { get; }
         private readonly Property _property;
 
@@ -232,17 +230,19 @@ namespace SimHub.Plugins.PropertyServer.Property
             IsMuted
         }
 
-        public SimHubPropertyShakeItBass(string propertyName, Guid guid, Property property) : base(PropertySource.ShakeItBass, propertyName)
+        protected SimHubPropertyShakeItBase(PropertySource source, string propertyName, Guid guid, Property property) : base(source, propertyName)
         {
             Guid = guid;
             _property = property;
         }
 
+        protected abstract EffectsContainerBase GetEffect(ShakeItAccessor shakeItAccessor, Guid guid);
+
         protected override object GetValue(object obj)
         {
-            if (obj is ShakeItBassAccessor accessor)
+            if (obj is ShakeItAccessor accessor)
             {
-                var effect = accessor.FindEffect(Guid);
+                var effect = GetEffect(accessor, Guid);
                 if (effect == null) return null;
 
                 switch (_property)
@@ -272,4 +272,35 @@ namespace SimHub.Plugins.PropertyServer.Property
             }
         }
     }
+
+    /// <summary>
+    /// A property which is mapped on a special view of all available ShakeIt Bass effect groups and effects.
+    /// </summary>
+    public class SimHubPropertyShakeItBass : SimHubPropertyShakeItBase
+    {
+        public SimHubPropertyShakeItBass(string propertyName, Guid guid, Property property) : base(PropertySource.ShakeItBass, propertyName, guid, property)
+        {
+        }
+
+        protected override EffectsContainerBase GetEffect(ShakeItAccessor shakeItAccessor, Guid guid)
+        {
+            return shakeItAccessor.FindBassEffect(guid);
+        }
+    }
+
+    /// <summary>
+    /// A property which is mapped on a special view of all available ShakeIt Motors effect groups and effects.
+    /// </summary>
+    public class SimHubPropertyShakeItMotors : SimHubPropertyShakeItBase
+    {
+        public SimHubPropertyShakeItMotors(string propertyName, Guid guid, Property property) : base(PropertySource.ShakeItMotors, propertyName, guid, property)
+        {
+        }
+
+        protected override EffectsContainerBase GetEffect(ShakeItAccessor shakeItAccessor, Guid guid)
+        {
+            return shakeItAccessor.FindMotorsEffect(guid);
+        }
+    }
+
 }
