@@ -135,6 +135,10 @@ $ telnet localhost 18082
 
 In this example, the client retrieves the structure of all ShakeIt Bass profile, their effect groups and effects. Then it subscribes to one specific entry to the value "Gain" and "IsMuted". The SimHub Property server will now send "Property" messages when these values change.
 
+==== Prefix `sim.*`
+
+Same as `sib.*`, but for ShakeIt Motors. See above for details.
+
 ==== No prefix, also known as "Generic" properties
 
 If a property name does not start with one of the prefixes listed above, then a generic access is used. This allows access to almost all properties of SimHub.
@@ -468,6 +472,7 @@ Available commands:
   trigger-input-pressed inputName
   trigger-input-released inputName
   shakeit-bass-structure
+  shakeit-motors-structure
   disconnect
 ----
 

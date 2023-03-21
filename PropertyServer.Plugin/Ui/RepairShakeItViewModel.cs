@@ -18,14 +18,16 @@ namespace SimHub.Plugins.PropertyServer.Ui
     /// </summary>
     public class RepairShakeItViewModel : NotifyPropertyChanges
     {
-        public ShakeItBassAccessor ShakeItBassAccessor { get; set; }
+        public ShakeItAccessor ShakeItAccessor { get; set; }
         public ICommand ScanShakeItBassCommand { get; }
+        public ICommand ScanShakeItMotorsCommand { get; }
         public ICommand RepairCommand { get; }
         public bool ShowScanHint => Profiles == null;
         public bool ShowDuplicatesList => Profiles != null && Profiles.Count > 0;
         public bool ShowNoResults => Profiles != null && Profiles.Count == 0;
 
         private ObservableCollection<ProfileHolder> _profiles;
+        private int _currentMode = 1; // 1 = Bass, 2 = Motors
 
         public ObservableCollection<ProfileHolder> Profiles
         {
@@ -42,6 +44,7 @@ namespace SimHub.Plugins.PropertyServer.Ui
         public RepairShakeItViewModel()
         {
             ScanShakeItBassCommand = new RelayCommand<object>(o => FindShakeItBassDuplicates());
+            ScanShakeItMotorsCommand = new RelayCommand<object>(o => FindShakeItMotorsDuplicates());
             RepairCommand = new RelayCommand<object>(
                 e => Profiles != null && Profiles.Any(p => p.IsChecked),
                 o => Repair()
@@ -50,11 +53,22 @@ namespace SimHub.Plugins.PropertyServer.Ui
 
         private void FindShakeItBassDuplicates()
         {
+            FindShakeItDuplicates(ShakeItAccessor.BassProfiles());
+            _currentMode = 1;
+        }
+
+        private void FindShakeItMotorsDuplicates()
+        {
+            FindShakeItDuplicates(ShakeItAccessor.MotorsProfiles());
+            _currentMode = 2;
+        }
+
+        private void FindShakeItDuplicates(ICollection<Profile> profiles)
+        {
             var tempProfiles = new ObservableCollection<ProfileHolder>();
-            var profiles = ShakeItBassAccessor.Profiles();
             foreach (var profile in profiles)
             {
-                var guidToEffects = ShakeItBassAccessor.GroupEffectsByGuid(profile);
+                var guidToEffects = ShakeItAccessor.GroupEffectsByGuid(profile);
                 var duplicates = guidToEffects.Where(kv => kv.Value.Count > 1).SelectMany(kv => kv.Value).ToList();
                 if (duplicates.Count > 0)
                 {
@@ -80,7 +94,8 @@ namespace SimHub.Plugins.PropertyServer.Ui
                 }
             }
 
-            FindShakeItBassDuplicates();
+            if (_currentMode == 1) FindShakeItBassDuplicates();
+            else FindShakeItMotorsDuplicates();
         }
     }
 

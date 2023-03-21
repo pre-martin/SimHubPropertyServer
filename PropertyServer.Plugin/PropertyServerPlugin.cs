@@ -32,7 +32,7 @@ namespace SimHub.Plugins.PropertyServer
         private readonly SubscriptionManager _subscriptionManager = new SubscriptionManager();
         private FieldInfo _rawField;
         private readonly RawDataManager _rawDataManager = new RawDataManager();
-        private readonly ShakeItBassAccessor _shakeItBassAccessor = new ShakeItBassAccessor();
+        private readonly ShakeItAccessor _shakeItAccessor = new ShakeItAccessor();
         private int _unhandledExceptionCount;
 
         public PluginManager PluginManager { get; set; }
@@ -61,7 +61,7 @@ namespace SimHub.Plugins.PropertyServer
 
             Log.Info($"Starting plugin, version {ThisAssembly.AssemblyFileVersion}");
 
-            _shakeItBassAccessor.Init(pluginManager);
+            _shakeItAccessor.Init(pluginManager);
 
             // Move execution of server into a new task/thread (away from SimHub thread). The server is async, but we
             // do not want to put any unnecessary load onto the SimHub thread.
@@ -150,7 +150,10 @@ namespace SimHub.Plugins.PropertyServer
                         await simHubProperty.UpdateFromObject(PluginManager);
                         break;
                     case PropertySource.ShakeItBass:
-                        await simHubProperty.UpdateFromObject(_shakeItBassAccessor);
+                        await simHubProperty.UpdateFromObject(_shakeItAccessor);
+                        break;
+                    case PropertySource.ShakeItMotors:
+                        await simHubProperty.UpdateFromObject(_shakeItAccessor);
                         break;
                     default:
                         throw new ArgumentException($"Unknown PropertySource {simHubProperty.PropertySource}");
@@ -197,12 +200,22 @@ namespace SimHub.Plugins.PropertyServer
 
         public ICollection<Profile> ShakeItBassStructure()
         {
-            return _shakeItBassAccessor.Profiles();
+            return _shakeItAccessor.BassProfiles();
         }
 
         public EffectsContainerBase FindShakeItBassEffect(Guid id)
         {
-            return _shakeItBassAccessor.FindEffect(id);
+            return _shakeItAccessor.FindBassEffect(id);
+        }
+
+        public ICollection<Profile> ShakeItMotorsStructure()
+        {
+            return _shakeItAccessor.MotorsProfiles();
+        }
+
+        public EffectsContainerBase FindShakeItMotorsEffect(Guid id)
+        {
+            return _shakeItAccessor.FindMotorsEffect(id);
         }
     }
 }

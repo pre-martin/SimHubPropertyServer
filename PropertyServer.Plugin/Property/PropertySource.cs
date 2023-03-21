@@ -40,7 +40,12 @@ namespace SimHub.Plugins.PropertyServer.Property
         /// <summary>
         /// Access to a (small) subset of ShakeIt Bass data.
         /// </summary>
-        ShakeItBass
+        ShakeItBass,
+
+        /// <summary>
+        /// Access to a (small) subset of ShakeIt Motors data.
+        /// </summary>
+        ShakeItMotors
     }
 
     public static class PropertySourceEx
@@ -64,7 +69,9 @@ namespace SimHub.Plugins.PropertyServer.Property
                 case PropertySource.Generic:
                     return typeof(PluginManager);
                 case PropertySource.ShakeItBass:
-                    return typeof(ShakeItBassAccessor);
+                    return typeof(ShakeItAccessor);
+                case PropertySource.ShakeItMotors:
+                    return typeof(ShakeItAccessor);
                 default:
                     throw new ArgumentException($"Unknown PropertySource {propertySource}");
             }
@@ -89,6 +96,8 @@ namespace SimHub.Plugins.PropertyServer.Property
                     return "";
                 case PropertySource.ShakeItBass:
                     return "sib"; // ShakeItBass
+                case PropertySource.ShakeItMotors:
+                    return "sim"; // ShakeItMotors
                 default:
                     throw new ArgumentException($"Unknown PropertySource {propertySource}");
             }

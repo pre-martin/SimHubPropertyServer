@@ -94,12 +94,12 @@
     <Compile Include="ShakeIt\EffectsContainerBase.cs" />
     <Compile Include="ShakeIt\GroupContainer.cs" />
     <Compile Include="ShakeIt\Profile.cs" />
-    <Compile Include="ShakeIt\ShakeItBassAccessor.cs" />
+    <Compile Include="ShakeIt\ShakeItAccessor.cs" />
     <Compile Include="ShakeIt\TreeElement.cs" />
     <Compile Include="SubscriptionManager.cs" />
     <Compile Include="Ui\IpPortValidationRule.cs" />
     <Compile Include="Ui\RepairShakeItViewModel.cs" />
-    <Page Include="Ui\RepairShakeItWindow.xaml"/>
+    <Page Include="Ui\RepairShakeItWindow.xaml" />
     <Compile Include="Ui\RepairShakeItWindow.xaml.cs">
       <DependentUpon>RepairShakeItWindow.xaml</DependentUpon>
     </Compile>

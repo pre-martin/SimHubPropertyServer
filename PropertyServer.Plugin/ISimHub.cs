@@ -37,5 +37,16 @@ namespace SimHub.Plugins.PropertyServer
         /// </summary>
         /// <returns><c>null</c> if nothing is found.</returns>
         EffectsContainerBase FindShakeItBassEffect(Guid id);
+
+        /// <summary>
+        /// Returns the structure of the ShakeIt Motors configuration (profiles with effect groups and effects).
+        /// </summary>
+        ICollection<Profile> ShakeItMotorsStructure();
+
+        /// <summary>
+        /// Tries to find a ShakeIt Motors effect or effect group with the given id.
+        /// </summary>
+        /// <returns><c>null</c> if nothing is found.</returns>
+        EffectsContainerBase FindShakeItMotorsEffect(Guid id);
     }
 }
