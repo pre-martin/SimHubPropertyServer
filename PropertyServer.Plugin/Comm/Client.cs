@@ -251,7 +251,7 @@ namespace SimHub.Plugins.PropertyServer.Comm
             await SendString("  trigger-input-pressed inputName");
             await SendString("  trigger-input-released inputName");
             await SendString("  shakeit-bass-structure");
-            await SendString("  shakeit-motor-structure");
+            await SendString("  shakeit-motors-structure");
             await SendString("  disconnect");
         }
 
