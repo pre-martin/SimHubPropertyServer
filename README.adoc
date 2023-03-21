@@ -467,7 +467,7 @@ Available commands:
   trigger-input-pressed inputName
   trigger-input-released inputName
   shakeit-bass-structure
-  shakeit-motor-structure
+  shakeit-motors-structure
   disconnect
 ----
 
