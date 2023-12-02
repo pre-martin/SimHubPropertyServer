@@ -58,14 +58,18 @@ namespace SimHub.Plugins.PropertyServer.Property
         {
             return pi.PropertyType == typeof(int) || pi.PropertyType == typeof(long) ||
                    pi.PropertyType == typeof(bool) ||
-                   pi.PropertyType == typeof(float) || pi.PropertyType == typeof(double);
+                   pi.PropertyType == typeof(float) || pi.PropertyType == typeof(double) ||
+                   pi.PropertyType == typeof(string) ||
+                   pi.PropertyType == typeof(TimeSpan);
         }
 
         private static bool IsFieldSupported(FieldInfo fi)
         {
             return fi.FieldType == typeof(int) || fi.FieldType == typeof(long) ||
                    fi.FieldType == typeof(bool) ||
-                   fi.FieldType == typeof(float) || fi.FieldType == typeof(double);
+                   fi.FieldType == typeof(float) || fi.FieldType == typeof(double) ||
+                   fi.FieldType == typeof(string) ||
+                   fi.FieldType == typeof(TimeSpan);
         }
 
         private static bool IsMethodSupported(MethodInfo mi)
@@ -75,7 +79,9 @@ namespace SimHub.Plugins.PropertyServer.Property
                    mi.GetParameters().Length == 0 &&
                    (mi.ReturnType == typeof(int) || mi.ReturnType == typeof(long) ||
                     mi.ReturnType == typeof(bool) ||
-                    mi.ReturnType == typeof(float) || mi.ReturnType == typeof(double)
+                    mi.ReturnType == typeof(float) || mi.ReturnType == typeof(double) ||
+                    mi.ReturnType == typeof(string) ||
+                    mi.ReturnType == typeof(TimeSpan)
                    );
         }
 

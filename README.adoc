@@ -169,17 +169,21 @@ This is the current output of the command `help`:
 ----
 Available properties:
   acc.graphics.ABS integer
+  acc.graphics.BestTime string
   acc.graphics.CarCount integer
   acc.graphics.clock double
   acc.graphics.CompletedLaps integer
   acc.graphics.CurrentSectorIndex integer
+  acc.graphics.CurrentTime string
   acc.graphics.currentTyreSet integer
+  acc.graphics.deltaLapTime string
   acc.graphics.directionLightsLeft integer
   acc.graphics.directionLightsRight integer
   acc.graphics.DistanceTraveled double
   acc.graphics.DriverStintTimeLeft integer
   acc.graphics.DriverStintTotalTimeLeft integer
   acc.graphics.EngineMap integer
+  acc.graphics.EstimatedLapTime string
   acc.graphics.ExhaustTemperature double
   acc.graphics.FlashingLights integer
   acc.graphics.fuelEstimatedLaps double
@@ -208,6 +212,7 @@ Available properties:
   acc.graphics.IsSetupMenuVisible integer
   acc.graphics.isValidLap integer
   acc.graphics.LastSectorTime integer
+  acc.graphics.LastTime string
   acc.graphics.LightsStage integer
   acc.graphics.MainDisplayIndex integer
   acc.graphics.MandatoryPitDone integer
@@ -230,10 +235,14 @@ Available properties:
   acc.graphics.SecondaryDisplayIndex integer
   acc.graphics.SessionIndex integer
   acc.graphics.SessionTimeLeft double
+  acc.graphics.Split string
   acc.graphics.strategyTyreSet integer
   acc.graphics.SurfaceGrip double
   acc.graphics.TC integer
   acc.graphics.TCCut integer
+  acc.graphics.ToString string
+  acc.graphics.trackStatus string
+  acc.graphics.TyreCompound string
   acc.graphics.UsedFuel double
   acc.graphics.WindDirection double
   acc.graphics.WindSpeed double
@@ -290,16 +299,22 @@ Available properties:
   acc.physics.SteerAngle double
   acc.physics.TC double
   acc.physics.tcinAction integer
+  acc.physics.ToString string
   acc.physics.Turbo double
   acc.physics.waterTemperature double
   dcp.GameInMenu boolean
+  dcp.GameName string
+  dcp.GamePath string
   dcp.GamePaused boolean
   dcp.GameReplay boolean
   dcp.GameRunning boolean
   dcp.gd.ABSActive integer
   dcp.gd.ABSLevel integer
   dcp.gd.AirTemperature double
+  dcp.gd.AllTimeBest timespan
   dcp.gd.BestLapOpponentPosition integer
+  dcp.gd.BestLapOpponentSameClassPosition integer
+  dcp.gd.BestLapTime timespan
   dcp.gd.Brake double
   dcp.gd.BrakeBias double
   dcp.gd.BrakesTemperatureAvg double
@@ -309,6 +324,7 @@ Available properties:
   dcp.gd.BrakeTemperatureFrontRight double
   dcp.gd.BrakeTemperatureRearLeft double
   dcp.gd.BrakeTemperatureRearRight double
+  dcp.gd.CarClass string
   dcp.gd.CarDamage1 double
   dcp.gd.CarDamage2 double
   dcp.gd.CarDamage3 double
@@ -317,6 +333,8 @@ Available properties:
   dcp.gd.CarDamagesAvg double
   dcp.gd.CarDamagesMax double
   dcp.gd.CarDamagesMin double
+  dcp.gd.CarId string
+  dcp.gd.CarModel string
   dcp.gd.CarSettings_CurrentDisplayedRPMPercent double
   dcp.gd.CarSettings_CurrentGearRedLineRPM double
   dcp.gd.CarSettings_FuelAlertActive integer
@@ -337,6 +355,7 @@ Available properties:
   dcp.gd.Clutch double
   dcp.gd.CompletedLaps integer
   dcp.gd.CurrentLap integer
+  dcp.gd.CurrentLapTime timespan
   dcp.gd.CurrentSectorIndex integer
   dcp.gd.DraftEstimate double
   dcp.gd.DRSAvailable integer
@@ -356,14 +375,19 @@ Available properties:
   dcp.gd.Flag_Blue integer
   dcp.gd.Flag_Checkered integer
   dcp.gd.Flag_Green integer
+  dcp.gd.Flag_Name string
   dcp.gd.Flag_Orange integer
   dcp.gd.Flag_White integer
   dcp.gd.Flag_Yellow integer
   dcp.gd.Fuel double
   dcp.gd.FuelPercent double
   dcp.gd.FuelRaw double
+  dcp.gd.FuelUnit string
+  dcp.gd.Gear string
   dcp.gd.GlobalAccelerationG double
+  dcp.gd.GuessedElaspedGameTime timespan
   dcp.gd.Handbrake double
+  dcp.gd.HasMultipleClassOpponents boolean
   dcp.gd.InstantConsumption_L100KM double
   dcp.gd.InstantConsumption_MPG_UK double
   dcp.gd.InstantConsumption_MPG_US double
@@ -372,11 +396,15 @@ Available properties:
   dcp.gd.IsInPitSince double
   dcp.gd.IsLapValid boolean
   dcp.gd.IsPitlimiterOrPitLane boolean
+  dcp.gd.IsSessionRestart boolean
+  dcp.gd.LapInvalidated boolean
+  dcp.gd.LastLapTime timespan
   dcp.gd.LastLapTyreWearFrontLeft double
   dcp.gd.LastLapTyreWearFrontRight double
   dcp.gd.LastLapTyreWearRearLeft double
   dcp.gd.LastLapTyreWearRearRight double
   dcp.gd.LastPitStopDuration double
+  dcp.gd.LastSectorTime timespan
   dcp.gd.MapAllowed boolean
   dcp.gd.MaxEngineTorque double
   dcp.gd.MaxFuel double
@@ -387,25 +415,35 @@ Available properties:
   dcp.gd.MaxTurbo double
   dcp.gd.MaxTurboBar double
   dcp.gd.OilPressure double
+  dcp.gd.OilPressureUnit string
   dcp.gd.OilTemperature double
   dcp.gd.OpponentsCount integer
   dcp.gd.OrientationPitch double
+  dcp.gd.OrientationPitchAcceleration double
   dcp.gd.OrientationRoll double
+  dcp.gd.OrientationRollAcceleration double
   dcp.gd.OrientationYaw double
+  dcp.gd.OrientationYawAcceleration double
   dcp.gd.OrientationYawWorld double
   dcp.gd.PitLimiterOn integer
   dcp.gd.PlayerClassOpponentsCount integer
+  dcp.gd.PlayerLeaderboardPosition integer
+  dcp.gd.PlayerName string
   dcp.gd.Position integer
   dcp.gd.Redline double
   dcp.gd.RemainingLaps integer
+  dcp.gd.ReplayMode string
   dcp.gd.ReportedTrackLength double
   dcp.gd.RoadTemperature double
   dcp.gd.Rpms double
   dcp.gd.SessionOdo double
   dcp.gd.SessionOdoLocalUnit double
+  dcp.gd.SessionTimeLeft timespan
+  dcp.gd.SessionTypeName string
   dcp.gd.Spectating boolean
   dcp.gd.SpeedKmh double
   dcp.gd.SpeedLocal double
+  dcp.gd.SpeedLocalUnit string
   dcp.gd.SpeedMph double
   dcp.gd.SpotterCarLeft integer
   dcp.gd.SpotterCarLeftAngle double
@@ -417,9 +455,15 @@ Available properties:
   dcp.gd.StintOdoLocalUnit double
   dcp.gd.TCActive integer
   dcp.gd.TCLevel integer
+  dcp.gd.TemperatureUnit string
   dcp.gd.Throttle double
   dcp.gd.TotalLaps integer
+  dcp.gd.TrackCode string
+  dcp.gd.TrackConfig string
+  dcp.gd.TrackId string
+  dcp.gd.TrackIdWithConfig string
   dcp.gd.TrackLength double
+  dcp.gd.TrackName string
   dcp.gd.TrackPositionPercent double
   dcp.gd.Turbo double
   dcp.gd.TurboBar double
@@ -434,6 +478,7 @@ Available properties:
   dcp.gd.TyrePressureFrontRight double
   dcp.gd.TyrePressureRearLeft double
   dcp.gd.TyrePressureRearRight double
+  dcp.gd.TyrePressureUnit string
   dcp.gd.TyresDirtyLevelAvg double
   dcp.gd.TyresDirtyLevelMax double
   dcp.gd.TyresDirtyLevelMin double
@@ -464,6 +509,7 @@ Available properties:
   dcp.gd.TyreWearRearLeft double
   dcp.gd.TyreWearRearRight double
   dcp.gd.WaterTemperature double
+  dcp.RunningGameProcessDetected boolean
   dcp.Spectating boolean
 Available commands:
   subscribe propertyName
