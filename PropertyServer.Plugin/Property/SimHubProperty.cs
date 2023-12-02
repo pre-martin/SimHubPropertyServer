@@ -109,6 +109,10 @@ namespace SimHub.Plugins.PropertyServer.Property
                     return "double";
                 case "System.Double":
                     return "double";
+                case "System.TimeSpan":
+                    return "timespan";
+                case "System.String":
+                    return "string";
                 case "System.Object":
                     return "object";
                 default:
