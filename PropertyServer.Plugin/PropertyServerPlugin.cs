@@ -128,7 +128,7 @@ namespace SimHub.Plugins.PropertyServer
             }
             _rawDataManager.UpdateObjects(rawData);
 
-            var properties = _subscriptionManager.GetProperties().Result;
+            var properties = await _subscriptionManager.GetProperties();
             foreach (var simHubProperty in properties.Values)
             {
                 // TODO Better performance: Collect all changed Properties and dispatch them in a Task
