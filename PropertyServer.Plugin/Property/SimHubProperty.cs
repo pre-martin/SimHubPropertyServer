@@ -217,7 +217,7 @@ namespace SimHub.Plugins.PropertyServer.Property
 
         protected override Type GetPropertyType()
         {
-            return _lastSeenType;
+            return _lastSeenType ?? typeof(object);
         }
     }
 
