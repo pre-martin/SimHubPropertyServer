@@ -19,7 +19,7 @@ This is a plugin for https://www.simhubdash.com/[SimHub]. It allows access to Si
 
 Clients can subscribe for property changes. They will then receive updates each time, when the value of a subscribed property changes.
 
-One use case is the project https://github.com/pre-martin/StreamDeckSimHubPlugin[StreamDeckSimHubPlugin], which allows updating the state of Stream Deck keys via SimHub properties.
+One use case is my project https://github.com/pre-martin/StreamDeckSimHubPlugin[StreamDeckSimHubPlugin], which allows updating the state of Stream Deck keys via SimHub properties.
 
 
 == Installation
@@ -133,7 +133,7 @@ $ telnet localhost 18082
 >Property sib.ff17edcb-c7b3-47e4-905c-a0d314447eab.ismuted boolean False
 ----
 
-In this example, the client retrieves the structure of all ShakeIt Bass profile, their effect groups and effects. Then it subscribes to one specific entry to the value "Gain" and "IsMuted". The SimHub Property server will now send "Property" messages when these values change.
+In this example, the client retrieves the structure of all ShakeIt Bass profile, their effect groups and effects. Then it subscribes to one specific entry to the value "Gain" and "IsMuted". The SimHub Property Server will now send "Property" messages when these values change.
 
 ==== Prefix `sim.*`
 
@@ -141,24 +141,22 @@ Same as `sib.*`, but for ShakeIt Motors. See above for details.
 
 ==== No prefix, also known as "Generic" properties
 
-If a property name does not start with one of the prefixes listed above, then a generic access is used. This allows access to almost all properties of SimHub.
+If a property name does not start with one of the prefixes listed above, then generic access is used. This allows access to almost all properties of SimHub.
 
-The number of available properties depends on the plugins that are enabled in SimHub, but in a usual setup there should be around 2000 properties available - including custom properties exported by NCalc scripts.
+The number of available properties depends on the plugins that are enabled in SimHub, but in a usual setup there should be around 2000 to 4000 properties available - including custom properties exported by NCalc scripts.
 
-These properties are not listed in the section <<help>>! Just search the properties you are interested in in SimHub under "Available properties" and use the "Copy name" function from the context menu.
+These properties are not listed in the section <<help>>! Simply search the available properties in SimHub under "Available properties" and use the "Copy name" function from the context menu.
 
 The downsides of generic properties are:
 
 - Access is a little bit slower (but that shouldn't be a problem - it's fractions of a millisecond)
-- These properties are not typed - they are just returned as `object`.
+- These properties are not *statically typed* - SimHub returns them just as `object`.
 
-The consequence of this second point is that client applications have to take care of the interpretation of the values themselves. Therefore the other prefixes should be used, if possible.
+This second point has some consequences::
 
-- Example 1: `ShakeItWindPlugin.DynamicGain` allows access to just this property
-- Example 2: `SystemInfoPlugin.CPULoadPercent` allows access to just this property
-- Example 3: Of course, names like `DataCorePlugin.GameData.Brake` can be used. But consider using `dcp.gd.Brake` instead (for the reasons mentioned above)
-- Example 4: Your SimHub installation contains an NCalc script example in the file `<SimHub>\NCalcScripts\samples.ini`, which exports the properties `DataCorePlugin.ExternalScript.BlinkingGear` and `DataCorePlugin.ExternalScript.BlinkingGearUP`. These custom properties can be accessed just by exactly these names. +
-  This allows you to convert values inside of SimHub with the help of NCalc for usage in external applications.
+Because the value of such a generic property can be anything (`DataCorePlugin.GameData.IsInPit` could contain the numeric value `1`, but it could also contain the text `1` or the text `True` or the boolean value `True`), the Stream Deck plugin cannot format the value of this property correctly. If you use a numeric format on a text value, the formatting will fail, and vice versa. In contrast, `dcp.gd.IsInPit` always contains a numeric value (its type is `integer` - see below), so you can be sure that a numeric format string will always work.
++
+That said, the situation is not that bad with generic properties. The SimHub Property Server tries to determine the type of generic properties during runtime. To stay with the example from above, the Property Server will recognize, that `DataCorePlugin.GameData.IsInPit` is actually of type `integer`. It will send this information together with the value to the Stream Deck plugin, so that you are able to use numeric formatting strings for this property.
 
 
 [#help,reftext=Help]
