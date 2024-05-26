@@ -202,18 +202,22 @@ namespace SimHub.Plugins.PropertyServer.Property
     /// </remarks>
     public class SimHubPropertyGeneric : SimHubProperty
     {
+        private Type _lastSeenType;
+
         public SimHubPropertyGeneric(string propertyName) : base(PropertySource.Generic, propertyName)
         {
         }
 
         protected override object GetValue(object obj)
         {
-            return obj is PluginManager pm ? pm.GetPropertyValue(Name) : null;
+            var value = obj is PluginManager pm ? pm.GetPropertyValue(Name) : null;
+            _lastSeenType = value == null ? typeof(object) : value.GetType();
+            return value;
         }
 
         protected override Type GetPropertyType()
         {
-            return typeof(object);
+            return _lastSeenType ?? typeof(object);
         }
     }
 
