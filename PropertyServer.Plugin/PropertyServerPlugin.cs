@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2023 Martin Renner
+﻿// Copyright (C) 2025 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
@@ -72,6 +72,7 @@ namespace SimHub.Plugins.PropertyServer
         public void End(PluginManager pluginManager)
         {
             Log.Info("Shutting down plugin");
+            this.SaveCommonSettings("GeneralSettings", _settings);
             _server?.Stop();
         }
 
@@ -170,12 +171,7 @@ namespace SimHub.Plugins.PropertyServer
         public Control GetWPFSettingsControl(PluginManager pluginManager)
         {
             var settingsViewModel = new SettingsViewModel(_settings);
-            settingsViewModel.SaveSettingsEvent += (sender, args) =>
-            {
-                Log.Info("Saving settings");
-                GetNamespaceLogger().Level = _settings.LogLevel.ToLog4Net();
-                this.SaveCommonSettings("GeneralSettings", _settings);
-            };
+            settingsViewModel.LogLevelChangedEvent += (sender, args) => GetNamespaceLogger().Level = _settings.LogLevel.ToLog4Net();
             return new SettingsControl { DataContext = settingsViewModel, PluginManager = pluginManager };
         }
 

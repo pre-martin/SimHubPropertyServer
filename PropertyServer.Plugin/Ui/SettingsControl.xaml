@@ -1,5 +1,5 @@
 ﻿<!--
-// Copyright (C) 2022 Martin Renner
+// Copyright (C) 2025 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 -->
 
@@ -9,8 +9,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:local="clr-namespace:SimHub.Plugins.PropertyServer.Ui"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
@@ -78,7 +76,6 @@
                             BorderBrush="#FF3A3A3A" />
 
                 </Grid>
-                <styles:SHButtonPrimary HorizontalAlignment="Left" Margin="0,25,0,0" Command="{Binding SaveSettings}">Save</styles:SHButtonPrimary>
             </StackPanel>
         </styles:SHSection>
     </Grid>
