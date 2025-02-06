@@ -1,27 +1,23 @@
-﻿// Copyright (C) 2023 Martin Renner
+﻿// Copyright (C) 2025 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using SimHub.Plugins.DataPlugins.ShakeItV3;
 using SimHub.Plugins.DataPlugins.ShakeItV3.Settings;
 
 namespace SimHub.Plugins.PropertyServer.ShakeIt
 {
     /// <summary>
-    /// <c>ShakeITBSV3Plugin.settings</c> and <c>ShakeITMotorsV3Plugin.settings</c> are not accessible for us, because both are "private".
-    /// So we use this class to manage access to these property. It allows us to read the whole configuration of the ShakeIt Bass
-    /// and the ShakeIt Motors plugin.
+    /// We use this class to manage access to the "settings" properties of the ShakeIt plugins. It allows us to read the
+    /// whole configuration of the ShakeIt Bass and the ShakeIt Motors plugin.
     /// </summary>
     public class ShakeItAccessor
     {
         private PluginManager _pluginManager;
-        private FieldInfo _shakeItBassSettingsField;
         private ShakeITBSV3Plugin _shakeItBassPlugin;
         private ShakeITMotorsV3Plugin _shakeItMotorsPlugin;
-        private FieldInfo _shakeItMotorsSettingsField;
 
         /// <summary>
         /// Initialises the accessor. Calls to subsequent methods of this class will only be successful, if this method was called once.
@@ -33,25 +29,7 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
         public void Init(PluginManager pluginManager)
         {
             _pluginManager = pluginManager;
-
-            if (_shakeItBassSettingsField == null)
-            {
-                var shakeItPluginBaseType = typeof(ShakeITBSV3Plugin).BaseType;
-                if (shakeItPluginBaseType != null)
-                {
-                    _shakeItBassSettingsField = shakeItPluginBaseType.GetField("settings", BindingFlags.NonPublic | BindingFlags.Instance);
-                }
-            }
             _shakeItBassPlugin = _pluginManager.GetPlugin<ShakeITBSV3Plugin>();
-
-            if (_shakeItMotorsSettingsField == null)
-            {
-                var shakeItPluginBaseType = typeof(ShakeITMotorsV3Plugin).BaseType;
-                if (shakeItPluginBaseType != null)
-                {
-                    _shakeItMotorsSettingsField = shakeItPluginBaseType.GetField("settings", BindingFlags.NonPublic | BindingFlags.Instance);
-                }
-            }
             _shakeItMotorsPlugin = _pluginManager.GetPlugin<ShakeITMotorsV3Plugin>();
         }
 
@@ -61,16 +39,10 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
         /// <remarks>
         /// This returns the original data structure of the ShakeIt internals! Be careful when modifying the data.
         /// </remarks>
-        private IEnumerable<ShakeItProfile> SimHubProfiles<T>(ShakeITV3PluginBase<T> shakeItPlugin, FieldInfo settingsField) where T : IOutputManager
+        private IEnumerable<ShakeItProfile> SimHubProfiles<T, TSettingsType>(ShakeITV3PluginBase<T, TSettingsType> shakeItPlugin)
+            where T : IOutputManager where TSettingsType : ShakeItSettings<T>, new()
         {
-            if (settingsField == null || shakeItPlugin == null) return Enumerable.Empty<ShakeItProfile>();
-
-            if (settingsField.GetValue(shakeItPlugin) is ShakeItSettings settings)
-            {
-                return settings.Profiles;
-            }
-
-            return Enumerable.Empty<ShakeItProfile>();
+            return shakeItPlugin == null ? Enumerable.Empty<ShakeItProfile>() : shakeItPlugin.Settings.Profiles;
         }
 
         /// <summary>
@@ -81,7 +53,7 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
         /// </remarks>
         public ICollection<Profile> BassProfiles()
         {
-            var simHubProfiles = SimHubProfiles(_shakeItBassPlugin, _shakeItBassSettingsField);
+            var simHubProfiles = SimHubProfiles(_shakeItBassPlugin);
             return simHubProfiles.Select(simHubProfile => new Profile(simHubProfile)).ToList();
         }
 
@@ -94,7 +66,7 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
         /// <returns>An instance of <c>EffectsContainerBase</c> or one if its subclasses, or <c>null</c> if the element was not found.</returns>
         public EffectsContainerBase FindBassEffect(Guid guid)
         {
-            var simHubProfiles = SimHubProfiles(_shakeItBassPlugin, _shakeItBassSettingsField);
+            var simHubProfiles = SimHubProfiles(_shakeItBassPlugin);
             return simHubProfiles.Select(simHubProfile => FindEffect(simHubProfile.EffectsContainers, guid)).FirstOrDefault(result => result != null);
         }
 
@@ -106,7 +78,7 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
         /// </remarks>
         public ICollection<Profile> MotorsProfiles()
         {
-            var simHubProfiles = SimHubProfiles(_shakeItMotorsPlugin, _shakeItMotorsSettingsField);
+            var simHubProfiles = SimHubProfiles(_shakeItMotorsPlugin);
             return simHubProfiles.Select(simHubProfile => new Profile(simHubProfile)).ToList();
         }
 
@@ -119,7 +91,7 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
         /// <returns>An instance of <c>EffectsContainerBase</c> or one if its subclasses, or <c>null</c> if the element was not found.</returns>
         public EffectsContainerBase FindMotorsEffect(Guid guid)
         {
-            var simHubProfiles = SimHubProfiles(_shakeItMotorsPlugin, _shakeItMotorsSettingsField);
+            var simHubProfiles = SimHubProfiles(_shakeItMotorsPlugin);
             return simHubProfiles.Select(simHubProfile => FindEffect(simHubProfile.EffectsContainers, guid)).FirstOrDefault(result => result != null);
         }
 

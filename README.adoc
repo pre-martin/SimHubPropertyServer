@@ -24,8 +24,9 @@ One use case is my project https://github.com/pre-martin/StreamDeckSimHubPlugin[
 
 == Installation
 
-WARNING: To download, do not use the green button! Instead click on "Releases" on the right side and download the file `PropertyServer.dll`.
+WARNING: To download, do not use the green button! Instead, click on "Releases" on the right side and download the file `PropertyServer.dll`.
 
+The plugin requires at least SimHub version **9.6.0**.
 
 Simply copy the file `PropertyServer.dll` into the root directory of your SimHub installation. After having launched SimHub, the plugin has to be activated under "_Settings_ > _Plugins_" (usually SimHub will autodetect the plugin and ask at startup, if the plugin shall be activated).
 
