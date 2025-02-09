@@ -15,7 +15,7 @@ namespace SimHub.Plugins.PropertyServer.Ui
     {
         //  As the data never changes in the underlying model, we do not need a NotifyPropertyChanged mechanism.
 
-        private readonly GeneralSettings _settings;
+        private readonly GeneralSettings _settings = new GeneralSettings();
 
         public event EventHandler LogLevelChangedEvent;
 
