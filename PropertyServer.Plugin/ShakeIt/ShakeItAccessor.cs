@@ -15,22 +15,13 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
     /// </summary>
     public class ShakeItAccessor
     {
-        private PluginManager _pluginManager;
-        private ShakeITBSV3Plugin _shakeItBassPlugin;
-        private ShakeITMotorsV3Plugin _shakeItMotorsPlugin;
+        private readonly ShakeITBSV3Plugin _shakeItBassPlugin;
+        private readonly ShakeITMotorsV3Plugin _shakeItMotorsPlugin;
 
-        /// <summary>
-        /// Initialises the accessor. Calls to subsequent methods of this class will only be successful, if this method was called once.
-        /// </summary>
-        /// <remarks>
-        /// De facto, this method initializes the reflective access to the private fields <c>ShakeITBSV3Plugin.settings</c> and
-        /// <c>ShakeItMotorsV3Plugin.settings</c>.
-        /// </remarks>
-        public void Init(PluginManager pluginManager)
+        public ShakeItAccessor()
         {
-            _pluginManager = pluginManager;
-            _shakeItBassPlugin = _pluginManager.GetPlugin<ShakeITBSV3Plugin>();
-            _shakeItMotorsPlugin = _pluginManager.GetPlugin<ShakeITMotorsV3Plugin>();
+            _shakeItBassPlugin = PluginManager.GetInstance().GetPlugin<ShakeITBSV3Plugin>();
+            _shakeItMotorsPlugin = PluginManager.GetInstance().GetPlugin<ShakeITMotorsV3Plugin>();
         }
 
         /// <summary>

@@ -61,8 +61,6 @@ namespace SimHub.Plugins.PropertyServer
 
             Log.Info($"Starting plugin, version {ThisAssembly.AssemblyFileVersion}");
 
-            _shakeItAccessor.Init(pluginManager);
-
             // Move execution of server into a new task/thread (away from SimHub thread). The server is async, but we
             // do not want to put any unnecessary load onto the SimHub thread.
             _server = new Server(this, _subscriptionManager, _settings.Port);
@@ -172,7 +170,7 @@ namespace SimHub.Plugins.PropertyServer
         {
             var settingsViewModel = new SettingsViewModel(_settings);
             settingsViewModel.LogLevelChangedEvent += (sender, args) => GetNamespaceLogger().Level = _settings.LogLevel.ToLog4Net();
-            return new SettingsControl { DataContext = settingsViewModel, PluginManager = pluginManager };
+            return new SettingsControl { DataContext = settingsViewModel };
         }
 
         public ImageSource PictureIcon => this.ToIcon(Properties.Resources.properties);

@@ -13,10 +13,6 @@
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
 
-    <UserControl.DataContext>
-        <local:SettingsViewModel />
-    </UserControl.DataContext>
-
     <Grid>
         <styles:SHSection Title="Property Server">
             <StackPanel>
