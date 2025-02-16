@@ -5,7 +5,7 @@
 . Switch to the release branch: +
    `git switch release/v1.2`
 . Push the release branch
-. Create a tag and push it afterwards:
+. Create a tag and push it afterward:
   - `nbgv tag`
   - `git push origin v1.2`
 . Build the plugin:

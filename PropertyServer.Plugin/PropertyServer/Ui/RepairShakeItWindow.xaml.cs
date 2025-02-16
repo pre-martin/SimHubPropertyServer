@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2023 Martin Renner
+﻿// Copyright (C) 2025 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System.Windows;
@@ -8,12 +8,11 @@ namespace SimHub.Plugins.PropertyServer.Ui
 {
     public partial class RepairShakeItWindow
     {
-        public RepairShakeItWindow(PluginManager pluginManager)
+        public RepairShakeItWindow()
         {
-            var shakeItBassAccessor = new ShakeItAccessor();
-            shakeItBassAccessor.Init(pluginManager);
-
             InitializeComponent();
+
+            var shakeItBassAccessor = new ShakeItAccessor();
             ((RepairShakeItViewModel)DataContext).ShakeItAccessor = shakeItBassAccessor;
         }
 

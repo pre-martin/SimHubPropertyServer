@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace SimHub.Plugins.PropertyServer.Ui.Util
+namespace SimHub.Plugins.PreCommon.Ui.Util
 {
     public class BooleanToVisibilityConverter : IValueConverter
     {

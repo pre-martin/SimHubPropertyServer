@@ -1,0 +1,11 @@
+﻿= SVG to WPF
+
+. Create a valid SVG file
+. Open the SVG file in InkScape
+. "Save as" - Select "*.xaml"
+. Export with
+** "WPF"
+** "DrawingImage"
+** "DynamicResource"
+. Move data to `IconResources.xaml`
+
