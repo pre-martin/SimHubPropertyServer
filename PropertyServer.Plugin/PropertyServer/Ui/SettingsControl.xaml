@@ -9,7 +9,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:SimHub.Plugins.PropertyServer.Ui"
+             xmlns:ui="clr-namespace:SimHub.Plugins.PropertyServer.Ui"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
 
@@ -46,7 +46,7 @@
                              VerticalAlignment="Center">
                         <Binding Path="Port" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
-                                <local:IpPortValidationRule />
+                                <ui:IpPortValidationRule />
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox>

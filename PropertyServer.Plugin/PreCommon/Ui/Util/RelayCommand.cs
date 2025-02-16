@@ -4,7 +4,7 @@
 using System;
 using System.Windows.Input;
 
-namespace SimHub.Plugins.PropertyServer.Ui.Util
+namespace SimHub.Plugins.PreCommon.Ui.Util
 {
     public class RelayCommand<T> : ICommand
     {

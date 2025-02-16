@@ -50,7 +50,7 @@ namespace SimHub.Plugins.PropertyServer
                 MaxSizeRollBackups = 5,
                 RollingStyle = RollingFileAppender.RollingMode.Size,
                 Layout = new PatternLayout(
-                    "%date{yyyy-MM-dd HH:mm:ss,fff} %-5level [%-15.15thread] %-30.30logger [cid:%-6.6property{client}] %message%newline")
+                    "%date{yyyy-MM-dd HH:mm:ss,fff} %-5level [%-15.15thread] %-30.30logger [cid:%-6.6property{client}] - %message%newline")
             };
             appender.ActivateOptions();
 
@@ -59,7 +59,7 @@ namespace SimHub.Plugins.PropertyServer
             namespaceLogger.AddAppender(appender);
             namespaceLogger.Level = _settings.LogLevel.ToLog4Net();
 
-            Log.Info($"Starting plugin, version {ThisAssembly.AssemblyFileVersion}");
+            Log.Info($"===== Starting plugin, version {ThisAssembly.AssemblyFileVersion} =====");
 
             // Move execution of server into a new task/thread (away from SimHub thread). The server is async, but we
             // do not want to put any unnecessary load onto the SimHub thread.
@@ -75,6 +75,11 @@ namespace SimHub.Plugins.PropertyServer
         }
 
         public void DataUpdate(PluginManager pluginManager, ref GameData data)
+        {
+            PropertyServerDataUpdate(pluginManager, ref data);
+        }
+
+        private void PropertyServerDataUpdate(PluginManager pluginManager, ref GameData data)
         {
             // We are not real time. As we do reflection, we are nice to the SimHub thread.
             const long updateMillis = 100;
@@ -170,6 +175,7 @@ namespace SimHub.Plugins.PropertyServer
         {
             var settingsViewModel = new SettingsViewModel(_settings);
             settingsViewModel.LogLevelChangedEvent += (sender, args) => GetNamespaceLogger().Level = _settings.LogLevel.ToLog4Net();
+
             return new SettingsControl { DataContext = settingsViewModel };
         }
 
