@@ -15,14 +15,13 @@ namespace SimHub.Plugins.ComputedProperties.Ui
             ShowCancel = true;
         }
 
+        private EditScriptWindowViewModel ViewModel => (EditScriptWindowViewModel)DataContext;
+
         public override string Title => "Edit script";
 
         private void TextEditor_OnTextChanged(object sender, EventArgs e)
         {
-            if (DataContext is EditScriptWindowViewModel viewModel)
-            {
-                viewModel.OnScriptChanged(CodeEditor.Text);
-            }
+            ViewModel.OnScriptChanged(CodeEditor.Text);
         }
     }
 }

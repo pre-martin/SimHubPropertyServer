@@ -89,6 +89,7 @@
 
   <ItemGroup>
     <Compile Include="ComputedProperties\ComputedPropertiesPlugin.cs" />
+    <Compile Include="ComputedProperties\IComputedPropertiesManager.cs" />
     <Compile Include="ComputedProperties\PluginManagerAccessor.cs" />
     <Compile Include="ComputedProperties\ScriptData.cs" />
     <Compile Include="ComputedProperties\Ui\ComputedPropertiesControl.xaml.cs">

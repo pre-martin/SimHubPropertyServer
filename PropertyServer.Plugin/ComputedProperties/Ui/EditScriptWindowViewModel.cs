@@ -13,7 +13,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
 {
     public class EditScriptWindowViewModel : ObservableObject
     {
-        private readonly ComputedPropertiesPlugin _computedPropertiesManager;
+        private readonly IComputedPropertiesManager _computedPropertiesManager;
 
         /// <summary>
         /// <c>ExpressionValue</c> allows us to get the syntax highlighting, which is partly "internal".
@@ -60,7 +60,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
 
         private CancellationTokenSource _debounceTokenSource;
 
-        public EditScriptWindowViewModel(ComputedPropertiesPlugin computedPropertiesManager, ScriptData scriptData)
+        public EditScriptWindowViewModel(IComputedPropertiesManager computedPropertiesManager, ScriptData scriptData)
         {
             _computedPropertiesManager = computedPropertiesManager;
             _scriptData = scriptData;

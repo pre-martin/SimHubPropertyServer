@@ -22,7 +22,7 @@ namespace SimHub.Plugins.ComputedProperties
     [PluginName("Computed Properties")]
     [PluginAuthor("Martin Renner")]
     [PluginDescription("Create new properties with JavaScript - v" + ThisAssembly.AssemblyFileVersion)]
-    public class ComputedPropertiesPlugin : IDataPlugin, IWPFSettingsV2
+    public class ComputedPropertiesPlugin : IDataPlugin, IWPFSettingsV2, IComputedPropertiesManager
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ComputedPropertiesPlugin));
 

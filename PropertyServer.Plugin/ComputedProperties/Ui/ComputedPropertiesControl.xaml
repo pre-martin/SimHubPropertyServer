@@ -53,10 +53,11 @@
 
                         <Image Width="18" Height="18" Source="{StaticResource DiErrorRounded}"
                                HorizontalAlignment="Left"
-                               Visibility="{Binding HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                               Visibility="{Binding HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}"
+                               ToolTip="Script contains errors" />
                         <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="4" Text="{Binding Name}" />
                         <StackPanel Orientation="Horizontal" Grid.Column="2">
-                            <Button Width="22" Height="22" Padding="4">
+                            <Button Width="22" Height="22" Padding="4" Click="Entry_DeleteClick">
                                 <Image Source="{StaticResource DiDeleteRounded}" />
                             </Button>
                         </StackPanel>
