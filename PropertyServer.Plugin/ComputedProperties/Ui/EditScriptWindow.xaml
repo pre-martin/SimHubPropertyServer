@@ -14,7 +14,7 @@
     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
     IsOkEnabled="{Binding IsOkEnabled}">
 
-    <!-- For UI design only -->
+    <!-- For IDE only -->
     <ui:SHDialogContentBase.DataContext>
         <local:EditScriptWindowViewModel />
     </ui:SHDialogContentBase.DataContext>
@@ -50,10 +50,12 @@
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
             <styles:SHButtonSecondary Width="120" Margin="4"
+                                      Click="InsertProperty_Click"
+                                      Content="Insert property" />
+            <styles:SHButtonSecondary Width="120" Margin="4"
                                       Command="{Binding InsertSampleCommand}"
-                                      ToolTip="Replaces the current content with a small sample script">
-                Insert sample
-            </styles:SHButtonSecondary>
+                                      Content="Insert sample"
+                                      ToolTip="Replaces the current content with a small sample script" />
         </StackPanel>
 
         <StackPanel Grid.Row="4">
