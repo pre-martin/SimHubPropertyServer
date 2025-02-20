@@ -13,7 +13,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
 {
     public class EditScriptWindowViewModel : ObservableObject
     {
-        private readonly IComputedPropertiesManager _computedPropertiesManager;
+        private readonly IScriptValidator _scriptValidator;
 
         /// <summary>
         /// <c>ExpressionValue</c> allows us to get the syntax highlighting, which is partly "internal".
@@ -60,9 +60,9 @@ namespace SimHub.Plugins.ComputedProperties.Ui
 
         private CancellationTokenSource _debounceTokenSource;
 
-        public EditScriptWindowViewModel(IComputedPropertiesManager computedPropertiesManager, ScriptData scriptData)
+        public EditScriptWindowViewModel(IScriptValidator scriptValidator, ScriptData scriptData)
         {
-            _computedPropertiesManager = computedPropertiesManager;
+            _scriptValidator = scriptValidator;
             _scriptData = scriptData;
             InsertSampleCommand = new RelayCommand<object>(_ => InsertSample());
 
@@ -71,7 +71,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
         }
 
         /// <summary>
-        /// Default constructor for UI design only
+        /// Default constructor for IDE only
         /// </summary>
         public EditScriptWindowViewModel()
         {
@@ -95,11 +95,11 @@ namespace SimHub.Plugins.ComputedProperties.Ui
         {
             Script = new TextDocument(@"
 /** Initialization. Only called by the plugin once for each script. */
-function init(context) {
+function init() {
   // create a new property in SimHub
   createProperty('MyNewDateAndTime');
   // instruct the plugin to call 'calculate' (see below) whenever 'DataCorePlugin.CurrentDateTime' changes
-  subscribe(context, 'DataCorePlugin.CurrentDateTime', 'calculate');
+  subscribe('DataCorePlugin.CurrentDateTime', 'calculate');
 }
 
 /** Called by the plugin whenever a corresponding property value (subscription) has changed. */
@@ -124,11 +124,11 @@ function calculate() {
                 try
                 {
                     await Task.Delay(TimeSpan.FromMilliseconds(500), token);
-                    if (!token.IsCancellationRequested && _computedPropertiesManager != null && !string.IsNullOrWhiteSpace(code))
+                    if (!token.IsCancellationRequested && _scriptValidator != null && !string.IsNullOrWhiteSpace(code))
                     {
                         try
                         {
-                            _computedPropertiesManager.ValidateScript(code);
+                            _scriptValidator.ValidateScript(code);
                             Problems = string.Empty;
                         }
                         catch (Exception e)

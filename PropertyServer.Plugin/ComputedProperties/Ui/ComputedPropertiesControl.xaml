@@ -40,12 +40,9 @@
                 <DataTemplate>
                     <Grid Margin="0,2">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="24" />
-                            <!-- Error -->
-                            <ColumnDefinition Width="*" />
-                            <!-- Name -->
-                            <ColumnDefinition Width="Auto" />
-                            <!-- Delete -->
+                            <ColumnDefinition Width="24" />   <!-- Error -->
+                            <ColumnDefinition Width="*" />    <!-- Name -->
+                            <ColumnDefinition Width="Auto" /> <!-- Buttons -->
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
@@ -57,7 +54,10 @@
                                ToolTip="Script contains errors" />
                         <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="4" Text="{Binding Name}" />
                         <StackPanel Orientation="Horizontal" Grid.Column="2">
-                            <Button Width="22" Height="22" Padding="4" Click="Entry_DeleteClick">
+                            <Button Width="22" Height="22" Padding="4" Click="Entry_InfoClick" Margin="0,0,10,0">
+                                <Image Source="{StaticResource DiInfoRounded}" />
+                            </Button>
+                            <Button Width="22" Height="22" Padding="4" Click="Entry_DeleteClick" Margin="0,0,10,0">
                                 <Image Source="{StaticResource DiDeleteRounded}" />
                             </Button>
                         </StackPanel>

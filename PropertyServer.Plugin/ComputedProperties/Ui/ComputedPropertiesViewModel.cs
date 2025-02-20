@@ -8,11 +8,10 @@ namespace SimHub.Plugins.ComputedProperties.Ui
 {
     public class ComputedPropertiesViewModel : ObservableObject
     {
-        public ComputedPropertiesViewModel(ObservableCollection<ScriptData> scripts,
-            IComputedPropertiesManager computedPropertiesManager)
+        public ComputedPropertiesViewModel(ObservableCollection<ScriptData> scripts, IScriptValidator scriptValidator)
         {
             Scripts = scripts;
-            ComputedPropertiesManager = computedPropertiesManager;
+            ScriptValidator = scriptValidator;
         }
 
         /// <summary>
@@ -22,7 +21,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
         {
         }
 
-        public IComputedPropertiesManager ComputedPropertiesManager { get; }
+        public IScriptValidator ScriptValidator { get; }
 
         public ObservableCollection<ScriptData> Scripts { get; set; }
 

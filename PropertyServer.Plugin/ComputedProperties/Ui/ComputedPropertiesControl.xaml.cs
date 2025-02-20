@@ -25,7 +25,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
             var scriptData = new ScriptData();
             var editWindow = new EditScriptWindow
             {
-                DataContext = new EditScriptWindowViewModel(ViewModel.ComputedPropertiesManager, scriptData)
+                DataContext = new EditScriptWindowViewModel(ViewModel.ScriptValidator, scriptData)
             };
 
             var result = await editWindow.ShowDialogWindowAsync(this, DialogOptions.Resizable, 1000, 800);
@@ -44,7 +44,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
             var editWindow = new EditScriptWindow
             {
                 // Create a clone of ScriptData, so that the editor does not work on the original data.
-                DataContext = new EditScriptWindowViewModel(myContext.ComputedPropertiesManager, selectedItem.Clone())
+                DataContext = new EditScriptWindowViewModel(myContext.ScriptValidator, selectedItem.Clone())
             };
             var result = await editWindow.ShowDialogWindowAsync(this, DialogOptions.Resizable, 1000, 800);
             if (result == DialogResult.OK)
@@ -61,10 +61,17 @@ namespace SimHub.Plugins.ComputedProperties.Ui
             }
         }
 
+        private async void Entry_InfoClick(object sender, RoutedEventArgs e)
+        {
+            if (!(((FrameworkElement)sender).DataContext is ScriptData scriptData)) return;
+
+            var performanceWindow = new PerformanceWindow() { DataContext = scriptData.FunctionPerformance };
+            await performanceWindow.ShowDialogWindowAsync(this, DialogOptions.Resizable, 500, 400);
+        }
+
         private async void Entry_DeleteClick(object sender, RoutedEventArgs e)
         {
-            var scriptData = ((FrameworkElement)sender).DataContext as ScriptData;
-            if (scriptData == null) return;
+            if (!(((FrameworkElement)sender).DataContext is ScriptData scriptData)) return;
 
             var linesOfCode = string.IsNullOrWhiteSpace(scriptData?.Script)
                 ? 0

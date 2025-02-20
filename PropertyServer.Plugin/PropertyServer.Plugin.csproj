@@ -89,7 +89,10 @@
 
   <ItemGroup>
     <Compile Include="ComputedProperties\ComputedPropertiesPlugin.cs" />
+    <Compile Include="ComputedProperties\IScriptValidator.cs" />
     <Compile Include="ComputedProperties\IComputedPropertiesManager.cs" />
+    <Compile Include="ComputedProperties\Performance\PerfToken.cs" />
+    <Compile Include="ComputedProperties\Performance\PerfData.cs" />
     <Compile Include="ComputedProperties\PluginManagerAccessor.cs" />
     <Compile Include="ComputedProperties\ScriptData.cs" />
     <Compile Include="ComputedProperties\Ui\ComputedPropertiesControl.xaml.cs">
@@ -102,6 +105,10 @@
     </Compile>
     <Page Include="ComputedProperties\Ui\EditScriptWindow.xaml" />
     <Compile Include="ComputedProperties\Ui\EditScriptWindowViewModel.cs" />
+    <Compile Include="ComputedProperties\Ui\PerformanceWindow.xaml.cs">
+        <DependentUpon>PerformanceWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="ComputedProperties\Ui\PerformanceWindow.xaml" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -155,7 +162,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
+  
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

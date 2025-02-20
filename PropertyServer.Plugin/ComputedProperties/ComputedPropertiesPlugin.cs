@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -15,6 +14,7 @@ using log4net.Appender;
 using log4net.Core;
 using log4net.Layout;
 using log4net.Repository.Hierarchy;
+using SimHub.Plugins.ComputedProperties.Performance;
 using SimHub.Plugins.ComputedProperties.Ui;
 
 namespace SimHub.Plugins.ComputedProperties
@@ -22,11 +22,10 @@ namespace SimHub.Plugins.ComputedProperties
     [PluginName("Computed Properties")]
     [PluginAuthor("Martin Renner")]
     [PluginDescription("Create new properties with JavaScript - v" + ThisAssembly.AssemblyFileVersion)]
-    public class ComputedPropertiesPlugin : IDataPlugin, IWPFSettingsV2, IComputedPropertiesManager
+    public class ComputedPropertiesPlugin : IDataPlugin, IWPFSettingsV2, IScriptValidator, IComputedPropertiesManager
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ComputedPropertiesPlugin));
 
-        private Engine _engine;
         private ObservableCollection<ScriptData> _scripts = new ObservableCollection<ScriptData>();
         private readonly PluginManagerAccessor _pluginManagerAccessor = new PluginManagerAccessor();
 
@@ -57,92 +56,10 @@ namespace SimHub.Plugins.ComputedProperties
 
             _pluginManagerAccessor.Init(pluginManager);
 
-            var scriptLogger = LogManager.GetLogger(GetNamespaceLogger().Name + ".script");
-
-            _engine = new Engine(options => options.Strict = true);
-            PrepareEngine(
-                engine: _engine,
-                getPropertyValue: pluginManager.GetPropertyValue,
-                getRawData: (Func<object>)pluginManager.LastData?.NewData?.GetRawDataObject(),
-                log: scriptLogger.Info,
-                createProperty: propertyName =>
-                {
-                    if (!string.IsNullOrWhiteSpace(propertyName))
-                    {
-                        pluginManager.AddProperty(propertyName, typeof(ComputedPropertiesPlugin), typeof(object));
-                        _pluginManagerAccessor.SetPropertySupportStatus(propertyName, typeof(ComputedPropertiesPlugin),
-                            SupportStatus.Computed);
-                    }
-                },
-                subscribe: (context, propertyName, function) =>
-                {
-                    if (string.IsNullOrWhiteSpace(propertyName)) return;
-                    if (string.IsNullOrWhiteSpace(function)) return;
-
-                    var scriptData = _scripts.FirstOrDefault(sm => sm.Guid == context);
-                    if (scriptData != null)
-                    {
-                        if (scriptData.SubscribedProperties.TryGetValue(propertyName, out var propertyData))
-                        {
-                            propertyData.Functions.Add(function);
-                        }
-                        else
-                        {
-                            var newPropertyData = new PropertyData(function);
-                            scriptData.SubscribedProperties.Add(propertyName, newPropertyData);
-                        }
-                    }
-                },
-                setPropertyValue: pluginManager.SetPropertyValue<ComputedPropertiesPlugin>);
-
-            #region Test
-
-            if (false)
+            // Initialize all scripts
+            foreach (var scriptData in _scripts)
             {
-                var scriptSource = $@"
-function init(context) {{
-    log('init(' + context + ')');
-    createProperty('RpmsThousands');
-    createProperty('RpmsHundreds');
-    createProperty('RpmsTens');
-    createProperty('RpmsOnes');
-    subscribe(context, 'DataCorePlugin.GameData.Rpms', 'calculateRpms');
-    subscribe(context, 'Rpms', 'calculateRpms');
-}}
-
-function calculateRpms() {{
-    var rpms = $prop('DataCorePlugin.GameData.Rpms');
-    var thousands = Math.floor(rpms / 1000);
-    var hundreds = Math.floor((rpms - thousands * 1000) / 100);
-    var tens = Math.floor((rpms - thousands * 1000 - hundreds * 100) / 10);
-    var ones = Math.floor(rpms - thousands * 1000 - hundreds * 100 - tens * 10);
-    setPropertyValue('RpmsThousands', thousands);
-    setPropertyValue('RpmsHundreds', hundreds);
-    setPropertyValue('RpmsTens', tens);
-    setPropertyValue('RpmsOnes', ones);
-}}
-";
-                var parsedScript = Engine.PrepareScript(scriptSource);
-
-                var guid = Guid.NewGuid();
-                var metadata = new ScriptData(guid) { Script = scriptSource, ParsedScript = parsedScript };
-                _scripts.Add(metadata);
-                _engine.Execute(metadata.Script).Invoke("init", guid);
-            }
-
-            #endregion
-
-            foreach (var scriptMetadata in _scripts)
-            {
-                try
-                {
-                    InitScript(scriptMetadata);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"Error in script. Disabling it.", ex);
-                    scriptMetadata.HasErrors = true;
-                }
+                InitScript(scriptData);
             }
         }
 
@@ -150,8 +67,17 @@ function calculateRpms() {{
         {
             Log.Info("Shutting down plugin");
             this.SaveCommonSettings("Scripts", _scripts);
-            _engine.Dispose();
-            _engine = null;
+
+            foreach (var scriptData in _scripts)
+            {
+                Log.Info($"Performance data for script \"{scriptData.Name}\":");
+                foreach (var fp in scriptData.FunctionPerformance)
+                {
+                    var avg = fp.Value.Time / fp.Value.Calls;
+                    Log.Info($"  {fp.Key}(): {fp.Value.Calls} calls, {avg:F3} ms/call, {fp.Value.Skipped} times skipped");
+                }
+                scriptData.Reset();
+            }
         }
 
         public void DataUpdate(PluginManager pluginManager, ref GameData data)
@@ -162,17 +88,10 @@ function calculateRpms() {{
                 // Maybe the script has just been added or edited, and we have to initialize it.
                 if (scriptData.InitRequired)
                 {
-                    try
-                    {
-                        InitScript(scriptData);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error($"Error in script \"{scriptData.Name}\". Disabling it.", ex);
-                        scriptData.HasErrors = true;
-                    }
+                    InitScript(scriptData);
                 }
 
+                // Incorrect scripts are skipped.
                 if (scriptData.HasErrors) continue;
 
                 // Loop over each subscribed property. If its value has changed, collect the associated functions.
@@ -192,18 +111,28 @@ function calculateRpms() {{
                     }
                 }
 
-                // Invoke the collected functions.
-                foreach (var functionName in functionsToInvoke)
+                // Invoke the collected functions. We iterate over the "performance" dictionary, as it knows
+                // all functions, and we can update the performance data in the same time.
+                foreach (var fp in scriptData.FunctionPerformance)
                 {
-                    try
+                    if (!functionsToInvoke.Contains(fp.Key))
                     {
-                        _engine.Execute(scriptData.Script).Invoke(functionName);
-                        scriptData.HasErrors = false;
+                        fp.Value.Skipped++;
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Log.Error($"Error in function \"{functionName}\" in script \"{scriptData.Name}\".", ex);
-                        scriptData.HasErrors = true;
+                        try
+                        {
+                            using (new PerfToken(fp.Value))
+                            {
+                                scriptData.InvokeFunction(fp.Key);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error($"Error in function \"{fp.Key}\" in script \"{scriptData.Name}\".", ex);
+                            scriptData.HasErrors = true;
+                        }
                     }
                 }
             }
@@ -219,8 +148,7 @@ function calculateRpms() {{
         {
             get
             {
-                var dictionary = new ResourceDictionary
-                    { Source = new Uri("pack://application:,,,/PropertyServer;component/PreCommon/Ui/IconResources.xaml") };
+                var dictionary = new ResourceDictionary { Source = new Uri("pack://application:,,,/PropertyServer;component/PreCommon/Ui/IconResources.xaml") };
                 return dictionary["DiCalculateOutlined"] as ImageSource;
             }
         }
@@ -229,15 +157,15 @@ function calculateRpms() {{
 
         private void InitScript(ScriptData scriptData)
         {
-            if (!scriptData.InitRequired) return;
-
-            scriptData.Reset();
-            scriptData.InitRequired = false;
-            Log.Info($"Script \"{scriptData.Name}\": Preparing script");
-            scriptData.ParsedScript = Engine.PrepareScript(scriptData.Script);
-            Log.Info($"Script \"{scriptData.Name}\": Calling \"init()\"");
-            _engine.Execute(scriptData.Script).Invoke("init", scriptData.Guid);
-            Log.Info($"Script \"{scriptData.Name}\": Ready to use");
+            try
+            {
+                scriptData.Init(this);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error in script \"{scriptData.Name}\". Disabling it.", ex);
+                scriptData.HasErrors = true;
+            }
         }
 
         private Logger GetNamespaceLogger()
@@ -246,11 +174,13 @@ function calculateRpms() {{
             return (Logger)namespaceLogger.Logger;
         }
 
+        /// <summary>
+        /// Validates the given JavaScript code. Throws exceptions if the script is invalid.
+        /// </summary>
         public void ValidateScript(string script)
         {
             using (var validationEngine = new Engine(options => options.Strict = true))
             {
-                var guid = new Guid("11111111-2222-3333-4444-555555555555");
                 var createdProperties = new HashSet<string>();
                 var functionsToInvoke = new HashSet<string>();
 
@@ -263,9 +193,8 @@ function calculateRpms() {{
                     {
                         if (!string.IsNullOrWhiteSpace(propName)) createdProperties.Add(propName);
                     },
-                    subscribe: (context, propName, function) =>
+                    subscribe: (propName, function) =>
                     {
-                        if (context != guid) throw new ArgumentException("Invalid parameter 'context' in 'subscribe()' command");
                         if (string.IsNullOrWhiteSpace(propName)) throw new ArgumentException("Invalid parameter 'name' in 'subscribe()' command");
                         if (string.IsNullOrWhiteSpace(function)) throw new ArgumentException("Invalid parameter 'function' in 'subscribe()' command");
                         functionsToInvoke.Add(function);
@@ -281,11 +210,12 @@ function calculateRpms() {{
                 // is there an init method? and what problems does it throw?
                 try
                 {
-                    validationEngine.Execute(preparedScript).Invoke("init", guid);
+                    validationEngine.Execute(preparedScript);
+                    validationEngine.Invoke("init");
                 }
                 catch (Exception e)
                 {
-                    throw new MissingMethodException("Function 'init(context)' cannot be called: " + e.Message);
+                    throw new MissingMethodException("Function 'init()' cannot be called: " + e.Message);
                 }
 
                 if (createdProperties.Count == 0)
@@ -297,7 +227,7 @@ function calculateRpms() {{
                 {
                     try
                     {
-                        validationEngine.Execute($"{function}()");
+                        validationEngine.Invoke(function);
                     }
                     catch (Exception e)
                     {
@@ -307,13 +237,37 @@ function calculateRpms() {{
             }
         }
 
-        private void PrepareEngine(
+
+        #region IComputedPropertiesManager
+
+        public object GetPropertyValue(string propertyName)
+        {
+            return PluginManager.GetPropertyValue(propertyName);
+        }
+
+        public object GetRawData()
+        {
+            return PluginManager.LastData?.NewData?.GetRawDataObject();
+        }
+
+        public void CreateProperty(string propertyName)
+        {
+            PluginManager.AddProperty(propertyName, typeof(ComputedPropertiesPlugin), typeof(object));
+            _pluginManagerAccessor.SetPropertySupportStatus(propertyName, typeof(ComputedPropertiesPlugin), SupportStatus.Computed);
+        }
+
+        public void SetPropertyValue(string propertyName, object value)
+        {
+            PluginManager.SetPropertyValue<ComputedPropertiesPlugin>(propertyName, value);
+        }
+
+        public void PrepareEngine(
             Engine engine,
             Func<string, object> getPropertyValue,
             Func<object> getRawData,
             Action<object> log,
             Action<string> createProperty,
-            Action<Guid, string, string> subscribe,
+            Action<string, string> subscribe,
             Action<string, object> setPropertyValue)
         {
             engine.SetValue("$prop", getPropertyValue);
@@ -323,5 +277,7 @@ function calculateRpms() {{
             engine.SetValue("subscribe", subscribe);
             engine.SetValue("setPropertyValue", setPropertyValue);
         }
+
+        #endregion
     }
 }
