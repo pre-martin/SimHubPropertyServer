@@ -17,6 +17,7 @@ namespace SimHub.Plugins.ComputedProperties
     /// </summary>
     public class ScriptData : ObservableObject
     {
+        public const string InitFunction = "init";
         private static readonly ILog Log = LogManager.GetLogger(typeof(ScriptData));
 
         private ScriptData(Guid guid)
@@ -51,14 +52,14 @@ namespace SimHub.Plugins.ComputedProperties
         public bool HasErrors
         {
             get => _hasErrors;
-            set => SetProperty(ref _hasErrors, value);
+            private set => SetProperty(ref _hasErrors, value);
         }
 
         [JsonIgnore]
         private Engine _engine;
 
         [JsonIgnore]
-        public Prepared<Script>? ParsedScript { get; set; }
+        private Prepared<Script>? ParsedScript { get; set; }
 
         /// <summary>
         /// Properties created by the scripts init() function.
@@ -66,17 +67,21 @@ namespace SimHub.Plugins.ComputedProperties
         [JsonIgnore]
         private readonly HashSet<string> _createdProperties = new HashSet<string>();
 
+        [JsonIgnore]
+        private readonly Dictionary<string, PropertyData> _subscribedProperties = new Dictionary<string, PropertyData>();
+
         /// <summary>
         /// Properties that this script is watching, associated with some data about this property.
         /// </summary>
+        public IReadOnlyDictionary<string, PropertyData> SubscribedProperties => _subscribedProperties;
+
         [JsonIgnore]
-        public Dictionary<string, PropertyData> SubscribedProperties { get; } = new Dictionary<string, PropertyData>();
+        private readonly Dictionary<string, PerfData> _functionPerformance = new Dictionary<string, PerfData>();
 
         /// <summary>
         /// Each function of this script associated with its performance data.
         /// </summary>
-        [JsonIgnore]
-        public Dictionary<string, PerfData> FunctionPerformance { get; } = new Dictionary<string, PerfData>();
+        public IReadOnlyDictionary<string, PerfData> FunctionPerformance => _functionPerformance;
 
         [JsonIgnore]
         public bool InitRequired { get; private set; } = true;
@@ -91,8 +96,8 @@ namespace SimHub.Plugins.ComputedProperties
             _engine.Dispose();
             _engine = null;
             _createdProperties.Clear();
-            SubscribedProperties.Clear();
-            FunctionPerformance.Clear();
+            _subscribedProperties.Clear();
+            _functionPerformance.Clear();
             InitRequired = true;
         }
 
@@ -105,61 +110,70 @@ namespace SimHub.Plugins.ComputedProperties
 
             InitRequired = false;
             var logPrefix = $"Script \"{Name}\": ";
-            _engine = new Engine(options => options.Strict = true);
-            computedPropertiesManager.PrepareEngine(
-                engine: _engine,
-                getPropertyValue: computedPropertiesManager.GetPropertyValue,
-                getRawData: computedPropertiesManager.GetRawData,
-                log: data => Log.Info(logPrefix + data),
-                createProperty: propertyName =>
-                {
-                    if (!string.IsNullOrWhiteSpace(propertyName))
-                    {
-                        computedPropertiesManager.CreateProperty(propertyName);
-                        _createdProperties.Add(propertyName);
-                    }
-                },
-                subscribe: (propertyName, function) =>
-                {
-                    if (string.IsNullOrWhiteSpace(propertyName)) return;
-                    if (string.IsNullOrWhiteSpace(function)) return;
 
-                    if (SubscribedProperties.TryGetValue(propertyName, out var propertyData))
+            try
+            {
+                _engine = new Engine(options => options.Strict = true);
+                computedPropertiesManager.PrepareEngine(
+                    engine: _engine,
+                    getPropertyValue: computedPropertiesManager.GetPropertyValue,
+                    getRawData: computedPropertiesManager.GetRawData,
+                    log: data => Log.Info(logPrefix + data),
+                    createProperty: propertyName =>
                     {
-                        propertyData.Functions.Add(function);
-                    }
-                    else
+                        if (!string.IsNullOrWhiteSpace(propertyName))
+                        {
+                            computedPropertiesManager.CreateProperty(propertyName);
+                            _createdProperties.Add(propertyName);
+                        }
+                    },
+                    subscribe: (propertyName, function) =>
                     {
-                        var newPropertyData = new PropertyData(function);
-                        SubscribedProperties.Add(propertyName, newPropertyData);
-                    }
+                        if (string.IsNullOrWhiteSpace(propertyName)) return;
+                        if (string.IsNullOrWhiteSpace(function)) return;
 
-                    if (!FunctionPerformance.ContainsKey(function))
+                        if (SubscribedProperties.TryGetValue(propertyName, out var propertyData))
+                        {
+                            propertyData.Functions.Add(function);
+                        }
+                        else
+                        {
+                            var newPropertyData = new PropertyData(function);
+                            _subscribedProperties.Add(propertyName, newPropertyData);
+                        }
+                    },
+                    setPropertyValue: (propertyName, value) =>
                     {
-                        FunctionPerformance.Add(function, new PerfData());
+                        if (_createdProperties.Contains(propertyName))
+                        {
+                            computedPropertiesManager.SetPropertyValue(propertyName, value);
+                        }
                     }
-                },
-                setPropertyValue: (propertyName, value) =>
+                );
+
+                if (string.IsNullOrWhiteSpace(Script))
                 {
-                    if (_createdProperties.Contains(propertyName))
+                    Log.Info(logPrefix + "Script has no code");
+                }
+                else
+                {
+                    Log.Info(logPrefix + "Preparing script");
+                    ParsedScript = Engine.PrepareScript(Script);
+                    _engine.Execute(Script);
+                    Log.Info(logPrefix + $"Calling \"{InitFunction}()\"");
+                    _engine.Invoke(InitFunction);
+                    Log.Info(logPrefix + "Ready to use");
+
+                    foreach (var functionName in GetAllFunctionNames())
                     {
-                        computedPropertiesManager.SetPropertyValue(propertyName, value);
+                        _functionPerformance.Add(functionName, new PerfData());
                     }
                 }
-            );
-
-            if (string.IsNullOrWhiteSpace(Script))
-            {
-                Log.Info(logPrefix + "Script has no code");
             }
-            else
+            catch (Exception)
             {
-                Log.Info(logPrefix + "Preparing script");
-                ParsedScript = Engine.PrepareScript(Script);
-                _engine.Execute(Script);
-                Log.Info(logPrefix + "Calling \"init()\"");
-                _engine.Invoke("init");
-                Log.Info(logPrefix + "Ready to use");
+                HasErrors = true;
+                throw;
             }
         }
 
@@ -168,7 +182,15 @@ namespace SimHub.Plugins.ComputedProperties
         /// </summary>
         public void InvokeFunction(string function)
         {
-            _engine.Invoke(function);
+            try
+            {
+                _engine.Invoke(function);
+            }
+            catch (Exception)
+            {
+                HasErrors = true;
+                throw;
+            }
         }
 
         /// <summary>
@@ -178,6 +200,29 @@ namespace SimHub.Plugins.ComputedProperties
         public ScriptData Clone()
         {
             var result = new ScriptData(this.Guid) { Name = this.Name, Script = this.Script };
+            return result;
+        }
+
+        /// <summary>
+        /// Returns all functions of the script, except the "init" function.
+        /// </summary>
+        public List<string> GetAllFunctionNames()
+        {
+            var result = new List<string>();
+
+            var scriptBody = ParsedScript?.Program?.Body ?? new NodeList<Statement>();
+            foreach (var statement in scriptBody)
+            {
+                if (statement is FunctionDeclaration functionDeclaration)
+                {
+                    var functionName = functionDeclaration.Id?.Name;
+                    if (functionName != null && functionName != "init")
+                    {
+                        result.Add(functionName);
+                    }
+                }
+            }
+
             return result;
         }
     }

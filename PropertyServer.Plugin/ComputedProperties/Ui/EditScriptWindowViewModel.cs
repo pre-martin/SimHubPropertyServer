@@ -24,7 +24,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
 
         public string Name
         {
-            get => _scriptData.Name;
+            get => _scriptData?.Name ?? string.Empty;
             set
             {
                 _scriptData.Name = value;

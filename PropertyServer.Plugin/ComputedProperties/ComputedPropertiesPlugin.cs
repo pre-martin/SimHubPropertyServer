@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -34,6 +36,7 @@ namespace SimHub.Plugins.ComputedProperties
         public void Init(PluginManager pluginManager)
         {
             _scripts = this.ReadCommonSettings("Scripts", () => new ObservableCollection<ScriptData>());
+            _scripts.CollectionChanged += ScriptsOnCollectionChanged;
 
             // Add our own log file for our plugin.
             var appender = new RollingFileAppender
@@ -61,6 +64,8 @@ namespace SimHub.Plugins.ComputedProperties
             {
                 InitScript(scriptData);
             }
+
+            ReplaceAllScriptActions();
         }
 
         public void End(PluginManager pluginManager)
@@ -82,6 +87,8 @@ namespace SimHub.Plugins.ComputedProperties
 
         public void DataUpdate(PluginManager pluginManager, ref GameData data)
         {
+            var initCalled = false;
+
             // Loop over each script
             foreach (var scriptData in _scripts)
             {
@@ -89,6 +96,7 @@ namespace SimHub.Plugins.ComputedProperties
                 if (scriptData.InitRequired)
                 {
                     InitScript(scriptData);
+                    initCalled = true;
                 }
 
                 // Incorrect scripts are skipped.
@@ -121,20 +129,15 @@ namespace SimHub.Plugins.ComputedProperties
                     }
                     else
                     {
-                        try
-                        {
-                            using (new PerfToken(fp.Value))
-                            {
-                                scriptData.InvokeFunction(fp.Key);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Error($"Error in function \"{fp.Key}\" in script \"{scriptData.Name}\".", ex);
-                            scriptData.HasErrors = true;
-                        }
+                        InvokeFunction(scriptData, fp.Key, fp.Value);
                     }
                 }
+            }
+
+            // At least one script has changed, so we have to replace all actions (update is not supported by SimHub).
+            if (initCalled)
+            {
+                ReplaceAllScriptActions();
             }
         }
 
@@ -163,8 +166,69 @@ namespace SimHub.Plugins.ComputedProperties
             }
             catch (Exception ex)
             {
-                Log.Error($"Error in script \"{scriptData.Name}\". Disabling it.", ex);
-                scriptData.HasErrors = true;
+                Log.Error($"Error in script \"{scriptData.Name}\". It is now disabled.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Invokes a function of the script and records its performance data.
+        /// </summary>
+        private void InvokeFunction(ScriptData scriptData, string functionName, PerfData perfData = null)
+        {
+            if (perfData == null)
+            {
+                scriptData.FunctionPerformance.TryGetValue(functionName, out perfData);
+            }
+
+            if (perfData != null)
+            {
+                try
+                {
+                    using (new PerfToken(perfData))
+                    {
+                        scriptData.InvokeFunction(functionName);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"Error in function \"{functionName}\" in script \"{scriptData.Name}\".", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes all "Script" actions and adds them again.
+        /// </summary>
+        /// <remarks>SimHub does not allow to update or remove actions, so we have to go this way.</remarks>
+        private void ReplaceAllScriptActions()
+        {
+            const string prefix = "Script";
+            PluginManager.ClearActions(typeof(ComputedPropertiesPlugin), prefix);
+
+            foreach (var scriptData in _scripts)
+            {
+                var functionNames = scriptData.GetAllFunctionNames();
+                foreach (var functionName in functionNames)
+                {
+                    this.AddAction($"{prefix}.{scriptData.Name}#{functionName}()", (manager, actionName) => HandleAction(scriptData.Name, functionName));
+                }
+            }
+        }
+
+        private void HandleAction(string scriptName, string functionName)
+        {
+            var scriptData = _scripts.FirstOrDefault(s => s.Name == scriptName);
+            if (scriptData == null) return;
+
+            InvokeFunction(scriptData, functionName);
+        }
+
+        private void ScriptsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            // When a script was removed, we have to update the available actions.
+            if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                ReplaceAllScriptActions();
             }
         }
 
@@ -179,6 +243,8 @@ namespace SimHub.Plugins.ComputedProperties
         /// </summary>
         public void ValidateScript(string script)
         {
+            const string initFunction = ScriptData.InitFunction;
+
             using (var validationEngine = new Engine(options => options.Strict = true))
             {
                 var createdProperties = new HashSet<string>();
@@ -201,7 +267,7 @@ namespace SimHub.Plugins.ComputedProperties
                     },
                     setPropertyValue: (propName, value) =>
                     {
-                        if (!createdProperties.Contains(propName)) throw new ArgumentException($"Property '{propName}' was not created in 'init()', cannot set value");
+                        if (!createdProperties.Contains(propName)) throw new ArgumentException($"Property '{propName}' was not created in '{initFunction}()', cannot set value");
                     }
                 );
 
@@ -211,17 +277,17 @@ namespace SimHub.Plugins.ComputedProperties
                 try
                 {
                     validationEngine.Execute(preparedScript);
-                    validationEngine.Invoke("init");
+                    validationEngine.Invoke(initFunction);
                 }
                 catch (Exception e)
                 {
-                    throw new MissingMethodException("Function 'init()' cannot be called: " + e.Message);
+                    throw new MissingMethodException($"Function '{initFunction}()' cannot be called: " + e.Message);
                 }
 
                 if (createdProperties.Count == 0)
-                    throw new Exception("Script does not create any properties - this is pointless. Use 'createProperty()' in 'init()'");
+                    throw new Exception($"Script does not create any properties - this is pointless. Use 'createProperty()' in '{initFunction}()'");
                 if (functionsToInvoke.Count == 0)
-                    throw new Exception("Script does not subscribe to any changes - nothing will happen. Use 'subscribe()' in 'init()'");
+                    throw new Exception($"Script does not subscribe to any changes - nothing will happen. Use 'subscribe()' in '{initFunction}()'");
 
                 foreach (var function in functionsToInvoke)
                 {

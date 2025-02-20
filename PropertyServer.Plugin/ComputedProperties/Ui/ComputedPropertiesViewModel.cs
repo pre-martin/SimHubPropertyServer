@@ -23,7 +23,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
 
         public IScriptValidator ScriptValidator { get; }
 
-        public ObservableCollection<ScriptData> Scripts { get; set; }
+        public ObservableCollection<ScriptData> Scripts { get; }
 
         private ScriptData _selectedScript;
 
