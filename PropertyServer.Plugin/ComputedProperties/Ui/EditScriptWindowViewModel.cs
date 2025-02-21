@@ -97,15 +97,16 @@ namespace SimHub.Plugins.ComputedProperties.Ui
 /** Initialization. Only called by the plugin once for each script. */
 function init() {
   // create a new property in SimHub
-  createProperty('MyNewDateAndTime');
+  createProperty('ComputedPropertiesPlugin.MyNewDateAndTime');
   // instruct the plugin to call 'calculate' (see below) whenever 'DataCorePlugin.CurrentDateTime' changes
   subscribe('DataCorePlugin.CurrentDateTime', 'calculate');
 }
 
 /** Called by the plugin whenever a corresponding property value (subscription) has changed. */
 function calculate() {
+  const currentDateTime = getPropertyValue('DataCorePlugin.CurrentDateTime');
   // set the value of the computed property.
-  setPropertyValue('MyNewDateAndTime', 'Time and date: ' + $prop('DataCorePlugin.CurrentDateTime'));
+  setPropertyValue('ComputedPropertiesPlugin.MyNewDateAndTime', 'My time and date: ' + currentDateTime);
 }
 ");
         }

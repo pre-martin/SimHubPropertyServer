@@ -252,12 +252,13 @@ namespace SimHub.Plugins.ComputedProperties
 
                 PrepareEngine(
                     engine: validationEngine,
-                    getPropertyValue: s => "5",
                     getRawData: () => "6",
                     log: data => { },
                     createProperty: propName =>
                     {
-                        if (!string.IsNullOrWhiteSpace(propName)) createdProperties.Add(propName);
+                        if (string.IsNullOrWhiteSpace(propName)) throw new ArgumentException("Property name must not be empty in 'createProperty()'");
+                        if (!propName.StartsWith(nameof(ComputedPropertiesPlugin) + ".")) throw new ArgumentException("Property name must start with 'ComputedPropertiesPlugin.' in 'createProperty()'");
+                        createdProperties.Add(propName);
                     },
                     subscribe: (propName, function) =>
                     {
@@ -265,8 +266,10 @@ namespace SimHub.Plugins.ComputedProperties
                         if (string.IsNullOrWhiteSpace(function)) throw new ArgumentException("Invalid parameter 'function' in 'subscribe()' command");
                         functionsToInvoke.Add(function);
                     },
+                    getPropertyValue: s => "5",
                     setPropertyValue: (propName, value) =>
                     {
+                        if (!propName.StartsWith(nameof(ComputedPropertiesPlugin) + ".")) throw new ArgumentException("Property name must start with 'ComputedPropertiesPlugin.' in 'setPropertyValue()'");
                         if (!createdProperties.Contains(propName)) throw new ArgumentException($"Property '{propName}' was not created in '{initFunction}()', cannot set value");
                     }
                 );
@@ -286,8 +289,6 @@ namespace SimHub.Plugins.ComputedProperties
 
                 if (createdProperties.Count == 0)
                     throw new Exception($"Script does not create any properties - this is pointless. Use 'createProperty()' in '{initFunction}()'");
-                if (functionsToInvoke.Count == 0)
-                    throw new Exception($"Script does not subscribe to any changes - nothing will happen. Use 'subscribe()' in '{initFunction}()'");
 
                 foreach (var function in functionsToInvoke)
                 {
@@ -318,29 +319,37 @@ namespace SimHub.Plugins.ComputedProperties
 
         public void CreateProperty(string propertyName)
         {
-            PluginManager.AddProperty(propertyName, typeof(ComputedPropertiesPlugin), typeof(object));
-            _pluginManagerAccessor.SetPropertySupportStatus(propertyName, typeof(ComputedPropertiesPlugin), SupportStatus.Computed);
+            if (propertyName.StartsWith(nameof(ComputedPropertiesPlugin) + "."))
+            {
+                var prop4SimHub = propertyName.Substring(propertyName.IndexOf('.') + 1);
+                PluginManager.AddProperty(prop4SimHub, typeof(ComputedPropertiesPlugin), typeof(object));
+                _pluginManagerAccessor.SetPropertySupportStatus(prop4SimHub, typeof(ComputedPropertiesPlugin), SupportStatus.Computed);
+            }
         }
 
         public void SetPropertyValue(string propertyName, object value)
         {
-            PluginManager.SetPropertyValue<ComputedPropertiesPlugin>(propertyName, value);
+            if (propertyName.StartsWith(nameof(ComputedPropertiesPlugin) + "."))
+            {
+                var prop4SimHub = propertyName.Substring(propertyName.IndexOf('.') + 1);
+                PluginManager.SetPropertyValue<ComputedPropertiesPlugin>(prop4SimHub, value);
+            }
         }
 
         public void PrepareEngine(
             Engine engine,
-            Func<string, object> getPropertyValue,
             Func<object> getRawData,
             Action<object> log,
             Action<string> createProperty,
             Action<string, string> subscribe,
+            Func<string, object> getPropertyValue,
             Action<string, object> setPropertyValue)
         {
-            engine.SetValue("$prop", getPropertyValue);
             engine.SetValue("NewRawData", getRawData);
             engine.SetValue("log", log);
             engine.SetValue("createProperty", createProperty);
             engine.SetValue("subscribe", subscribe);
+            engine.SetValue("getPropertyValue", getPropertyValue);
             engine.SetValue("setPropertyValue", setPropertyValue);
         }
 

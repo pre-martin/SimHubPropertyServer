@@ -47,8 +47,10 @@ namespace SimHub.Plugins.ComputedProperties
             set => SetProperty(ref _script, value);
         }
 
-        [JsonIgnore] private bool _hasErrors;
+        [JsonIgnore]
+        private bool _hasErrors;
 
+        [JsonIgnore]
         public bool HasErrors
         {
             get => _hasErrors;
@@ -73,6 +75,7 @@ namespace SimHub.Plugins.ComputedProperties
         /// <summary>
         /// Properties that this script is watching, associated with some data about this property.
         /// </summary>
+        [JsonIgnore]
         public IReadOnlyDictionary<string, PropertyData> SubscribedProperties => _subscribedProperties;
 
         [JsonIgnore]
@@ -81,6 +84,7 @@ namespace SimHub.Plugins.ComputedProperties
         /// <summary>
         /// Each function of this script associated with its performance data.
         /// </summary>
+        [JsonIgnore]
         public IReadOnlyDictionary<string, PerfData> FunctionPerformance => _functionPerformance;
 
         [JsonIgnore]
@@ -116,7 +120,6 @@ namespace SimHub.Plugins.ComputedProperties
                 _engine = new Engine(options => options.Strict = true);
                 computedPropertiesManager.PrepareEngine(
                     engine: _engine,
-                    getPropertyValue: computedPropertiesManager.GetPropertyValue,
                     getRawData: computedPropertiesManager.GetRawData,
                     log: data => Log.Info(logPrefix + data),
                     createProperty: propertyName =>
@@ -142,6 +145,7 @@ namespace SimHub.Plugins.ComputedProperties
                             _subscribedProperties.Add(propertyName, newPropertyData);
                         }
                     },
+                    getPropertyValue: computedPropertiesManager.GetPropertyValue,
                     setPropertyValue: (propertyName, value) =>
                     {
                         if (_createdProperties.Contains(propertyName))

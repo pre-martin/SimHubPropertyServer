@@ -15,11 +15,11 @@ namespace SimHub.Plugins.ComputedProperties
 
         void PrepareEngine(
             Engine engine,
-            Func<string, object> getPropertyValue,
             Func<object> getRawData,
             Action<object> log,
             Action<string> createProperty,
             Action<string, string> subscribe,
+            Func<string, object> getPropertyValue,
             Action<string, object> setPropertyValue);
     }
 }
