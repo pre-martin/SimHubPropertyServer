@@ -161,6 +161,23 @@ And it could like this on your Stream Deck +:
 image:ETS2-Retarder.png[ETS2 Retarder]
 
 
+== Bind a SimHub Control to your function
+
+You can bind a SimHub Control to your function. This means, that whenever the SimHub Control is triggered, your function is called. This can be achieved by the following steps:
+
+1. Open "Controls and events" in SimHub.
+2. On the "Controls" tab, press "New mapping" and the following dialog will appear.
+3. Press the control (could be a Stream Deck buttin with my Stream Deck plugin) you want to bind.
+4. Adjust the "Input mode" if required.
+5. Select the function on the right side (in the screenshot the Control Mapper Role "PsiPlusFour" is being mapped to the function "increment()" of the script "PSI").
+
+image:Control-Mapping.png[Control Mapping]
+
+SimHub does not support to update the name of actions. The action name for your functions is built from the name of the script and the name of the function. Whenever you rename your script or your function, you will lose this binding.
+
+TIP: On the tab "Events", SimHub has some predefined events, that you can also use to trigger your code. There you will find useful events like "NewValidLap", all different race flags, "PitEnter", "PitOut" and some more.
+
+
 [#performance-data]
 == Performance Data
 
