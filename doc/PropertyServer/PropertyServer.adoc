@@ -1,5 +1,4 @@
 ﻿= Property Server
-
 :toc:
 :sectnums:
 ifdef::env-github[]

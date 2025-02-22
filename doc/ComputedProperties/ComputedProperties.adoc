@@ -1,5 +1,4 @@
 ﻿= Computed Properties
-
 :toc:
 :sectnums:
 ifdef::env-github[]
