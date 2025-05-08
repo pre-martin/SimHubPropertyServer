@@ -8,9 +8,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:ui="clr-namespace:SimHub.Plugins.ComputedProperties.Ui"
              x:Class="SimHub.Plugins.ComputedProperties.Ui.ComputedPropertiesControl"
+             xmlns:local="clr-namespace:SimHub.Plugins.ComputedProperties.Ui"
              mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance local:ComputedPropertiesViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="400">
 
     <UserControl.Resources>
@@ -21,11 +22,6 @@
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
-
-    <!-- For IDE only -->
-    <UserControl.DataContext>
-        <ui:ComputedPropertiesViewModel />
-    </UserControl.DataContext>
 
     <StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="15,4">

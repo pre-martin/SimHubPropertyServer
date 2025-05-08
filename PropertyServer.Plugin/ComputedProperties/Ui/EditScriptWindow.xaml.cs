@@ -24,7 +24,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
 
         private void TextEditor_OnTextChanged(object sender, EventArgs e)
         {
-            ViewModel.OnScriptChanged(CodeEditor.Text);
+            ViewModel?.OnScriptChanged(CodeEditor.Text);
         }
 
         private async void InsertProperty_Click(object sender, RoutedEventArgs e)

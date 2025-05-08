@@ -7,22 +7,21 @@
     x:Class="SimHub.Plugins.ComputedProperties.Ui.EditScriptWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:styles="clr-namespace:SimHub.Plugins.Styles;assembly=SimHub.Plugins"
     xmlns:ui="clr-namespace:SimHub.Plugins.UI;assembly=SimHub.Plugins"
     xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
     xmlns:local="clr-namespace:SimHub.Plugins.ComputedProperties.Ui"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance local:EditScriptWindowViewModel, IsDesignTimeCreatable=True}"
     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
     IsOkEnabled="{Binding IsOkEnabled}">
-
-    <!-- For IDE only -->
-    <ui:SHDialogContentBase.DataContext>
-        <local:EditScriptWindowViewModel />
-    </ui:SHDialogContentBase.DataContext>
 
     <Grid VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" /> <!-- Name + Name field -->
-            <RowDefinition Height="Auto" /> <!-- Section "Javascript" -->
+            <RowDefinition Height="Auto" /> <!-- Section "JavaScript" -->
             <RowDefinition Height="*" /> <!-- Code editor -->
             <RowDefinition Height="Auto" /> <!-- Button row -->
             <RowDefinition Height="Auto" /> <!-- Errors -->

@@ -40,18 +40,17 @@ namespace SimHub.Plugins.ComputedProperties.Ui
             var selectedItem = ViewModel.SelectedScript;
             if (selectedItem == null) return;
 
-            var myContext = (ComputedPropertiesViewModel)DataContext;
             var editWindow = new EditScriptWindow
             {
                 // Create a clone of ScriptData, so that the editor does not work on the original data.
-                DataContext = new EditScriptWindowViewModel(myContext.ScriptValidator, selectedItem.Clone())
+                DataContext = new EditScriptWindowViewModel(ViewModel.ScriptValidator, selectedItem.Clone())
             };
             var result = await editWindow.ShowDialogWindowAsync(this, DialogOptions.Resizable, 1000, 800);
             if (result == DialogResult.OK)
             {
                 // OK: Copy all data from the dialog (view model) into the underlying DataContext.
                 var scriptData = ((EditScriptWindowViewModel)editWindow.DataContext).GetScriptData();
-                var existingEntry= myContext.Scripts.SingleOrDefault(data => data.Guid == scriptData.Guid);
+                var existingEntry= ViewModel.Scripts.SingleOrDefault(data => data.Guid == scriptData.Guid);
                 if (existingEntry != null)
                 {
                     existingEntry.Name = scriptData.Name;
