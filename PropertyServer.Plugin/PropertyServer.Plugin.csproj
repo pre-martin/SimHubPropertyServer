@@ -8,7 +8,7 @@
     <ProjectGuid>{B3A7DBD0-917C-4FF1-9AAB-D3DC6ED29AE2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimHub.Plugins.PropertyServer</RootNamespace>
+    <RootNamespace>SimHub.Plugins</RootNamespace>
     <AssemblyName>PropertyServer</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -43,6 +43,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
@@ -72,49 +73,88 @@
       <HintPath>..\SimHub\MahApps.Metro.SimpleChildWindow.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Jint">
+      <HintPath>..\SimHub\Jint.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Acornima">
+      <HintPath>..\SimHub\Acornima.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="IcsSharpCode.AvalonEdit">
+      <HintPath>..\SimHub\ICSharpCode.AvalonEdit.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="ISimHub.cs" />
+    <Compile Include="ComputedProperties\ComputedPropertiesPlugin.cs" />
+    <Compile Include="ComputedProperties\IScriptValidator.cs" />
+    <Compile Include="ComputedProperties\IComputedPropertiesManager.cs" />
+    <Compile Include="ComputedProperties\Performance\PerfToken.cs" />
+    <Compile Include="ComputedProperties\Performance\PerfData.cs" />
+    <Compile Include="ComputedProperties\PluginManagerAccessor.cs" />
+    <Compile Include="ComputedProperties\ScriptData.cs" />
+    <Compile Include="ComputedProperties\Ui\ComputedPropertiesControl.xaml.cs">
+      <DependentUpon>ComputedPropertiesControl.xaml</DependentUpon>
+    </Compile>
+    <Page Include="ComputedProperties\Ui\ComputedPropertiesControl.xaml" />
+    <Compile Include="ComputedProperties\Ui\ComputedPropertiesViewModel.cs" />
+    <Compile Include="ComputedProperties\Ui\EditScriptWindow.xaml.cs">
+      <DependentUpon>EditScriptWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="ComputedProperties\Ui\EditScriptWindow.xaml" />
+    <Compile Include="ComputedProperties\Ui\EditScriptWindowViewModel.cs" />
+    <Compile Include="ComputedProperties\Ui\PerformanceWindow.xaml.cs">
+        <DependentUpon>PerformanceWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="ComputedProperties\Ui\PerformanceWindow.xaml" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="PropertyServerPlugin.cs" />
-    <Compile Include="Property\PropertyAccessor.cs" />
-    <Compile Include="Property\PropertySource.cs" />
-    <Compile Include="Property\SimHubProperty.cs" />
-    <Compile Include="RawDataManager.cs" />
-    <Compile Include="Comm\Client.cs" />
-    <Compile Include="Comm\Server.cs" />
-    <Compile Include="Settings\GeneralSettings.cs" />
-    <Compile Include="Settings\LogLevelSetting.cs" />
-    <Compile Include="ShakeIt\Converter.cs" />
-    <Compile Include="ShakeIt\EffectsContainerCollector.cs" />
-    <Compile Include="ShakeIt\EffectsContainerBase.cs" />
-    <Compile Include="ShakeIt\GroupContainer.cs" />
-    <Compile Include="ShakeIt\Profile.cs" />
-    <Compile Include="ShakeIt\ShakeItAccessor.cs" />
-    <Compile Include="ShakeIt\TreeElement.cs" />
-    <Compile Include="SubscriptionManager.cs" />
-    <Compile Include="Ui\IpPortValidationRule.cs" />
-    <Compile Include="Ui\RepairShakeItViewModel.cs" />
-    <Page Include="Ui\RepairShakeItWindow.xaml" />
-    <Compile Include="Ui\RepairShakeItWindow.xaml.cs">
+    <Compile Include="PropertyServer\Comm\Client.cs" />
+    <Compile Include="PropertyServer\Comm\Server.cs" />
+    <Compile Include="PropertyServer\ISimHub.cs" />
+    <Compile Include="PropertyServer\PropertyServerPlugin.cs" />
+    <Compile Include="PropertyServer\Property\PropertyAccessor.cs" />
+    <Compile Include="PropertyServer\Property\PropertySource.cs" />
+    <Compile Include="PropertyServer\Property\SimHubProperty.cs" />
+    <Compile Include="PropertyServer\RawDataManager.cs" />
+    <Compile Include="PropertyServer\Settings\GeneralSettings.cs" />
+    <Compile Include="PropertyServer\Settings\LogLevelSetting.cs" />
+    <Compile Include="PropertyServer\ShakeIt\Converter.cs" />
+    <Compile Include="PropertyServer\ShakeIt\EffectsContainerBase.cs" />
+    <Compile Include="PropertyServer\ShakeIt\EffectsContainerCollector.cs" />
+    <Compile Include="PropertyServer\ShakeIt\GroupContainer.cs" />
+    <Compile Include="PropertyServer\ShakeIt\Profile.cs" />
+    <Compile Include="PropertyServer\ShakeIt\ShakeItAccessor.cs" />
+    <Compile Include="PropertyServer\ShakeIt\TreeElement.cs" />
+    <Compile Include="PropertyServer\SubscriptionManager.cs" />
+    <Compile Include="PropertyServer\Ui\IpPortValidationRule.cs" />
+    <Compile Include="PropertyServer\Ui\RepairShakeItViewModel.cs" />
+    <Compile Include="PropertyServer\Ui\RepairShakeItWindow.xaml.cs">
       <DependentUpon>RepairShakeItWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="Ui\SettingsControl.xaml" />
-    <Compile Include="Ui\SettingsControl.xaml.cs">
+    <Page Include="PropertyServer\Ui\RepairShakeItWindow.xaml" />
+    <Compile Include="PropertyServer\Ui\SettingsControl.xaml.cs">
       <DependentUpon>SettingsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Ui\SettingsViewModel.cs" />
-    <Compile Include="Ui\Util\Converters.cs" />
-    <Compile Include="Ui\Util\NotifyPropertyChanges.cs" />
-    <Compile Include="Ui\Util\RelayCommand.cs" />
+    <Page Include="PropertyServer\Ui\SettingsControl.xaml" />
+    <Compile Include="PropertyServer\Ui\SettingsViewModel.cs" />
+    <Page Include="PreCommon\Ui\IconResources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="PreCommon\Ui\Util\Converters.cs" />
+    <Compile Include="PreCommon\Ui\Util\ObservableObject.cs" />
+    <Compile Include="PreCommon\Ui\Util\RelayCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
-    <Content Include="properties.png" />
+    <Content Include="PropertyServer\properties.png" />
+    <Content Include="PropertyServer\properties.xcf" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -122,6 +162,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

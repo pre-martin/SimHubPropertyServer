@@ -10,9 +10,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:SimHub.Plugins.PropertyServer.Ui"
-    xmlns:localUtil="clr-namespace:SimHub.Plugins.PropertyServer.Ui.Util"
     xmlns:simpleChildWindow="clr-namespace:MahApps.Metro.SimpleChildWindow;assembly=MahApps.Metro.SimpleChildWindow"
+    xmlns:ui="clr-namespace:SimHub.Plugins.PropertyServer.Ui"
+    xmlns:util="clr-namespace:SimHub.Plugins.PreCommon.Ui.Util"
     GlowBrush="Black"
     ShowTitleBar="False"
     BorderThickness="1"
@@ -23,11 +23,11 @@
     </simpleChildWindow:ChildWindow.OverlayBrush>
 
     <simpleChildWindow:ChildWindow.DataContext>
-        <local:RepairShakeItViewModel />
+        <ui:RepairShakeItViewModel />
     </simpleChildWindow:ChildWindow.DataContext>
 
     <simpleChildWindow:ChildWindow.Resources>
-        <localUtil:BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
+        <util:BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
     </simpleChildWindow:ChildWindow.Resources>
 
     <Grid Width="800" Height="650" Margin="8">
