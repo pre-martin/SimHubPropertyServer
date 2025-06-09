@@ -52,7 +52,7 @@
                                       Click="InsertProperty_Click"
                                       Content="Insert property" />
             <styles:SHButtonSecondary Width="120" Margin="4"
-                                      Command="{Binding InsertSampleCommand}"
+                                      Click="InsertSample_Click"
                                       Content="Insert sample"
                                       ToolTip="Replaces the current content with a small sample script" />
         </StackPanel>

@@ -4,6 +4,8 @@
 using System;
 using System.Windows;
 using System.Windows.Forms;
+using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using SimHub.Plugins.OutputPlugins.Dash.WPFUI;
 
 namespace SimHub.Plugins.ComputedProperties.Ui
@@ -37,6 +39,15 @@ namespace SimHub.Plugins.ComputedProperties.Ui
                 {
                     CodeEditor.SelectedText = $"'{pp.Result.GetPropertyName()}'";
                 }
+            }
+        }
+
+        private async void InsertSample_Click(object sender, RoutedEventArgs e)
+        {
+            var result = await (Window.GetWindow(this) as MetroWindow).ShowMessageAsync("Insert Sample", "This will replace your current script with the sample script. Continue?", MessageDialogStyle.AffirmativeAndNegative);
+            if (result == MessageDialogResult.Affirmative)
+            {
+                ViewModel.InsertSample();
             }
         }
     }

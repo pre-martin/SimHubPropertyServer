@@ -4,7 +4,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using ICSharpCode.AvalonEdit.Document;
 using SimHub.Plugins.OutputPlugins.Dash.GLCDTemplating;
 using SimHub.Plugins.PreCommon.Ui.Util;
@@ -40,8 +39,6 @@ namespace SimHub.Plugins.ComputedProperties.Ui
             set => SetProperty(ref _script, value);
         }
 
-        public ICommand InsertSampleCommand { get; }
-
         private bool _isOkEnabled;
 
         public bool IsOkEnabled
@@ -64,7 +61,6 @@ namespace SimHub.Plugins.ComputedProperties.Ui
         {
             _scriptValidator = scriptValidator;
             _scriptData = scriptData;
-            InsertSampleCommand = new RelayCommand<object>(_ => InsertSample());
 
             Script = new TextDocument(scriptData.Script);
             UpdateButtonState();
@@ -91,7 +87,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
         /// <summary>
         /// Inserts a minimal, functioning script into the editor.
         /// </summary>
-        private void InsertSample()
+        public void InsertSample()
         {
             Script = new TextDocument(@"
 /** Initialization. Only called by the plugin once for each script. */
