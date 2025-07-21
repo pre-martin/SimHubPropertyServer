@@ -32,7 +32,7 @@ namespace SimHub.Plugins.PropertyServer
         private readonly SubscriptionManager _subscriptionManager = new SubscriptionManager();
         private FieldInfo _rawField;
         private readonly RawDataManager _rawDataManager = new RawDataManager();
-        private readonly ShakeItAccessor _shakeItAccessor = new ShakeItAccessor();
+        private ShakeItAccessor _shakeItAccessor;
         private int _unhandledExceptionCount;
 
         public PluginManager PluginManager { get; set; }
@@ -60,6 +60,8 @@ namespace SimHub.Plugins.PropertyServer
             namespaceLogger.Level = _settings.LogLevel.ToLog4Net();
 
             Log.Info($"===== Starting plugin, version {ThisAssembly.AssemblyFileVersion} =====");
+
+            _shakeItAccessor = new ShakeItAccessor();
 
             // Move execution of server into a new task/thread (away from SimHub thread). The server is async, but we
             // do not want to put any unnecessary load onto the SimHub thread.
