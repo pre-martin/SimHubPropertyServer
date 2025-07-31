@@ -10,7 +10,7 @@
   - MahApps.Metro.SimpleChildWindow.dll
   - Jint.dll
   - Acornima.dll
-  - ICSharpCode.AvalonEdit.dll.dll
+  - ICSharpCode.AvalonEdit.dll
 . Restore NuGet packages: +
   `msbuild -t:restore -p:Platform="Any CPU" -p:RestorePackagesConfig=true`
 . Build the project: +
