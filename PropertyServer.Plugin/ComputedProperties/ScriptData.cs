@@ -244,7 +244,7 @@ namespace SimHub.Plugins.ComputedProperties
         public object OldValue { get; set; }
 
         /// <summary>
-        /// JavaScript functions that have to be invoked, when the value of the property changes.
+        /// JavaScript functions that have to be invoked when the value of the property changes.
         /// </summary>
         public HashSet<string> Functions { get; } = new HashSet<string>();
     }

@@ -64,7 +64,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
         {
             if (!(((FrameworkElement)sender).DataContext is ScriptData scriptData)) return;
 
-            var performanceWindow = new PerformanceWindow() { DataContext = scriptData.FunctionPerformance };
+            var performanceWindow = new PerformanceWindow { DataContext = scriptData.FunctionPerformance };
             await performanceWindow.ShowDialogWindowAsync(this, DialogOptions.Resizable, 500, 400);
         }
 

@@ -27,7 +27,7 @@ namespace SimHub.Plugins.ComputedProperties
                 }
             }
 
-            _propertySupportStatus = typeof(PropertyEntry).GetProperty("SupportStatus");
+            _propertySupportStatus = typeof(PropertyEntry).GetProperty(nameof(SupportStatus));
         }
 
         public void SetPropertySupportStatus(string name, Type pluginType, SupportStatus status)

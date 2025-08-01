@@ -78,8 +78,7 @@ namespace SimHub.Plugins.ComputedProperties
                 Log.Info($"Performance data for script \"{scriptData.Name}\":");
                 foreach (var fp in scriptData.FunctionPerformance)
                 {
-                    var avg = fp.Value.Time / fp.Value.Calls;
-                    Log.Info($"  {fp.Key}(): {fp.Value.Calls} calls, {avg:F3} ms/call, {fp.Value.Skipped} times skipped");
+                    Log.Info($"  {fp.Key}(): {fp.Value.Calls} calls, {fp.Value.Duration:F3} ms/call, {fp.Value.Skipped} times skipped");
                 }
                 scriptData.Reset();
             }
@@ -257,7 +256,7 @@ namespace SimHub.Plugins.ComputedProperties
                     createProperty: propName =>
                     {
                         if (string.IsNullOrWhiteSpace(propName)) throw new ArgumentException("Property name must not be empty in 'createProperty()'");
-                        if (!propName.StartsWith(nameof(ComputedPropertiesPlugin) + ".")) throw new ArgumentException("Property name must start with 'ComputedPropertiesPlugin.' in 'createProperty()'");
+                        if (!propName.StartsWith(nameof(ComputedPropertiesPlugin) + ".")) throw new ArgumentException($"Property name must start with '{nameof(ComputedPropertiesPlugin)}.' in 'createProperty()'");
                         createdProperties.Add(propName);
                     },
                     subscribe: (propName, function) =>
@@ -269,7 +268,7 @@ namespace SimHub.Plugins.ComputedProperties
                     getPropertyValue: s => "5",
                     setPropertyValue: (propName, value) =>
                     {
-                        if (!propName.StartsWith(nameof(ComputedPropertiesPlugin) + ".")) throw new ArgumentException("Property name must start with 'ComputedPropertiesPlugin.' in 'setPropertyValue()'");
+                        if (!propName.StartsWith(nameof(ComputedPropertiesPlugin) + ".")) throw new ArgumentException($"Property name must start with '{nameof(ComputedPropertiesPlugin)}.' in 'setPropertyValue()'");
                         if (!createdProperties.Contains(propName)) throw new ArgumentException($"Property '{propName}' was not created in '{initFunction}()', cannot set value");
                     }
                 );

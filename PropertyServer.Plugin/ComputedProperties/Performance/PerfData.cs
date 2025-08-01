@@ -11,6 +11,6 @@ namespace SimHub.Plugins.ComputedProperties.Performance
         public int Calls { get; set; }
         public int Skipped { get; set; }
         public double Time { get; set; }
-        public double Duration => Time / Calls;
+        public double Duration => Calls == 0 ? 0 : Time / Calls;
     }
 }

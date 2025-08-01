@@ -18,16 +18,16 @@ TIP: Always read the *correct version* of the documentation, which matches the v
 
 As written on the main page, this plugin allows you to execute user-defined JavaScript code within SimHub.
 
-With this code, you can define new properties (thus the name of the plugin), which are calculated from the values of other properties. Your new properties are available everywhere in SimHub, where properties can be used, for example in SimHub Dashes or on the keys of your Stream Deck (see my other project https://github.com/pre-martin/StreamDeckSimHubPlugin[StreamDeckSimHubPlugin]).
+With this code, you can define new properties, which are calculated from the values of other properties (thus the name of the plugin). Your new properties are available everywhere in SimHub, where properties can be used, for example, in SimHub Dashes or on the keys of your Stream Deck (see my other project https://github.com/pre-martin/StreamDeckSimHubPlugin[StreamDeckSimHubPlugin]).
 
-Your code is executed whenever other properties change their value (you can "subscribe" to other properties). Alternatively, your code can also be linked with a SimHub Controls or SimHub Control Mapper Roles: Whenever this is triggered, your associated code is executed.
+Your code is executed whenever other properties change their value (you can "subscribe" to other properties). Alternatively, your code can also be linked with SimHub Controls or SimHub Control Mapper Roles: Whenever this is triggered, your associated code is executed.
 
 
 == Structure of a script
 
 Each script must contain an `init()` function. This function is called once, whenever the script gets active (start of the plugin, selection of a new game in SimHub, after having modified the script). In this `init()` function, you can define/create your properties, subscribe to other properties and initialize local variables of your script.
 
-Additionally, you can define as many functions as you like. They get either called, when the value of a subscribed property has changed, when a linked SimHub Control was triggered, or you can call them from other functions. All the functions that get called from the outside, must be parameterless.
+Additionally, you can define as many functions as you like. They get either called, when the value of a subscribed property has changed, when a linked SimHub Control was triggered, or you can call them from other functions. All the functions that get called from the outside must be parameterless.
 
 In addition to the code, each script must also have a name. To avoid confusion, this name should be meaningful and **unique**.
 
@@ -36,13 +36,13 @@ Each script is executed in its own context. This means that scripts cannot acces
 
 == Available Commands
 
-TIP: Your scripts use JavaScript, not TypeScript. So there is no typing information or type validation available. Nevertheless, I will specify the types of the parameters in the following, as the typing is relevant for the transition from and to C#.
+TIP: Your scripts have to use JavaScript, not TypeScript. So there is no typing information or type validation available. Nevertheless, I will specify the types of the parameters in the following, as the typing is relevant for SimHub and my plugin itself (SimHub and my plugin are written in C#).
 
 **log(message: object)**
 
 Logs the given message into `<SimHub>\Logs\ComputedProperties.log`.
 
-Be careful with this command, because your functions could be called as often as 60 times per second. This is the internal frequency of SimHub, if you use the licensed version.
+Be careful with this command, because your functions could be called as often as 60 times per second. This is the internal frequency of SimHub if you use the licensed version.
 
 **createProperty(name: string)**
 
@@ -84,7 +84,7 @@ function calculate() {
 }
 ----
 
-The content of the script editor gets also replaced by this code, when you click on the "Insert sample" button.
+When you click on the "Insert sample" button, the content of the script editor gets replaced by this code.
 
 What does this script do?
 
@@ -163,25 +163,27 @@ image:ETS2-Retarder.png[ETS2 Retarder]
 
 == Bind a SimHub Control to your function
 
-You can bind a SimHub Control to your function. This means, that whenever the SimHub Control is triggered, your function is called. This can be achieved by the following steps:
+You can bind a SimHub Control to your function. This means that whenever the SimHub Control is triggered, your function is called. This can be achieved by the following steps:
 
 1. Open "Controls and events" in SimHub.
 2. On the "Controls" tab, press "New mapping" and the following dialog will appear.
-3. Press the control (could be a Stream Deck buttin with my Stream Deck plugin) you want to bind.
+3. Press the control (could be a Stream Deck button with my Stream Deck plugin) you want to bind.
 4. Adjust the "Input mode" if required.
-5. Select the function on the right side (in the screenshot the Control Mapper Role "PsiPlusFour" is being mapped to the function "increment()" of the script "PSI").
+5. Select the function on the right side.
+
+In the screenshot, the Control Mapper Role "PsiPlusFour" is being mapped to the function "increment()" of the script "PSI":
 
 image:Control-Mapping.png[Control Mapping]
 
-SimHub does not support to update the name of actions. The action name for your functions is built from the name of the script and the name of the function. Whenever you rename your script or your function, you will lose this binding.
+SimHub does not support to update the name of actions (or "Target" in this dialog). The action name for your functions is built from the name of the script and the name of the function. Whenever you rename your script or your function, you will lose this binding.
 
-TIP: On the tab "Events", SimHub has some predefined events, that you can also use to trigger your code. There you will find useful events like "NewValidLap", all different race flags, "PitEnter", "PitOut" and some more.
+TIP: On the tab "Events", SimHub has some predefined events that you can also use to trigger your code. There you will find useful events like "NewValidLap", all different race flags, "PitEnter", "PitOut" and some more.
 
 
 [#performance-data]
 == Performance Data
 
-In the list of all your computed properties, there is an info icon for each script. If you open it, you get some performance data, which may help you to get an overview of the performance impact of your script to SimHub:
+In the list of all your computed properties, there is an info icon for each script. If you open it, you get some performance data, which may help you to get an overview about the performance impact of your script to SimHub:
 
 image::Performance-Window.png[Performance window]
 
@@ -191,6 +193,6 @@ This window lists each of your functions, except of the `init()` function. For e
 - **Duration**: The average duration of the execution time of the function in milliseconds per call.
 - **Skipped**: How often the function has not been called, because the value of a subscribed property did not change. If this value is very low (like in the screenshot), your function has a high impact on SimHub, because it is executed very often. Maybe you could subscribe to other properties, if possible, or you could implement some logic that the code in your function only gets executed upon each __n__th call.
 
-Internal functions (that do not get called from the outside by the plugin), won't have any performance data, because the plugin cannot survey their execution.
+Internal functions (that do not get called from the outside by the plugin) won't have any performance data, because the plugin cannot survey their execution.
 
 You can find this data also when you exit SimHub. The plugin will then dump the performance data into the log file `<SimHub>\Logs\ComputedProperties.log`.
