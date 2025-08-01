@@ -1,14 +1,40 @@
-= Release process
+= Development and Release Process
 
-. If there is no release branch yet for the current version: +
+== Development
+
+This project uses the Gitflow workflow. Although this workflow is a little bit more complex than e.g. the GitHub workflow, it assures that only tagged versions are on the main branch. Thus, our users always get the correct documentation for the latest version without having to switch branches in the UI.
+
+The whole development happens on the `develop` branch. New features are started from the `develop` branch and merged back into it when they are finished.
+
+
+== Release
+
+When a new version is ready to be released, the following steps are taken:
+
+. Switch to the `develop` branch: +
+   `git switch develop`
+. Create a release branch based on `version.json`: +
    `nbgv prepare-release`
 . Switch to the release branch: +
    `git switch release/v1.2`
-. Push the release branch
+. Push the release branch: +
+   `git push origin release/v1.2`
+
+The release branch can be used to further stabilize the release. If there are any changes made to the release branch, they should be merged back into the `develop` branch as well.
+
+When the release is ready, the following steps are taken:
+
+. Merge the release branch into the `main` branch: +
+   `git switch main`
+   `git merge --no-ff release/v1.2`
 . Create a tag and push it afterward:
   - `nbgv tag`
   - `git push origin v1.2`
 . Build the plugin:
   - see link:Building.adoc[Building.adoc]
 . Create a release in GitHub from the tag and attach the file `PropertyServer.dll`
-. Push the main branch.
+. Push the main branch: +
+   `git push origin main`
+. Merge the main branch back into the `develop` branch: +
+   `git switch develop`
+   `git merge --no-ff main`
