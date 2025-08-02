@@ -1,13 +1,16 @@
 = Building
 
 . The project requires .NET Framework 4.8, because SimHub is built with this framework.
-. Copy required DLLs from SimHub to the local directory `SimHub`
+. Copy required DLLs from SimHub to the local directory `SimHub` (see `copyApiFromSimHub.bat`):
   - SimHub.Plugins.dll
   - GameReaderCommon.dll
   - log4net.dll
   - Newtonsoft.Json.dll
   - MahApps.Metro.dll
   - MahApps.Metro.SimpleChildWindow.dll
+  - Jint.dll
+  - Acornima.dll
+  - ICSharpCode.AvalonEdit.dll
 . Restore NuGet packages: +
   `msbuild -t:restore -p:Platform="Any CPU" -p:RestorePackagesConfig=true`
 . Build the project: +

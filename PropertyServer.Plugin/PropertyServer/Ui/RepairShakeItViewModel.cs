@@ -8,15 +8,15 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
+using SimHub.Plugins.PreCommon.Ui.Util;
 using SimHub.Plugins.PropertyServer.ShakeIt;
-using SimHub.Plugins.PropertyServer.Ui.Util;
 
 namespace SimHub.Plugins.PropertyServer.Ui
 {
     /// <summary>
     /// ViewModel for the "Repair ShakeIt" view.
     /// </summary>
-    public class RepairShakeItViewModel : NotifyPropertyChanges
+    public class RepairShakeItViewModel : ObservableObject
     {
         public ShakeItAccessor ShakeItAccessor { get; set; }
         public ICommand ScanShakeItBassCommand { get; }
@@ -34,7 +34,7 @@ namespace SimHub.Plugins.PropertyServer.Ui
             get => _profiles;
             private set
             {
-                SetField(ref _profiles, value);
+                SetProperty(ref _profiles, value);
                 OnPropertyChanged(nameof(ShowScanHint));
                 OnPropertyChanged(nameof(ShowDuplicatesList));
                 OnPropertyChanged(nameof(ShowNoResults));

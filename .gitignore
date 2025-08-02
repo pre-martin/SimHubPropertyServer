@@ -1,9 +1,9 @@
 /.idea
 /*.DotSettings.user
+/.vs
 
 /packages
 /bin
 /obj
 
 /SimHub
-/*.bat
