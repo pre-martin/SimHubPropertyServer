@@ -45,12 +45,13 @@ namespace SimHub.Plugins.ComputedProperties.Ui
                 // Create a clone of ScriptData, so that the editor does not work on the original data.
                 DataContext = new EditScriptWindowViewModel(ViewModel.ScriptValidator, selectedItem.Clone())
             };
-            var result = await editWindow.ShowDialogWindowAsync(this, DialogOptions.Resizable, 1000, 800);
+            var result = await editWindow.ShowDialogWindowAsync(this, DialogOptions.Resizable | DialogOptions.DoNotCloseOnEscape,
+                1000, 800);
             if (result == DialogResult.OK)
             {
                 // OK: Copy all data from the dialog (view model) into the underlying DataContext.
                 var scriptData = ((EditScriptWindowViewModel)editWindow.DataContext).GetScriptData();
-                var existingEntry= ViewModel.Scripts.SingleOrDefault(data => data.Guid == scriptData.Guid);
+                var existingEntry = ViewModel.Scripts.SingleOrDefault(data => data.Guid == scriptData.Guid);
                 if (existingEntry != null)
                 {
                     existingEntry.Name = scriptData.Name;
@@ -65,7 +66,8 @@ namespace SimHub.Plugins.ComputedProperties.Ui
             if (!(((FrameworkElement)sender).DataContext is ScriptData scriptData)) return;
 
             var performanceWindow = new PerformanceWindow { DataContext = scriptData.FunctionPerformance };
-            await performanceWindow.ShowDialogWindowAsync(this, DialogOptions.Resizable, 500, 400);
+            await performanceWindow.ShowDialogWindowAsync(this, DialogOptions.Resizable | DialogOptions.DoNotCloseOnEscape, 500,
+                400);
         }
 
         private async void Entry_DeleteClick(object sender, RoutedEventArgs e)
@@ -76,8 +78,9 @@ namespace SimHub.Plugins.ComputedProperties.Ui
                 ? 0
                 : scriptData.Script.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None).Length;
 
-            var result = await SHMessageBox.Show($"Are you sure you want to delete the script \n\"{scriptData.Name}\"? \nIt has {linesOfCode} lines of code.", "Confirm delete",
-                MessageBoxButton.OKCancel, MessageBoxImage.Question);
+            var result = await SHMessageBox.Show(
+                $"Are you sure you want to delete the script \n\"{scriptData.Name}\"? \nIt has {linesOfCode} lines of code.",
+                "Confirm delete", MessageBoxButton.OKCancel, MessageBoxImage.Question);
 
             if (result != DialogResult.OK) return;
             ViewModel.DeleteScript(scriptData);
