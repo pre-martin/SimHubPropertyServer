@@ -15,6 +15,8 @@ When a new version is ready to be released, the following steps are taken:
    `git switch develop`
 . Create a release branch based on `version.json`: +
    `nbgv prepare-release`
+. Push the `develop` branch as nbgv updated the version number:
+   `git push`
 . Switch to the release branch: +
    `git switch release/v1.2`
 . Push the release branch: +
@@ -34,7 +36,8 @@ When the release is ready, the following steps are taken:
   - see link:Building.adoc[Building.adoc]
 . Create a release in GitHub from the tag and attach the file `PropertyServer.dll`
 . Push the main branch: +
-   `git push origin main`
+   `git push`
 . Merge the main branch back into the `develop` branch: +
-   `git switch develop`
-   `git merge --no-ff main`
+   `git switch develop` +
+   `git merge --no-ff main` +
+  `git push`
