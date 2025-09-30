@@ -143,7 +143,7 @@ namespace SimHub.Plugins.ComputedProperties
         public Control GetWPFSettingsControl(PluginManager pluginManager)
         {
             var computedPropertiesViewModel = new ComputedPropertiesViewModel(_scripts, this);
-            return new ComputedPropertiesControl { DataContext = computedPropertiesViewModel };
+            return new ComputedPropertiesControl(this) { DataContext = computedPropertiesViewModel };
         }
 
         public ImageSource PictureIcon
@@ -350,6 +350,11 @@ namespace SimHub.Plugins.ComputedProperties
             engine.SetValue("subscribe", subscribe);
             engine.SetValue("getPropertyValue", getPropertyValue);
             engine.SetValue("setPropertyValue", setPropertyValue);
+        }
+
+        public void SaveScripts()
+        {
+            this.SaveCommonSettings("Scripts", _scripts);
         }
 
         #endregion

@@ -21,5 +21,7 @@ namespace SimHub.Plugins.ComputedProperties
             Action<string, string> subscribe,
             Func<string, object> getPropertyValue,
             Action<string, object> setPropertyValue);
+
+        void SaveScripts();
     }
 }

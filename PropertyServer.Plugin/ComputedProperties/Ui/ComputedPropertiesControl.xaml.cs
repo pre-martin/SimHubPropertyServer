@@ -13,8 +13,11 @@ namespace SimHub.Plugins.ComputedProperties.Ui
 {
     public partial class ComputedPropertiesControl
     {
-        public ComputedPropertiesControl()
+        private readonly IComputedPropertiesManager _computedPropertiesManager;
+
+        public ComputedPropertiesControl(IComputedPropertiesManager computedPropertiesManager)
         {
+            _computedPropertiesManager = computedPropertiesManager;
             InitializeComponent();
         }
 
@@ -32,6 +35,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
             if (result == DialogResult.OK)
             {
                 ViewModel.Scripts.Add(((EditScriptWindowViewModel)editWindow.DataContext).GetScriptData());
+                _computedPropertiesManager.SaveScripts();
             }
         }
 
@@ -57,6 +61,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
                     existingEntry.Name = scriptData.Name;
                     existingEntry.Script = scriptData.Script;
                     existingEntry.Reset();
+                    _computedPropertiesManager.SaveScripts();
                 }
             }
         }
