@@ -34,7 +34,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
             var result = await editWindow.ShowDialogWindowAsync(this, DialogOptions.Resizable, 1000, 800);
             if (result == DialogResult.OK)
             {
-                ViewModel.Scripts.Add(((EditScriptWindowViewModel)editWindow.DataContext).GetScriptData());
+                ViewModel.AddScript(((EditScriptWindowViewModel)editWindow.DataContext).GetScriptData());
                 _computedPropertiesManager.SaveScripts();
             }
         }
@@ -61,6 +61,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
                     existingEntry.Name = scriptData.Name;
                     existingEntry.Script = scriptData.Script;
                     existingEntry.Reset();
+                    ViewModel.UpdateScript(existingEntry);
                     _computedPropertiesManager.SaveScripts();
                 }
             }
