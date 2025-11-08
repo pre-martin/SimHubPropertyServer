@@ -35,7 +35,9 @@ namespace SimHub.Plugins.ComputedProperties
 
         public void Init(PluginManager pluginManager)
         {
-            _scripts = this.ReadCommonSettings("Scripts", () => new ObservableCollection<ScriptData>());
+            // Load scripts and sort by Name
+            var loadedScripts = this.ReadCommonSettings("Scripts", () => new ObservableCollection<ScriptData>());
+            _scripts = new ObservableCollection<ScriptData>(loadedScripts.OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase));
             _scripts.CollectionChanged += ScriptsOnCollectionChanged;
 
             // Add our own log file for our plugin.
@@ -71,7 +73,7 @@ namespace SimHub.Plugins.ComputedProperties
         public void End(PluginManager pluginManager)
         {
             Log.Info("Shutting down plugin");
-            this.SaveCommonSettings("Scripts", _scripts);
+            SaveScripts();
 
             foreach (var scriptData in _scripts)
             {
@@ -143,7 +145,7 @@ namespace SimHub.Plugins.ComputedProperties
         public Control GetWPFSettingsControl(PluginManager pluginManager)
         {
             var computedPropertiesViewModel = new ComputedPropertiesViewModel(_scripts, this);
-            return new ComputedPropertiesControl { DataContext = computedPropertiesViewModel };
+            return new ComputedPropertiesControl(this) { DataContext = computedPropertiesViewModel };
         }
 
         public ImageSource PictureIcon
@@ -350,6 +352,11 @@ namespace SimHub.Plugins.ComputedProperties
             engine.SetValue("subscribe", subscribe);
             engine.SetValue("getPropertyValue", getPropertyValue);
             engine.SetValue("setPropertyValue", setPropertyValue);
+        }
+
+        public void SaveScripts()
+        {
+            this.SaveCommonSettings("Scripts", _scripts);
         }
 
         #endregion

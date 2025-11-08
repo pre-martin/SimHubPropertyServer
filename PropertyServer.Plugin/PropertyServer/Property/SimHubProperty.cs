@@ -97,6 +97,12 @@ namespace SimHub.Plugins.PropertyServer.Property
 
         private string TypeToString(Type type)
         {
+            // Check if the type is an enum first
+            if (type.IsEnum)
+            {
+                return "string";
+            }
+
             switch (type.FullName)
             {
                 case "System.Boolean":
@@ -106,7 +112,6 @@ namespace SimHub.Plugins.PropertyServer.Property
                 case "System.Int64":
                     return "long";
                 case "System.Single":
-                    return "double";
                 case "System.Double":
                     return "double";
                 case "System.TimeSpan":
