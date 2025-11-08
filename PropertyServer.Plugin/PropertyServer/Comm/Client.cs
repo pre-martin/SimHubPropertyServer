@@ -278,8 +278,16 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
         private async Task SendString(string msg)
         {
-            await _writer.WriteAsync($"{msg}\r\n");
-            await _writer.FlushAsync();
+            try
+            {
+                await _writer.WriteAsync($"{msg}\r\n");
+                await _writer.FlushAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Warn("Exception while sending data to client. We will disconnect the client.", ex);
+                await Disconnect();
+            }
         }
     }
 }
