@@ -39,6 +39,7 @@ namespace SimHub.Plugins.PropertyServer.Property
         public PropertySource PropertySource { get; }
         public string Name { get; }
         public string Type => TypeToString(GetPropertyType());
+        public Type RawType => GetPropertyType();
         public string ValueAsString => _value != null ? _value.ToString() : "(null)";
         public bool HasSubscribers => SubscriberCount > 0;
         public int SubscriberCount => _subscribers.Count;
