@@ -257,7 +257,18 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
         private async Task ValueChanged(ValueChangedEventArgs e)
         {
-            await SendString($"Property {e.Property.Name} {e.Property.Type} {e.Property.ValueAsString}");
+            var valueToSend = e.Property.ValueAsString;
+            if (e.Property.RawType == typeof(string))
+            {
+                var hasSpecial = valueToSend.Any(c => c < 32 || c > 126);
+                if (hasSpecial)
+                {
+                    // Encode Base64
+                    var base64 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(valueToSend));
+                    valueToSend = $"{{base64}}{base64}";
+                }
+            }
+            await SendString($"Property {e.Property.Name} {e.Property.Type} {valueToSend}");
         }
 
         public async Task Disconnect()
