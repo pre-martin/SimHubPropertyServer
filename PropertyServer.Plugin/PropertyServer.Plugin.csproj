@@ -43,6 +43,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
@@ -132,6 +133,7 @@
     <Compile Include="PropertyServer\ShakeIt\ShakeItAccessor.cs" />
     <Compile Include="PropertyServer\ShakeIt\TreeElement.cs" />
     <Compile Include="PropertyServer\SubscriptionManager.cs" />
+    <Compile Include="PropertyServer\Ui\Converters.cs" />
     <Compile Include="PropertyServer\Ui\IpPortValidationRule.cs" />
     <Compile Include="PropertyServer\Ui\RepairShakeItViewModel.cs" />
     <Compile Include="PropertyServer\Ui\RepairShakeItWindow.xaml.cs">
