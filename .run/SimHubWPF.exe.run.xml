@@ -1,0 +1,21 @@
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="SimHubWPF.exe" type="RunExe" factoryName=".NET Executable">
+    <log_file alias="SimHub.txt" path="$PROJECT_DIR$/../../../Games/SimHub/Logs/SimHub.txt" />
+    <log_file alias="PropertyServer.log" path="$PROJECT_DIR$/../../../Games/SimHub/Logs/PropertyServer.log" />
+    <log_file alias="ComputedProperties.log" path="$PROJECT_DIR$/../../../Games/SimHub/Logs/ComputedProperties.log" />
+    <option name="EXE_PATH" value="$PROJECT_DIR$/../../../Games/SimHub/SimHubWPF.exe" />
+    <option name="PROGRAM_PARAMETERS" value="" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../../../Games/SimHub" />
+    <option name="PASS_PARENT_ENVS" value="1" />
+    <option name="ENV_FILE_PATHS" value="" />
+    <option name="REDIRECT_INPUT_PATH" value="" />
+    <option name="MIXED_MODE_DEBUG" value="0" />
+    <option name="USE_MONO" value="0" />
+    <option name="RUNTIME_ARGUMENTS" value="" />
+    <option name="AUTO_ATTACH_CHILDREN" value="0" />
+    <method v="2">
+      <option name="Build" default="false" projectName="PropertyServer.Plugin" projectPath="$PROJECT_DIR$/PropertyServer.Plugin/PropertyServer.Plugin.csproj" />
+      <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_Copy To SimHub" />
+    </method>
+  </configuration>
+</component>
