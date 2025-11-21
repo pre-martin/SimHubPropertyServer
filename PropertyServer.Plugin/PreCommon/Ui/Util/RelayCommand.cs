@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2023 Martin Renner
+﻿// Copyright (C) 2025 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
@@ -8,8 +8,8 @@ namespace SimHub.Plugins.PreCommon.Ui.Util
 {
     public class RelayCommand<T> : ICommand
     {
-        private readonly Predicate<T> _canExecute;
         private readonly Action<T> _execute;
+        private readonly Predicate<T> _canExecute;
 
         public RelayCommand(Action<T> execute) : this(null, execute)
         {

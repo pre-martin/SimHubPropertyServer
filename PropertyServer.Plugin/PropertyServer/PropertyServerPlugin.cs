@@ -175,7 +175,7 @@ namespace SimHub.Plugins.PropertyServer
 
         public Control GetWPFSettingsControl(PluginManager pluginManager)
         {
-            var settingsViewModel = new SettingsViewModel(_settings);
+            var settingsViewModel = new SettingsViewModel(this, _settings);
             settingsViewModel.LogLevelChangedEvent += (sender, args) => GetNamespaceLogger().Level = _settings.LogLevel.ToLog4Net();
 
             return new SettingsControl { DataContext = settingsViewModel };
@@ -184,6 +184,8 @@ namespace SimHub.Plugins.PropertyServer
         public ImageSource PictureIcon => this.ToIcon(Properties.Resources.properties);
 
         public string LeftMenuTitle => "Property Server";
+
+        #region ISimHub Implementation
 
         public void TriggerInput(string inputName)
         {
@@ -219,5 +221,12 @@ namespace SimHub.Plugins.PropertyServer
         {
             return _shakeItAccessor.FindMotorsEffect(id);
         }
+
+        public void RestartSimHub()
+        {
+            PluginManager.RequestApplicationExit(true);
+        }
+
+        #endregion
     }
 }
