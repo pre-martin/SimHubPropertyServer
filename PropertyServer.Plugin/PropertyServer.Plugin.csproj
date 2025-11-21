@@ -115,6 +115,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="PropertyServer\AutoUpdate\AutoUpdater.cs" />
+    <Compile Include="PropertyServer\AutoUpdate\GitHubVersionInfo.cs" />
     <Compile Include="PropertyServer\Comm\Client.cs" />
     <Compile Include="PropertyServer\Comm\Server.cs" />
     <Compile Include="PropertyServer\ISimHub.cs" />

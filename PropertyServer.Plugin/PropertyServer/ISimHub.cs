@@ -48,5 +48,10 @@ namespace SimHub.Plugins.PropertyServer
         /// </summary>
         /// <returns><c>null</c> if nothing is found.</returns>
         EffectsContainerBase FindShakeItMotorsEffect(Guid id);
+
+        /// <summary>
+        /// Restart SimHub.
+        /// </summary>
+        void RestartSimHub();
     }
 }

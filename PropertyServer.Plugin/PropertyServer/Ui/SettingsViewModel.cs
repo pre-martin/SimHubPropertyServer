@@ -4,13 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using log4net;
-using Newtonsoft.Json.Linq;
 using SimHub.Plugins.PreCommon.Ui.Util;
+using SimHub.Plugins.PropertyServer.AutoUpdate;
 using SimHub.Plugins.PropertyServer.Settings;
+using SimHub.Plugins.Styles;
 
 namespace SimHub.Plugins.PropertyServer.Ui
 {
@@ -20,9 +21,9 @@ namespace SimHub.Plugins.PropertyServer.Ui
     public class SettingsViewModel : ObservableObject
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(SettingsViewModel));
-        private const string GitHubApiUrl = "https://api.github.com/repos/pre-martin/SimHubPropertyServer/releases/latest";
+        private readonly ISimHub _simHub;
         private readonly GeneralSettings _settings;
-        private readonly HttpClient _httpClient = new HttpClient();
+        private readonly AutoUpdater _autoUpdater = new AutoUpdater();
 
         public event EventHandler LogLevelChangedEvent;
         public string Version => "Version " + ThisAssembly.AssemblyFileVersion;
@@ -61,32 +62,17 @@ namespace SimHub.Plugins.PropertyServer.Ui
             set => SetProperty(ref _isVersionCheckError, value);
         }
 
-        public ICommand CheckNewVersionCheckCommand { get; }
+        public ICommand CheckNewVersionCommand { get; }
 
         #endregion
 
-        #region Download Properties
-
-        public ICommand DownloadCommand { get; }
-
-        #endregion
-
-
-        public SettingsViewModel(GeneralSettings settings)
+        public SettingsViewModel(ISimHub simHub, GeneralSettings settings)
         {
+            _simHub = simHub;
             _settings = settings;
             _ = Task.Run(CheckForNewVersion);
             PopulateFromSettings(settings);
-            _httpClient.DefaultRequestHeaders.Add("User-Agent", "SimHubPropertyServer-Updater");
-            CheckNewVersionCheckCommand = new RelayCommand<object>(o => Task.Run(CheckForNewVersion));
-            DownloadCommand = new RelayCommand<object>(o => { });
-        }
-
-        /// <summary>
-        /// Only used for UI design.
-        /// </summary>
-        public SettingsViewModel() : this(new GeneralSettings())
-        {
+            CheckNewVersionCommand = new RelayCommand<object>(o => Task.Run(CheckForNewVersion));
         }
 
         private void PopulateFromSettings(GeneralSettings settings)
@@ -98,26 +84,27 @@ namespace SimHub.Plugins.PropertyServer.Ui
 
         private async Task CheckForNewVersion()
         {
+            await CheckForNewVersion(false);
+        }
+
+        public async Task CheckForNewVersion(bool testMode)
+        {
             IsVersionCheckError = false;
             IsNewVersionAvailable = false;
             VersionCheckMessage = string.Empty;
+
             try
             {
-                var jsonString = await _httpClient.GetStringAsync(GitHubApiUrl);
-                var jsonObject = JObject.Parse(jsonString);
-                var tagName = (string)jsonObject["tag_name"];
-                var isDraft = (bool?)jsonObject["draft"] ?? false;
-                var isPrerelease = (bool?)jsonObject["prerelease"] ?? false;
-                if (string.IsNullOrEmpty(tagName))
-                {
-                    throw new Exception("GitHub release tag_name not found.");
-                }
+                var versionInfo = testMode
+                    ? new GitHubVersionInfo { RawTagName = "v99.99.1", Draft = false, Prerelease = false }
+                    : await _autoUpdater.GetLatestVersion();
+
                 var currentVersion = new Version(ThisAssembly.AssemblyFileVersion);
-                var latestVersion = new Version(tagName.TrimStart('v'));
-                if (latestVersion > currentVersion && !isDraft && !isPrerelease)
+                var latestVersion = new Version(versionInfo.TagName);
+                if (latestVersion > currentVersion && !versionInfo.Draft && !versionInfo.Prerelease)
                 {
                     IsNewVersionAvailable = true;
-                    VersionCheckMessage = $"New version available: {tagName}";
+                    VersionCheckMessage = $"New version available: {versionInfo.TagName}";
                 }
                 else
                 {
@@ -127,9 +114,25 @@ namespace SimHub.Plugins.PropertyServer.Ui
             }
             catch (Exception ex)
             {
+                Log.Error($"Error checking for new version: {ex.Message}");
                 IsVersionCheckError = true;
-                VersionCheckMessage = "Could not check for new version.";
-                Log.Error($"Version check failed: {ex.Message}");
+                VersionCheckMessage = $"Error checking for new version: {ex.Message}";
+            }
+        }
+
+        public async Task Update()
+        {
+            try
+            {
+                await _autoUpdater.Update();
+                _simHub.RestartSimHub();
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Updated failed", ex);
+                await SHMessageBox.Show($"Update failed: {ex.Message}.\n" +
+                                        "See \"Logs\\PropertyServer.log\" for details.",
+                    "Update Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
