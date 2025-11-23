@@ -10,8 +10,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="clr-namespace:SimHub.Plugins.PropertyServer.Ui"
+             xmlns:util="clr-namespace:SimHub.Plugins.PreCommon.Ui.Util"
              mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance ui:SettingsViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="300" d:DesignWidth="300">
+
+    <UserControl.Resources>
+        <util:BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
+        <ui:VersionCheckMessageBackgroundConverter x:Key="VersionCheckMessageBackgroundConverter" />
+    </UserControl.Resources>
 
     <Grid>
         <styles:SHSection Title="Property Server">
@@ -32,7 +39,25 @@
                         <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="{Binding Path=Version}" />
+                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                        <Label Content="{Binding Path=Version}" VerticalAlignment="Center" />
+                        <Border Margin="20,0,0,0" VerticalAlignment="Center">
+                            <Border.Background>
+                                <MultiBinding Converter="{StaticResource VersionCheckMessageBackgroundConverter}">
+                                    <Binding Path="IsNewVersionAvailable" />
+                                    <Binding Path="IsVersionCheckError" />
+                                </MultiBinding>
+                            </Border.Background>
+                            <TextBlock Text="{Binding VersionCheckMessage}" Foreground="White" Padding="6,2" />
+                        </Border>
+                        <!-- Invisible area for Shift+Click: Click to get "Update" button -->
+                        <Border Width="30" Height="20" Opacity="0" IsHitTestVisible="True"
+                                MouseLeftButtonDown="SecretArea_MouseLeftButtonDown" Background="Transparent" />
+                    </StackPanel>
+                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                        <styles:SHButtonPrimary Content="Update" Click="UpdateButton_Click" Visibility="{Binding IsNewVersionAvailable, Converter={StaticResource BooleanToVisibility}}" />
+                        <styles:SHButtonPrimary Content="Retry" Command="{Binding CheckNewVersionCommand}" Visibility="{Binding IsVersionCheckError, Converter={StaticResource BooleanToVisibility}}" />
+                    </StackPanel>
 
                     <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BorderThickness="0,0,0,1" Margin="0,2,0,5"
                             BorderBrush="#FF3A3A3A" />

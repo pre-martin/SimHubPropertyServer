@@ -15,14 +15,8 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
     /// </summary>
     public class ShakeItAccessor
     {
-        private readonly ShakeITBSV3Plugin _shakeItBassPlugin;
-        private readonly ShakeITMotorsV3Plugin _shakeItMotorsPlugin;
-
-        public ShakeItAccessor()
-        {
-            _shakeItBassPlugin = PluginManager.GetInstance().GetPlugin<ShakeITBSV3Plugin>();
-            _shakeItMotorsPlugin = PluginManager.GetInstance().GetPlugin<ShakeITMotorsV3Plugin>();
-        }
+        private readonly ShakeITBSV3Plugin _shakeItBassPlugin = PluginManager.GetInstance().GetPlugin<ShakeITBSV3Plugin>();
+        private readonly ShakeITMotorsV3Plugin _shakeItMotorsPlugin = PluginManager.GetInstance().GetPlugin<ShakeITMotorsV3Plugin>();
 
         /// <summary>
         /// Returns all known profiles of the given plugin, which must be a "ShakeItV3" plugin.
@@ -33,7 +27,7 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
         private IEnumerable<ShakeItProfile> SimHubProfiles<T, TSettingsType>(ShakeITV3PluginBase<T, TSettingsType> shakeItPlugin)
             where T : IOutputManager where TSettingsType : ShakeItSettings<T>, new()
         {
-            return shakeItPlugin == null ? Enumerable.Empty<ShakeItProfile>() : shakeItPlugin.Settings.Profiles;
+            return shakeItPlugin?.Settings == null ? Enumerable.Empty<ShakeItProfile>() : shakeItPlugin.Settings.Profiles;
         }
 
         /// <summary>

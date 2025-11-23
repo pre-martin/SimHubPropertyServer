@@ -23,7 +23,7 @@ namespace SimHub.Plugins.PropertyServer
     [PluginName("Property Server")]
     [PluginAuthor("Martin Renner")]
     [PluginDescription("Provides a network server for read access to game properties - v" + ThisAssembly.AssemblyFileVersion)]
-    public class PropertyServerPlugin : IDataPlugin, IWPFSettingsV2, ISimHub, IInputPlugin
+    public class PropertyServerPlugin : IDataPlugin, IPluginV2, IWPFSettingsV2, IInputPlugin, ISimHub
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PropertyServerPlugin));
         private GeneralSettings _settings = new GeneralSettings();
@@ -66,7 +66,11 @@ namespace SimHub.Plugins.PropertyServer
             // Move execution of server into a new task/thread (away from SimHub thread). The server is async, but we
             // do not want to put any unnecessary load onto the SimHub thread.
             _server = new Server(this, _subscriptionManager, _settings.Port);
-            Task.Run(_server.Start);
+        }
+
+        public void PluginManagerLoaded(PluginManager pluginManager)
+        {
+            _ = Task.Run(_server.Start);
         }
 
         public void End(PluginManager pluginManager)
@@ -87,30 +91,29 @@ namespace SimHub.Plugins.PropertyServer
             const long updateMillis = 100;
 
             var now = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-            if (now - _lastDataUpdate > updateMillis)
+            if (now - _lastDataUpdate < updateMillis) return;
+
+            try
             {
-                try
+                DataUpdateInternal(data);
+            }
+            catch (Exception e)
+            {
+                // We are on the critical path of the SimHub thread. Writing excessive logs does not help and is I/O intensive.
+                // So we stop reporting unhandled exceptions after a specific limit.
+                if (_unhandledExceptionCount < 50)
                 {
-                    DataUpdateInternal(data);
-                }
-                catch (Exception e)
-                {
-                    // We are on the critical path of the SimHub thread. Writing excessive logs does not help and is I/O intensive.
-                    // So we stop reporting unhandled exceptions after a specific limit.
-                    if (_unhandledExceptionCount < 50)
+                    _unhandledExceptionCount++;
+                    Log.Error($"Oh no, we have an unhandled exception: {e}");
+                    if (_unhandledExceptionCount >= 50)
                     {
-                        _unhandledExceptionCount++;
-                        Log.Error($"Oh no, we have an unhandled exception: {e}");
-                        if (_unhandledExceptionCount >= 50)
-                        {
-                            Log.Error($"Reached limit of more than {_unhandledExceptionCount} unhandled exceptions.");
-                            Log.Error("Not reporting any more exceptions, but most probably the problem still exists.");
-                        }
+                        Log.Error($"Reached limit of more than {_unhandledExceptionCount} unhandled exceptions.");
+                        Log.Error("Not reporting any more exceptions, but most probably the problem still exists.");
                     }
                 }
-
-                _lastDataUpdate = now;
             }
+
+            _lastDataUpdate = now;
         }
 
         private async void DataUpdateInternal(GameData data)
@@ -175,7 +178,7 @@ namespace SimHub.Plugins.PropertyServer
 
         public Control GetWPFSettingsControl(PluginManager pluginManager)
         {
-            var settingsViewModel = new SettingsViewModel(_settings);
+            var settingsViewModel = new SettingsViewModel(this, _settings);
             settingsViewModel.LogLevelChangedEvent += (sender, args) => GetNamespaceLogger().Level = _settings.LogLevel.ToLog4Net();
 
             return new SettingsControl { DataContext = settingsViewModel };
@@ -184,6 +187,8 @@ namespace SimHub.Plugins.PropertyServer
         public ImageSource PictureIcon => this.ToIcon(Properties.Resources.properties);
 
         public string LeftMenuTitle => "Property Server";
+
+        #region ISimHub Implementation
 
         public void TriggerInput(string inputName)
         {
@@ -219,5 +224,12 @@ namespace SimHub.Plugins.PropertyServer
         {
             return _shakeItAccessor.FindMotorsEffect(id);
         }
+
+        public void RestartSimHub()
+        {
+            PluginManager.RequestApplicationExit(true);
+        }
+
+        #endregion
     }
 }
