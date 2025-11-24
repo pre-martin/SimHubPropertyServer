@@ -326,12 +326,23 @@ namespace SimHub.Plugins.ComputedProperties
                 PluginManager.AddProperty(prop4SimHub, typeof(ComputedPropertiesPlugin), typeof(object));
                 _pluginManagerAccessor.SetPropertySupportStatus(prop4SimHub, typeof(ComputedPropertiesPlugin), SupportStatus.Computed);
             }
+            else
+            {
+                Log.Warn($"Cannot create property with name \"{propertyName}\", the name is invalid.");
+            }
         }
 
         public void SetPropertyValue(string propertyName, object value)
         {
             if (propertyName.StartsWith(nameof(ComputedPropertiesPlugin) + "."))
             {
+                // Performance optimization: Only set the value if it has changed. Because SimHub triggers updates on each set.
+                var currentValue = PluginManager.GetPropertyValue(propertyName);
+                var diff = currentValue is IComparable currentComparable
+                    ? currentComparable.CompareTo(value) != 0
+                    : currentValue != value;
+                if (!diff) return;
+
                 var prop4SimHub = propertyName.Substring(propertyName.IndexOf('.') + 1);
                 PluginManager.SetPropertyValue<ComputedPropertiesPlugin>(prop4SimHub, value);
             }
