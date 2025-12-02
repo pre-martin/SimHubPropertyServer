@@ -12,6 +12,10 @@ namespace SimHub.Plugins.ComputedProperties
         object GetRawData();
         void CreateProperty(string propertyName);
         void SetPropertyValue(string propertyName, object value);
+        void StartRole(string roleName);
+        void StopRole(string roleName);
+        void TriggerInputPress(string inputName);
+        void TriggerInputRelease(string inputName);
 
         void PrepareEngine(
             Engine engine,
@@ -20,7 +24,11 @@ namespace SimHub.Plugins.ComputedProperties
             Action<string> createProperty,
             Action<string, string> subscribe,
             Func<string, object> getPropertyValue,
-            Action<string, object> setPropertyValue);
+            Action<string, object> setPropertyValue,
+            Action<string> startRole,
+            Action<string> stopRole,
+            Action<string> triggerInputPress,
+            Action<string> triggerInputRelease);
 
         void SaveScripts();
     }
