@@ -152,7 +152,11 @@ namespace SimHub.Plugins.ComputedProperties
                         {
                             computedPropertiesManager.SetPropertyValue(propertyName, value);
                         }
-                    }
+                    },
+                    startRole: computedPropertiesManager.StartRole,
+                    stopRole: computedPropertiesManager.StopRole,
+                    triggerInputPress: computedPropertiesManager.TriggerInputPress,
+                    triggerInputRelease: computedPropertiesManager.TriggerInputRelease
                 );
 
                 if (string.IsNullOrWhiteSpace(Script))
