@@ -18,6 +18,7 @@ using log4net.Layout;
 using log4net.Repository.Hierarchy;
 using SimHub.Plugins.ComputedProperties.Performance;
 using SimHub.Plugins.ComputedProperties.Ui;
+using SimHub.Plugins.OutputPlugins.ControlRemapper;
 
 namespace SimHub.Plugins.ComputedProperties
 {
@@ -272,7 +273,11 @@ namespace SimHub.Plugins.ComputedProperties
                     {
                         if (!propName.StartsWith(nameof(ComputedPropertiesPlugin) + ".")) throw new ArgumentException($"Property name must start with '{nameof(ComputedPropertiesPlugin)}.' in 'setPropertyValue()'");
                         if (!createdProperties.Contains(propName)) throw new ArgumentException($"Property '{propName}' was not created in '{initFunction}()', cannot set value");
-                    }
+                    },
+                    startRole: roleName => { },
+                    stopRole: roleName => { },
+                    triggerInputPress: inputName => { },
+                    triggerInputRelease: inputName => { }
                 );
 
                 // could throw a ScriptPreparationException
@@ -287,9 +292,6 @@ namespace SimHub.Plugins.ComputedProperties
                 {
                     throw new MissingMethodException($"Function '{initFunction}()' cannot be called: " + e.Message);
                 }
-
-                if (createdProperties.Count == 0)
-                    throw new Exception($"Script does not create any properties - this is pointless. Use 'createProperty()' in '{initFunction}()'");
 
                 foreach (var function in functionsToInvoke)
                 {
@@ -326,15 +328,46 @@ namespace SimHub.Plugins.ComputedProperties
                 PluginManager.AddProperty(prop4SimHub, typeof(ComputedPropertiesPlugin), typeof(object));
                 _pluginManagerAccessor.SetPropertySupportStatus(prop4SimHub, typeof(ComputedPropertiesPlugin), SupportStatus.Computed);
             }
+            else
+            {
+                Log.Warn($"Cannot create property with name \"{propertyName}\", the name is invalid.");
+            }
         }
 
         public void SetPropertyValue(string propertyName, object value)
         {
             if (propertyName.StartsWith(nameof(ComputedPropertiesPlugin) + "."))
             {
+                // Performance optimization: Only set the value if it has changed. Because SimHub triggers updates on each set.
+                var currentValue = PluginManager.GetPropertyValue(propertyName);
+                var diff = currentValue is IComparable currentComparable
+                    ? currentComparable.CompareTo(value) != 0
+                    : currentValue != value;
+                if (!diff) return;
+
                 var prop4SimHub = propertyName.Substring(propertyName.IndexOf('.') + 1);
                 PluginManager.SetPropertyValue<ComputedPropertiesPlugin>(prop4SimHub, value);
             }
+        }
+
+        public void StartRole(string roleName)
+        {
+            PluginManager.GetPlugin<ControlMapperPlugin>()?.StartRole(roleName, nameof(ComputedPropertiesPlugin));
+        }
+
+        public void StopRole(string roleName)
+        {
+            PluginManager.GetPlugin<ControlMapperPlugin>()?.StopRole(roleName, nameof(ComputedPropertiesPlugin));
+        }
+
+        public void TriggerInputPress(string inputName)
+        {
+            PluginManager.TriggerInputPress(inputName, typeof(ComputedPropertiesPlugin));
+        }
+
+        public void TriggerInputRelease(string inputName)
+        {
+            PluginManager.TriggerInputRelease(inputName, typeof(ComputedPropertiesPlugin));
         }
 
         public void PrepareEngine(
@@ -344,7 +377,11 @@ namespace SimHub.Plugins.ComputedProperties
             Action<string> createProperty,
             Action<string, string> subscribe,
             Func<string, object> getPropertyValue,
-            Action<string, object> setPropertyValue)
+            Action<string, object> setPropertyValue,
+            Action<string> startRole,
+            Action<string> stopRole,
+            Action<string> triggerInputPress,
+            Action<string> triggerInputRelease)
         {
             engine.SetValue("NewRawData", getRawData);
             engine.SetValue("log", log);
@@ -352,6 +389,10 @@ namespace SimHub.Plugins.ComputedProperties
             engine.SetValue("subscribe", subscribe);
             engine.SetValue("getPropertyValue", getPropertyValue);
             engine.SetValue("setPropertyValue", setPropertyValue);
+            engine.SetValue("startRole", startRole);
+            engine.SetValue("stopRole", stopRole);
+            engine.SetValue("triggerInputPress", triggerInputPress);
+            engine.SetValue("triggerInputRelease", triggerInputRelease);
         }
 
         public void SaveScripts()

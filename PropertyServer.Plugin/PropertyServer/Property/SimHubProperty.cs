@@ -1,8 +1,9 @@
-﻿// Copyright (C) 2022 Martin Renner
+﻿// Copyright (C) 2025 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,9 +39,21 @@ namespace SimHub.Plugins.PropertyServer.Property
 
         public PropertySource PropertySource { get; }
         public string Name { get; }
-        public string Type => TypeToString(GetPropertyType());
+        public string Type => TypeToString();
         public Type RawType => GetPropertyType();
-        public string ValueAsString => _value != null ? _value.ToString() : "(null)";
+
+        public string ValueAsString
+        {
+            get
+            {
+                if (GetPropertyType() == typeof(DateTime) && _value != null)
+                {
+                    return ((DateTime)_value).ToString("o", CultureInfo.InvariantCulture);
+                }
+                return _value != null ? _value.ToString() : "(null)";
+            }
+        }
+
         public bool HasSubscribers => SubscriberCount > 0;
         public int SubscriberCount => _subscribers.Count;
 
@@ -70,7 +83,7 @@ namespace SimHub.Plugins.PropertyServer.Property
             }
         }
 
-        protected abstract object GetValue(object obj);
+        protected abstract object ExtractValue(object obj);
         protected abstract Type GetPropertyType();
 
         private async Task FireValueChangedEvent()
@@ -86,7 +99,7 @@ namespace SimHub.Plugins.PropertyServer.Property
 
         public async Task UpdateFromObject(object obj)
         {
-            var newValue = obj != null ? GetValue(obj) : null;
+            var newValue = obj != null ? ExtractValue(obj) : null;
             if (_oldValue == null && newValue != null || _oldValue != null && newValue == null ||
                 (_oldValue != null && !_oldValue.Equals(newValue)))
             {
@@ -96,8 +109,10 @@ namespace SimHub.Plugins.PropertyServer.Property
             }
         }
 
-        private string TypeToString(Type type)
+        private string TypeToString()
         {
+            var type = GetPropertyType();
+
             // Check if the type is an enum first
             if (type.IsEnum)
             {
@@ -115,8 +130,10 @@ namespace SimHub.Plugins.PropertyServer.Property
                 case "System.Single":
                 case "System.Double":
                     return "double";
-                case "System.TimeSpan":
+                case "System.TimeSpan": // e.g. "DataCorePlugin.Computed.Fuel_RemainingTime"
                     return "timespan";
+                case "System.DateTime": // e.g. "DataCorePlugin.CurrentDateTime"
+                    return "datetime";
                 case "System.String":
                     return "string";
                 case "System.Object":
@@ -140,7 +157,7 @@ namespace SimHub.Plugins.PropertyServer.Property
             _propertyInfo = propertyInfo;
         }
 
-        protected override object GetValue(object obj)
+        protected override object ExtractValue(object obj)
         {
             return _propertyInfo.GetValue(obj);
         }
@@ -164,7 +181,7 @@ namespace SimHub.Plugins.PropertyServer.Property
             _fieldInfo = fieldInfo;
         }
 
-        protected override object GetValue(object obj)
+        protected override object ExtractValue(object obj)
         {
             return _fieldInfo.GetValue(obj);
         }
@@ -188,7 +205,7 @@ namespace SimHub.Plugins.PropertyServer.Property
             _methodInfo = methodInfo;
         }
 
-        protected override object GetValue(object obj)
+        protected override object ExtractValue(object obj)
         {
             return _methodInfo.Invoke(obj, null);
         }
@@ -214,7 +231,7 @@ namespace SimHub.Plugins.PropertyServer.Property
         {
         }
 
-        protected override object GetValue(object obj)
+        protected override object ExtractValue(object obj)
         {
             var value = obj is PluginManager pm ? pm.GetPropertyValue(Name) : null;
             _lastSeenType = value == null ? typeof(object) : value.GetType();
@@ -252,7 +269,7 @@ namespace SimHub.Plugins.PropertyServer.Property
 
         protected abstract EffectsContainerBase GetEffect(ShakeItAccessor shakeItAccessor, Guid guid);
 
-        protected override object GetValue(object obj)
+        protected override object ExtractValue(object obj)
         {
             if (obj is ShakeItAccessor accessor)
             {
