@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Martin Renner
+// Copyright (C) 2026 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
@@ -27,6 +27,8 @@ namespace SimHub.Plugins.PropertyServer.Ui
 
         public event EventHandler LogLevelChangedEvent;
         public string Version => "Version " + ThisAssembly.AssemblyFileVersion;
+        public List<ListenAddress> ListenAddresses { get; private set; }
+        public ListenAddress SelectedListenAddress { get => _settings.ListenAddress; set => _settings.ListenAddress = value; }
         public int Port { get => _settings.Port; set => _settings.Port = value; }
         public List<LogLevelSetting> LogLevels { get; private set; }
         public LogLevelSetting SelectedLogLevel
@@ -77,6 +79,8 @@ namespace SimHub.Plugins.PropertyServer.Ui
 
         private void PopulateFromSettings(GeneralSettings settings)
         {
+            this.ListenAddresses = new List<ListenAddress>(Enum.GetValues(typeof(ListenAddress)).Cast<ListenAddress>());
+            this.SelectedListenAddress = settings.ListenAddress;
             this.Port = settings.Port;
             this.LogLevels = new List<LogLevelSetting>(Enum.GetValues(typeof(LogLevelSetting)).Cast<LogLevelSetting>());
             this.SelectedLogLevel = settings.LogLevel;

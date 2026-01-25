@@ -31,7 +31,8 @@ namespace SimHub.Plugins.ComputedProperties.Ui
                 DataContext = new EditScriptWindowViewModel(ViewModel.ScriptValidator, scriptData)
             };
 
-            var result = await editWindow.ShowDialogWindowAsync(this, DialogOptions.Resizable, 1000, 800);
+            var result = await editWindow.ShowDialogWindowAsync(this, DialogOptions.Resizable | DialogOptions.DoNotCloseOnEscape,
+                1000, 800);
             if (result == DialogResult.OK)
             {
                 ViewModel.AddScript(((EditScriptWindowViewModel)editWindow.DataContext).GetScriptData());
@@ -72,8 +73,7 @@ namespace SimHub.Plugins.ComputedProperties.Ui
             if (!(((FrameworkElement)sender).DataContext is ScriptData scriptData)) return;
 
             var performanceWindow = new PerformanceWindow { DataContext = scriptData.FunctionPerformance };
-            await performanceWindow.ShowDialogWindowAsync(this, DialogOptions.Resizable | DialogOptions.DoNotCloseOnEscape, 500,
-                400);
+            await performanceWindow.ShowDialogWindowAsync(this, DialogOptions.Resizable, 500, 400);
         }
 
         private async void Entry_DeleteClick(object sender, RoutedEventArgs e)
