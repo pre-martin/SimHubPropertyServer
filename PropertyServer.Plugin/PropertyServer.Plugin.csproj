@@ -126,6 +126,7 @@
     <Compile Include="PropertyServer\Property\SimHubProperty.cs" />
     <Compile Include="PropertyServer\RawDataManager.cs" />
     <Compile Include="PropertyServer\Settings\GeneralSettings.cs" />
+    <Compile Include="PropertyServer\Settings\ListenAddress.cs" />
     <Compile Include="PropertyServer\Settings\LogLevelSetting.cs" />
     <Compile Include="PropertyServer\ShakeIt\Converter.cs" />
     <Compile Include="PropertyServer\ShakeIt\EffectsContainerBase.cs" />

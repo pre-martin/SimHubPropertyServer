@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Martin Renner
+﻿// Copyright (C) 2026 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
@@ -63,13 +63,13 @@ namespace SimHub.Plugins.PropertyServer
 
             _shakeItAccessor = new ShakeItAccessor();
 
-            // Move execution of server into a new task/thread (away from SimHub thread). The server is async, but we
-            // do not want to put any unnecessary load onto the SimHub thread.
-            _server = new Server(this, _subscriptionManager, _settings.Port);
+            _server = new Server(this, _subscriptionManager, _settings.ListenAddress.ToIpAddress(), _settings.Port);
         }
 
         public void PluginManagerLoaded(PluginManager pluginManager)
         {
+            // Move execution of server into a new task/thread (away from SimHub thread). The server is async, but we
+            // do not want to put any unnecessary load onto the SimHub thread.
             _ = Task.Run(_server.Start);
         }
 

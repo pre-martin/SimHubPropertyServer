@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022 Martin Renner
+﻿// Copyright (C) 2026 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
@@ -24,6 +24,7 @@ namespace SimHub.Plugins.PropertyServer.Comm
         private readonly List<Client> _clients = new List<Client>();
         private readonly ISimHub _simHub;
         private readonly SubscriptionManager _subscriptionManager;
+        private readonly IPAddress _listenAddress;
         private readonly int _port;
 
         private bool Running
@@ -32,10 +33,11 @@ namespace SimHub.Plugins.PropertyServer.Comm
             set => Interlocked.Exchange(ref _running, Convert.ToInt64(value));
         }
 
-        public Server(ISimHub simHub, SubscriptionManager subscriptionManager, int port)
+        public Server(ISimHub simHub, SubscriptionManager subscriptionManager, IPAddress listenAddress, int port)
         {
             _simHub = simHub;
             _subscriptionManager = subscriptionManager;
+            _listenAddress = listenAddress;
             _port = port;
         }
 
@@ -44,7 +46,7 @@ namespace SimHub.Plugins.PropertyServer.Comm
         /// </summary>
         public async Task Start()
         {
-            _tcpListener = new TcpListener(IPAddress.Loopback, _port);
+            _tcpListener = new TcpListener(_listenAddress, _port);
             _tcpListener.Start();
             Log.Info($"Listening on port {_port}");
 

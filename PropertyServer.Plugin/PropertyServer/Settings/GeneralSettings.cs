@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022 Martin Renner
+﻿// Copyright (C) 2026 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using Newtonsoft.Json;
@@ -8,6 +8,9 @@ namespace SimHub.Plugins.PropertyServer.Settings
 {
     public class GeneralSettings
     {
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ListenAddress ListenAddress { get; set; }
+
         public int Port { get; set; } = 18082;
 
         [JsonConverter(typeof(StringEnumConverter))]
