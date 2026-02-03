@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2023 Martin Renner
+﻿// Copyright (C) 2026 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System.Collections.Generic;
@@ -13,13 +13,11 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
     /// </remarks>
     public class GroupContainer : EffectsContainerBase
     {
-        private readonly DataPlugins.ShakeItV3.EffectsContainers.GroupContainer _simHubGroupContainer;
         private readonly List<EffectsContainerBase> _effectsContainers = new List<EffectsContainerBase>();
 
         public GroupContainer(TreeElement parent, DataPlugins.ShakeItV3.EffectsContainers.GroupContainer simHubGroupContainer)
             : base(parent, simHubGroupContainer)
         {
-            _simHubGroupContainer = simHubGroupContainer;
             Converter.Convert(this, simHubGroupContainer.EffectsContainers, _effectsContainers);
         }
 

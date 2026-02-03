@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2023 Martin Renner
+﻿// Copyright (C) 2026 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
@@ -30,7 +30,7 @@ namespace SimHub.Plugins.PropertyServer.ShakeIt
             set => _simHubEffectsContainerBase.ContainerId = value;
         }
 
-        public string ContainerName => _simHubEffectsContainerBase.ContainerName;
+        public string ContainerName => _simHubEffectsContainerBase.ContainerName.Value;
         public string Description => _simHubEffectsContainerBase.Description;
         public double Gain => _simHubEffectsContainerBase.Gain;
         public bool IsMuted => _simHubEffectsContainerBase.IsMuted;

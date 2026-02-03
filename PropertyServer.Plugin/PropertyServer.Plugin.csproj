@@ -58,6 +58,10 @@
       <HintPath>..\SimHub\log4net.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="WoteverLocalization">
+      <HintPath>..\SimHub\WoteverLocalization.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="SimHub.Plugins">
       <HintPath>..\SimHub\SimHub.Plugins.dll</HintPath>
       <Private>False</Private>
@@ -167,7 +171,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  
+
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
