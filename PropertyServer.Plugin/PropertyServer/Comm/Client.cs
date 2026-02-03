@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2023 Martin Renner
+﻿// Copyright (C) 2026 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
@@ -213,13 +213,22 @@ namespace SimHub.Plugins.PropertyServer.Comm
         private async Task ShakeItStructure(ICollection<Profile> profiles, string loggingName)
         {
             // Send structure, profile by profile.
-            foreach (var profile in profiles)
+            try
             {
-                await SendString($"0: {profile.ProfileId} {profile.GetType().Name} {profile.Name}");
-                await SendEffects(1, profile.EffectsContainers);
+                foreach (var profile in profiles)
+                {
+                    await SendString($"0: {profile.ProfileId} {profile.GetType().Name} {profile.Name}");
+                    await SendEffects(1, profile.EffectsContainers);
+                }
+
+                Log.Info($"Sent ShakeIt {loggingName} structure with {profiles.Count()} profiles to client");
             }
+            catch (Exception e)
+            {
+                Log.Error($"Exception while sending ShakeIt {loggingName} structure to client", e);
+            }
+
             await SendString("End");
-            Log.Info($"Sent ShakeIt {loggingName} structure with {profiles.Count()} profiles to client");
         }
 
         private async Task SendEffects(int depth, IEnumerable<EffectsContainerBase> profileEffectsContainers)
