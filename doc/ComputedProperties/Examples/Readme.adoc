@@ -1,0 +1,35 @@
+﻿= Examples
+:toc:
+:sectnums:
+
+This directory contains example scripts for Computed Properties for various games. Some can be used as-is, others need to be adapted to your specific needs. Especially when Control Mapper Roles are used in the scripts, these usually need to be customized.
+
+Each script has a version number in its header, so you can check if you are using the latest version.
+
+== ETS2
+
+=== ETS2 - Fuel Time
+
+Calculates the estimated time remaining until the fuel tank is empty based on current speed and fuel range. To avoid oscillation, speeds are rounded up to the nearest number divisible by 5. Speeds below 30 km/h are fixed at 30.
+
+=== ETS2 - Light Stage
+
+Can be used if you want to switch the lights in ETS2 sequentially - for example, with a Stream Deck dial.
+
+The script assumes that the light is controlled via Control Mapper Roles. The logical roles `Light-` and `Light+` are mapped to the actual roles `Headlights` (linked in ETS2 to "Light Modes") and `RainLight` (linked in ETS2 to "High Beam Headlights").
+
+=== ETS2 - Wiper Stage
+
+ETS2 has no property for the current wiper stage, only `DataCorePlugin.GameRawData.TruckValues.CurrentValues.DashboardValues.Wipers` with the values `false` (off) and `true` (on).
+
+This script assumes that the Control Mapper Roles `WiperDec` and `WiperInc` are mapped in ETS2 to "Wipers Back" and "Wipers". This makes it possible to calculate the windshield wiper stage, which is exactly what this script does.
+
+=== ETS2 - Job Calculations (Job Buffer Time)
+
+This script is about how much time you'll have left at your destination when you're doing an internal job in ETS2. From this, you can figure out if you need to drive faster or if you'll have time for sightseeing along the way.
+
+The script takes driving and rest times into account.
+
+=== ETS2 - Liftable Wheels
+
+Unfortunately, there are no properties in ETS2 that directly indicate whether a truck or trailer has liftable wheels. For trucks, this is spread across 16 different properties, and for trailers, across 160 properties. This script evaluates these properties and determines whether the truck or trailer(s) have liftable wheels.
