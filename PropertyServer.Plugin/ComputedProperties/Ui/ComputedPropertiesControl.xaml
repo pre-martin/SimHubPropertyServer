@@ -23,12 +23,13 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="15,4">
-            <styles:SHButtonPrimary Click="NewScript_Click" Content="New script"/>
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right" Margin="15,4">
+            <styles:SHButtonPrimary Click="NewScript_Click" Content="New script" />
         </StackPanel>
 
-        <styles:SHListBox ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+        <styles:SHListBox ScrollViewer.VerticalScrollBarVisibility="Visible"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           ItemsSource="{Binding Scripts}"
                           SelectedItem="{Binding SelectedScript}"
                           MouseDoubleClick="Entry_MouseDoubleClick">
@@ -61,5 +62,5 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </styles:SHListBox>
-    </StackPanel>
+    </DockPanel>
 </UserControl>
