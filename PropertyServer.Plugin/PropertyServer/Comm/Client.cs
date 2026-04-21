@@ -47,7 +47,7 @@ namespace SimHub.Plugins.PropertyServer.Comm
             var reader = new StreamReader(stream);
             _writer = new StreamWriter(stream);
 
-            await SendString("SimHub Property Server");
+            await SendString("SimHub Property Server v" + ThisAssembly.AssemblyFileVersion);
             while (Running && !token.IsCancellationRequested)
             {
                 string line = null;
