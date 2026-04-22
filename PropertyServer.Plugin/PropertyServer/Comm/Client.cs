@@ -26,6 +26,10 @@ namespace SimHub.Plugins.PropertyServer.Comm
         private readonly TcpClient _tcpClient;
         private long _running;
         private StreamWriter _writer;
+        private long _lastSentTicks;
+
+        /// <summary>Ping interval: send a ping if no message has been sent for this duration.</summary>
+        private static readonly TimeSpan PingInterval = TimeSpan.FromSeconds(30);
 
         private bool Running
         {
@@ -48,6 +52,7 @@ namespace SimHub.Plugins.PropertyServer.Comm
             _writer = new StreamWriter(stream);
 
             await SendString("SimHub Property Server v" + ThisAssembly.AssemblyFileVersion);
+            var pingTask = Task.Run(() => PingLoopAsync(token), token);
             while (Running && !token.IsCancellationRequested)
             {
                 string line = null;
@@ -61,7 +66,13 @@ namespace SimHub.Plugins.PropertyServer.Comm
                     await Disconnect();
                 }
 
-                if (line != null)
+                if (line == null)
+                {
+                    // End of stream: client closed the connection.
+                    Log.Info("Client closed the connection (end of stream)");
+                    await Disconnect();
+                }
+                else
                 {
                     try
                     {
@@ -71,6 +82,32 @@ namespace SimHub.Plugins.PropertyServer.Comm
                     {
                         Log.Error($"Unhandled exception while handling command from client: {e}");
                     }
+                }
+            }
+
+            try
+            {
+                await pingTask;
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected when token is cancelled.
+            }
+        }
+
+        private async Task PingLoopAsync(CancellationToken token)
+        {
+            // Check every 5 seconds whether a ping is due.
+            while (!token.IsCancellationRequested && Running)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5), token);
+                if (!Running) break;
+
+                var lastSent = new DateTime(Interlocked.Read(ref _lastSentTicks), DateTimeKind.Utc);
+                if (DateTime.UtcNow - lastSent >= PingInterval)
+                {
+                    Log.Debug("Sending ping to client");
+                    await SendString("ping");
                 }
             }
         }
@@ -302,6 +339,7 @@ namespace SimHub.Plugins.PropertyServer.Comm
             {
                 await _writer.WriteAsync($"{msg}\r\n");
                 await _writer.FlushAsync();
+                Interlocked.Exchange(ref _lastSentTicks, DateTime.UtcNow.Ticks);
             }
             catch (Exception ex)
             {
