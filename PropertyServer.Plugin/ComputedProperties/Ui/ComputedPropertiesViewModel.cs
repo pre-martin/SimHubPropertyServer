@@ -1,8 +1,10 @@
-﻿// Copyright (C) 2025 Martin Renner
+﻿// Copyright (C) 2026 Martin Renner
 // LGPL-3.0-or-later (see file COPYING and COPYING.LESSER)
 
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Data;
 using SimHub.Plugins.PreCommon.Ui.Util;
 
 namespace SimHub.Plugins.ComputedProperties.Ui
@@ -13,6 +15,8 @@ namespace SimHub.Plugins.ComputedProperties.Ui
         {
             Scripts = scripts;
             ScriptValidator = scriptValidator;
+            FilteredScripts = CollectionViewSource.GetDefaultView(Scripts);
+            FilteredScripts.Filter = FilterScripts;
         }
 
         /// <summary>
@@ -25,6 +29,22 @@ namespace SimHub.Plugins.ComputedProperties.Ui
         public IScriptValidator ScriptValidator { get; }
 
         public ObservableCollection<ScriptData> Scripts { get; }
+
+        public ICollectionView FilteredScripts { get; }
+
+        private string _filterText = string.Empty;
+
+        public string FilterText
+        {
+            get => _filterText;
+            set
+            {
+                if (SetProperty(ref _filterText, value))
+                {
+                    FilteredScripts.Refresh();
+                }
+            }
+        }
 
         private ScriptData _selectedScript;
 
@@ -62,6 +82,13 @@ namespace SimHub.Plugins.ComputedProperties.Ui
                 AddScript(scriptData);
                 SelectedScript = scriptData;
             }
+        }
+
+        private bool FilterScripts(object obj)
+        {
+            if (string.IsNullOrWhiteSpace(_filterText)) return true;
+            return obj is ScriptData script &&
+                   script.Name.IndexOf(_filterText, StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 }
