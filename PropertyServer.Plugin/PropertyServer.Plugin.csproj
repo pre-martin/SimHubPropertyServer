@@ -152,6 +152,10 @@
     </Compile>
     <Page Include="PropertyServer\Ui\SettingsControl.xaml" />
     <Compile Include="PropertyServer\Ui\SettingsViewModel.cs" />
+    <Page Include="PropertyServer\Ui\UpdateConfirmWindow.xaml" />
+    <Compile Include="PropertyServer\Ui\UpdateConfirmWindow.xaml.cs">
+      <DependentUpon>UpdateConfirmWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="PreCommon\Ui\IconResources.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
