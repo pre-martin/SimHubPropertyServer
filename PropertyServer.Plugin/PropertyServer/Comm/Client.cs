@@ -27,6 +27,13 @@ namespace SimHub.Plugins.PropertyServer.Comm
         private long _running;
         private StreamWriter _writer;
         private long _lastSentTicks;
+        // Serializes all writes to _writer. SendString is invoked concurrently from the
+        // per-property ValueChanged callbacks (SimHub data thread) and from PingLoopAsync;
+        // without this lock the overlapping StreamWriter.WriteAsync calls throw
+        // "The stream is currently in use by a previous operation" and force a disconnect.
+        private readonly SemaphoreSlim _writeLock = new SemaphoreSlim(1, 1);
+        // Ensures Disconnect() tears down exactly once (it can be triggered concurrently).
+        private long _disconnected;
 
         /// <summary>Ping interval: send a ping if no message has been sent for this duration.</summary>
         private static readonly TimeSpan PingInterval = TimeSpan.FromSeconds(30);
@@ -303,6 +310,10 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
         private async Task ValueChanged(ValueChangedEventArgs e)
         {
+            // Already disconnecting: don't touch the (closing) stream. Sending here would just
+            // throw and re-enter Disconnect, and doing work for a dead client is pointless.
+            if (!Running) return;
+
             var valueToSend = e.Property.ValueAsString;
             if (e.Property.RawType == typeof(string))
             {
@@ -319,11 +330,23 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
         public async Task Disconnect()
         {
+            // Run the teardown exactly once. Disconnect can be triggered concurrently from
+            // several paths (the read loop ending, a failed SendString on the SimHub data
+            // thread, or an explicit 'disconnect' command). If the unsubscribe loop runs more
+            // than once or re-enters while _mySubscriptions is being mutated, it can abort
+            // partway and leave a ValueChanged handler registered on a shared property. That
+            // dangling delegate roots this whole (dead) Client and keeps firing on every
+            // SimHub update -> a per-connection memory leak that accumulates across reconnects.
+            if (Interlocked.Exchange(ref _disconnected, 1) == 1) return;
             Running = false;
-            foreach (var mySubscription in _mySubscriptions)
+
+            // Iterate a snapshot: Unsubscribe is async and other paths may still touch
+            // _mySubscriptions, so copy first to guarantee every subscription is removed.
+            foreach (var mySubscription in _mySubscriptions.ToList())
             {
                 await _subscriptionManager.Unsubscribe(mySubscription, ValueChanged);
             }
+            _mySubscriptions.Clear();
 
             _tcpClient.Close();
         }
@@ -335,6 +358,11 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
         private async Task SendString(string msg)
         {
+            var writeFailed = false;
+            // Serialize writes so concurrent callers (ValueChanged on the SimHub data thread
+            // and PingLoopAsync) can't overlap on the shared StreamWriter, which otherwise
+            // throws "The stream is currently in use by a previous operation".
+            await _writeLock.WaitAsync();
             try
             {
                 await _writer.WriteAsync($"{msg}\r\n");
@@ -344,8 +372,16 @@ namespace SimHub.Plugins.PropertyServer.Comm
             catch (Exception ex)
             {
                 Log.Warn("Exception while sending data to client. We will disconnect the client.", ex);
-                await Disconnect();
+                writeFailed = true;
             }
+            finally
+            {
+                _writeLock.Release();
+            }
+
+            // Disconnect outside the write lock (Disconnect does not write, but keep the lock
+            // hold time minimal and avoid any chance of re-entrancy).
+            if (writeFailed) await Disconnect();
         }
     }
 }
