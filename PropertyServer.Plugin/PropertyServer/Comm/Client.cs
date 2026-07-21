@@ -23,8 +23,11 @@ namespace SimHub.Plugins.PropertyServer.Comm
         private readonly ISimHub _simHub;
         private readonly SubscriptionManager _subscriptionManager;
         private readonly HashSet<string> _mySubscriptions = new HashSet<string>();
+        private readonly object _mySubscriptionsLock = new object();
+        private readonly SemaphoreSlim _writeLock = new SemaphoreSlim(1, 1);
         private readonly TcpClient _tcpClient;
         private long _running;
+        private long _disconnecting;
         private StreamWriter _writer;
         private long _lastSentTicks;
 
@@ -189,7 +192,11 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
         private async Task Subscribe(string propertyName)
         {
-            if (_mySubscriptions.Contains(propertyName)) return;
+            if (!Running) return;
+            lock (_mySubscriptionsLock)
+            {
+                if (_mySubscriptions.Contains(propertyName)) return;
+            }
 
             var property = await _subscriptionManager.Subscribe(propertyName, ValueChanged, SendError);
             // We have to check here (outside the SubscriptionManager) if the ShakeIt Bass element exists.
@@ -205,18 +212,30 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
             if (property != null)
             {
-                _mySubscriptions.Add(propertyName);
+                lock (_mySubscriptionsLock)
+                {
+                    if (Running)
+                    {
+                        _mySubscriptions.Add(propertyName);
+                    }
+                }
             }
         }
 
         private async Task Unsubscribe(string propertyName)
         {
-            if (!_mySubscriptions.Contains(propertyName)) return;
+            lock (_mySubscriptionsLock)
+            {
+                if (!_mySubscriptions.Contains(propertyName)) return;
+            }
 
             var result = await _subscriptionManager.Unsubscribe(propertyName, ValueChanged);
             if (result)
             {
-                _mySubscriptions.Remove(propertyName);
+                lock (_mySubscriptionsLock)
+                {
+                    _mySubscriptions.Remove(propertyName);
+                }
             }
         }
 
@@ -303,6 +322,10 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
         private async Task ValueChanged(ValueChangedEventArgs e)
         {
+            // Already disconnecting: don't touch the (closing) stream. Sending here would just
+            // throw and re-enter Disconnect, and doing work for a dead client is pointless.
+            if (!Running) return;
+
             var valueToSend = e.Property.ValueAsString;
             if (e.Property.RawType == typeof(string))
             {
@@ -319,10 +342,29 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
         public async Task Disconnect()
         {
+            // Run the teardown exactly once. Disconnect can be triggered concurrently from several paths.
+            if (Interlocked.Exchange(ref _disconnecting, 1) == 1) return;
             Running = false;
-            foreach (var mySubscription in _mySubscriptions)
+
+            // Iterate a snapshot: Unsubscribe is async and other paths may still touch
+            // _mySubscriptions, so copy first to guarantee every subscription is removed.
+            List<string> mySubscriptionsSnapshot;
+            lock (_mySubscriptionsLock)
             {
-                await _subscriptionManager.Unsubscribe(mySubscription, ValueChanged);
+                mySubscriptionsSnapshot = _mySubscriptions.ToList();
+                _mySubscriptions.Clear();
+            }
+
+            foreach (var mySubscription in mySubscriptionsSnapshot)
+            {
+                try
+                {
+                    await _subscriptionManager.Unsubscribe(mySubscription, ValueChanged);
+                }
+                catch (Exception e)
+                {
+                    Log.Warn($"Exception while unsubscribing from {mySubscription} during disconnect", e);
+                }
             }
 
             _tcpClient.Close();
@@ -335,10 +377,23 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
         private async Task SendString(string msg)
         {
+            if (!Running) return;
+
+            // Serialize writes so concurrent callers can't overlap on the shared StreamWriter, which otherwise
+            // throws "The stream is currently in use by a previous operation".
             try
             {
-                await _writer.WriteAsync($"{msg}\r\n");
-                await _writer.FlushAsync();
+                await _writeLock.WaitAsync();
+                try
+                {
+                    await _writer.WriteAsync($"{msg}\r\n");
+                    await _writer.FlushAsync();
+                }
+                finally
+                {
+                    _writeLock.Release();
+                }
+
                 Interlocked.Exchange(ref _lastSentTicks, DateTime.UtcNow.Ticks);
             }
             catch (Exception ex)
