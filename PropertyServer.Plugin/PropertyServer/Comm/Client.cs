@@ -23,17 +23,13 @@ namespace SimHub.Plugins.PropertyServer.Comm
         private readonly ISimHub _simHub;
         private readonly SubscriptionManager _subscriptionManager;
         private readonly HashSet<string> _mySubscriptions = new HashSet<string>();
+        private readonly object _mySubscriptionsLock = new object();
+        private readonly SemaphoreSlim _writeLock = new SemaphoreSlim(1, 1);
         private readonly TcpClient _tcpClient;
         private long _running;
+        private long _disconnecting;
         private StreamWriter _writer;
         private long _lastSentTicks;
-        // Serializes all writes to _writer. SendString is invoked concurrently from the
-        // per-property ValueChanged callbacks (SimHub data thread) and from PingLoopAsync;
-        // without this lock the overlapping StreamWriter.WriteAsync calls throw
-        // "The stream is currently in use by a previous operation" and force a disconnect.
-        private readonly SemaphoreSlim _writeLock = new SemaphoreSlim(1, 1);
-        // Ensures Disconnect() tears down exactly once (it can be triggered concurrently).
-        private long _disconnected;
 
         /// <summary>Ping interval: send a ping if no message has been sent for this duration.</summary>
         private static readonly TimeSpan PingInterval = TimeSpan.FromSeconds(30);
@@ -196,7 +192,11 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
         private async Task Subscribe(string propertyName)
         {
-            if (_mySubscriptions.Contains(propertyName)) return;
+            if (!Running) return;
+            lock (_mySubscriptionsLock)
+            {
+                if (_mySubscriptions.Contains(propertyName)) return;
+            }
 
             var property = await _subscriptionManager.Subscribe(propertyName, ValueChanged, SendError);
             // We have to check here (outside the SubscriptionManager) if the ShakeIt Bass element exists.
@@ -212,18 +212,30 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
             if (property != null)
             {
-                _mySubscriptions.Add(propertyName);
+                lock (_mySubscriptionsLock)
+                {
+                    if (Running)
+                    {
+                        _mySubscriptions.Add(propertyName);
+                    }
+                }
             }
         }
 
         private async Task Unsubscribe(string propertyName)
         {
-            if (!_mySubscriptions.Contains(propertyName)) return;
+            lock (_mySubscriptionsLock)
+            {
+                if (!_mySubscriptions.Contains(propertyName)) return;
+            }
 
             var result = await _subscriptionManager.Unsubscribe(propertyName, ValueChanged);
             if (result)
             {
-                _mySubscriptions.Remove(propertyName);
+                lock (_mySubscriptionsLock)
+                {
+                    _mySubscriptions.Remove(propertyName);
+                }
             }
         }
 
@@ -330,23 +342,30 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
         public async Task Disconnect()
         {
-            // Run the teardown exactly once. Disconnect can be triggered concurrently from
-            // several paths (the read loop ending, a failed SendString on the SimHub data
-            // thread, or an explicit 'disconnect' command). If the unsubscribe loop runs more
-            // than once or re-enters while _mySubscriptions is being mutated, it can abort
-            // partway and leave a ValueChanged handler registered on a shared property. That
-            // dangling delegate roots this whole (dead) Client and keeps firing on every
-            // SimHub update -> a per-connection memory leak that accumulates across reconnects.
-            if (Interlocked.Exchange(ref _disconnected, 1) == 1) return;
+            // Run the teardown exactly once. Disconnect can be triggered concurrently from several paths.
+            if (Interlocked.Exchange(ref _disconnecting, 1) == 1) return;
             Running = false;
 
             // Iterate a snapshot: Unsubscribe is async and other paths may still touch
             // _mySubscriptions, so copy first to guarantee every subscription is removed.
-            foreach (var mySubscription in _mySubscriptions.ToList())
+            List<string> mySubscriptionsSnapshot;
+            lock (_mySubscriptionsLock)
             {
-                await _subscriptionManager.Unsubscribe(mySubscription, ValueChanged);
+                mySubscriptionsSnapshot = _mySubscriptions.ToList();
+                _mySubscriptions.Clear();
             }
-            _mySubscriptions.Clear();
+
+            foreach (var mySubscription in mySubscriptionsSnapshot)
+            {
+                try
+                {
+                    await _subscriptionManager.Unsubscribe(mySubscription, ValueChanged);
+                }
+                catch (Exception e)
+                {
+                    Log.Warn($"Exception while unsubscribing from {mySubscription} during disconnect", e);
+                }
+            }
 
             _tcpClient.Close();
         }
@@ -358,30 +377,30 @@ namespace SimHub.Plugins.PropertyServer.Comm
 
         private async Task SendString(string msg)
         {
-            var writeFailed = false;
-            // Serialize writes so concurrent callers (ValueChanged on the SimHub data thread
-            // and PingLoopAsync) can't overlap on the shared StreamWriter, which otherwise
+            if (!Running) return;
+
+            // Serialize writes so concurrent callers can't overlap on the shared StreamWriter, which otherwise
             // throws "The stream is currently in use by a previous operation".
-            await _writeLock.WaitAsync();
             try
             {
-                await _writer.WriteAsync($"{msg}\r\n");
-                await _writer.FlushAsync();
+                await _writeLock.WaitAsync();
+                try
+                {
+                    await _writer.WriteAsync($"{msg}\r\n");
+                    await _writer.FlushAsync();
+                }
+                finally
+                {
+                    _writeLock.Release();
+                }
+
                 Interlocked.Exchange(ref _lastSentTicks, DateTime.UtcNow.Ticks);
             }
             catch (Exception ex)
             {
                 Log.Warn("Exception while sending data to client. We will disconnect the client.", ex);
-                writeFailed = true;
+                await Disconnect();
             }
-            finally
-            {
-                _writeLock.Release();
-            }
-
-            // Disconnect outside the write lock (Disconnect does not write, but keep the lock
-            // hold time minimal and avoid any chance of re-entrancy).
-            if (writeFailed) await Disconnect();
         }
     }
 }
