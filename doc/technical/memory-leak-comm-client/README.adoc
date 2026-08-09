@@ -1,0 +1,57 @@
+= Comm Client Memory Leak Repro
+
+This folder contains two small scripts to reproduce and observe a memory leak scenario in `Comm/Client.cs` under reconnect churn.
+
+== Purpose
+
+* `reconnect_stress.py`: creates many short-lived TCP client sessions that reconnect and re-subscribe repeatedly.
+* `log_simhub_memory.ps1`: logs SimHub process memory over time to CSV.
+
+Use both scripts together for a before/after proof when testing fixes.
+
+== Prerequisites
+
+* SimHub + plugin running locally.
+* Python 3.x available as `python`.
+* PowerShell 7+ (`pwsh`) for memory logging.
+
+== Usage
+
+Start memory logging (terminal 1):
+
+[source,powershell]
+----
+pwsh -File .\doc\technical\memory-leak-comm-client\log_simhub_memory.ps1 -ProcessName "SimHubWPF" -OutFile "simhub-mem.csv" -IntervalSeconds 5
+----
+
+Start reconnect stress (terminal 2):
+
+[source,powershell]
+----
+python .\doc\technical\memory-leak-comm-client\reconnect_stress.py
+----
+
+Heavier stress example:
+
+[source,powershell]
+----
+python .\doc\technical\memory-leak-comm-client\reconnect_stress.py --clients 20 --help-spam-interval 0.1 --runtime 3600
+----
+
+== Expected Result
+
+*With the bug present*:
+
+* SimHub memory (`privateMB` in CSV) keeps climbing over time and does not stabilize.
+* Plugin log may show repeated send failures, often including:
+** `The stream is currently in use by a previous operation`
+** `Exception while sending data to client. We will disconnect the client.`
+* `send_fail` in `reconnect_stress.py` increases over time.
+
+*With the fix applied*:
+
+* Memory growth is significantly reduced or stabilizes after churn.
+* Writer-race exceptions should disappear (or become very rare unrelated transport errors).
+* `send_fail` stays at `0` (or near `0` in long noisy runs).
+
+Note: occasional `ObjectDisposedException` / `IOException` while disconnecting can be harmless shutdown timing noise and is not, by itself, evidence of the original leak/race.
