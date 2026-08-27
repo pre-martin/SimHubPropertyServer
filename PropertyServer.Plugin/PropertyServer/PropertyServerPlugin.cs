@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using GameReaderCommon;
@@ -184,7 +185,14 @@ namespace SimHub.Plugins.PropertyServer
             return new SettingsControl { DataContext = settingsViewModel };
         }
 
-        public ImageSource PictureIcon => this.ToIcon(Properties.Resources.properties);
+        public ImageSource PictureIcon
+        {
+            get
+            {
+                var dictionary = new ResourceDictionary { Source = new Uri("pack://application:,,,/PropertyServer;component/PreCommon/Ui/IconResources.xaml") };
+                return dictionary["DiPropertyServer"] as ImageSource;
+            }
+        }
 
         public string LeftMenuTitle => "Property Server";
 

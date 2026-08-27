@@ -14,13 +14,7 @@ echo.
 echo Building for configuration: %CONFIG%
 echo.
 
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\amd64\MSBuild.exe" -t:restore -p:Platform="Any CPU" -p:RestorePackagesConfig=true SimHubPropertyServer.sln
-if %errorlevel% neq 0 (
-    popd
-    exit /b 1
-)
-
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\amd64\MSBuild.exe" -p:Configuration=%CONFIG% SimHubPropertyServer.sln
+dotnet build -c %CONFIG% SimHubPropertyServer.sln
 if %errorlevel% neq 0 (
     popd
     exit /b 1
@@ -29,7 +23,7 @@ if %errorlevel% neq 0 (
 taskkill /im SimHubWPF.exe /t /f
 timeout /t 1
 
-copy /y PropertyServer.Plugin\bin\%CONFIG%\PropertyServer.dll \Games\SimHub\
+copy /y PropertyServer.Plugin\bin\%CONFIG%\net48\PropertyServer.dll \Games\SimHub\
 
 start /d \Games\SimHub SimHubWPF.exe
 

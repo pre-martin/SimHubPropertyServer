@@ -12,7 +12,7 @@ Guidance for coding agents working in this repository.
 - Repository: `SimHubPropertyServer`
 - Main code: `PropertyServer.Plugin/`
 - Solution: `SimHubPropertyServer.sln`
-- Target framework: `.NET Framework 4.8` (classic csproj, not SDK-style)
+- Target framework: `.NET Framework 4.8` (SDK-style csproj)
 - UI stack: WPF/XAML (SimHub plugin UI)
 
 ## Build Prerequisites
@@ -27,14 +27,14 @@ See `doc/Building.adoc` for the expected DLL list.
 
 ## Common Commands
 
-- If `msbuild` is not in `PATH`, initialize the Visual Studio build environment first:
-  - `call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" && msbuild -p:Platform="Any CPU" -p:Configuration=Debug`
 - Restore packages:
-  - `msbuild -t:restore -p:Platform="Any CPU" -p:RestorePackagesConfig=true`
+  - `dotnet restore`
 - Build release:
-  - `msbuild -p:Platform="Any CPU" -p:Configuration=Release`
+  - `dotnet build -c Release`
 - Build debug:
-  - `msbuild -p:Platform="Any CPU" -p:Configuration=Debug`
+  - `dotnet build -c Debug`
+- Alternatively, `msbuild` still works if the Visual Studio build environment is initialized first:
+  - `call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" && msbuild -p:Platform="Any CPU" -p:Configuration=Debug`
 
 ## Coding Conventions
 

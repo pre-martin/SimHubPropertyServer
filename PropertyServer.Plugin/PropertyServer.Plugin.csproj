@@ -1,54 +1,19 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.props" Condition="Exists('..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B3A7DBD0-917C-4FF1-9AAB-D3DC6ED29AE2}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>SimHub.Plugins</RootNamespace>
     <AssemblyName>PropertyServer</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
+
   <ItemGroup>
     <Reference Include="GameReaderCommon">
       <HintPath>..\SimHub\GameReaderCommon.dll</HintPath>
@@ -92,97 +57,4 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="ComputedProperties\ComputedPropertiesPlugin.cs" />
-    <Compile Include="ComputedProperties\IScriptValidator.cs" />
-    <Compile Include="ComputedProperties\IComputedPropertiesManager.cs" />
-    <Compile Include="ComputedProperties\Performance\PerfToken.cs" />
-    <Compile Include="ComputedProperties\Performance\PerfData.cs" />
-    <Compile Include="ComputedProperties\PluginManagerAccessor.cs" />
-    <Compile Include="ComputedProperties\ScriptData.cs" />
-    <Compile Include="ComputedProperties\Ui\ComputedPropertiesControl.xaml.cs">
-      <DependentUpon>ComputedPropertiesControl.xaml</DependentUpon>
-    </Compile>
-    <Page Include="ComputedProperties\Ui\ComputedPropertiesControl.xaml" />
-    <Compile Include="ComputedProperties\Ui\ComputedPropertiesViewModel.cs" />
-    <Compile Include="ComputedProperties\Ui\EditScriptWindow.xaml.cs">
-      <DependentUpon>EditScriptWindow.xaml</DependentUpon>
-    </Compile>
-    <Page Include="ComputedProperties\Ui\EditScriptWindow.xaml" />
-    <Compile Include="ComputedProperties\Ui\EditScriptWindowViewModel.cs" />
-    <Compile Include="ComputedProperties\Ui\PerformanceWindow.xaml.cs">
-        <DependentUpon>PerformanceWindow.xaml</DependentUpon>
-    </Compile>
-    <Page Include="ComputedProperties\Ui\PerformanceWindow.xaml" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="PropertyServer\AutoUpdate\AutoUpdater.cs" />
-    <Compile Include="PropertyServer\AutoUpdate\GitHubVersionInfo.cs" />
-    <Compile Include="PropertyServer\Comm\Client.cs" />
-    <Compile Include="PropertyServer\Comm\Server.cs" />
-    <Compile Include="PropertyServer\ISimHub.cs" />
-    <Compile Include="PropertyServer\PropertyServerPlugin.cs" />
-    <Compile Include="PropertyServer\Property\PropertyAccessor.cs" />
-    <Compile Include="PropertyServer\Property\PropertySource.cs" />
-    <Compile Include="PropertyServer\Property\SimHubProperty.cs" />
-    <Compile Include="PropertyServer\RawDataManager.cs" />
-    <Compile Include="PropertyServer\Settings\GeneralSettings.cs" />
-    <Compile Include="PropertyServer\Settings\ListenAddress.cs" />
-    <Compile Include="PropertyServer\Settings\LogLevelSetting.cs" />
-    <Compile Include="PropertyServer\ShakeIt\Converter.cs" />
-    <Compile Include="PropertyServer\ShakeIt\EffectsContainerBase.cs" />
-    <Compile Include="PropertyServer\ShakeIt\EffectsContainerCollector.cs" />
-    <Compile Include="PropertyServer\ShakeIt\GroupContainer.cs" />
-    <Compile Include="PropertyServer\ShakeIt\Profile.cs" />
-    <Compile Include="PropertyServer\ShakeIt\ShakeItAccessor.cs" />
-    <Compile Include="PropertyServer\ShakeIt\TreeElement.cs" />
-    <Compile Include="PropertyServer\SubscriptionManager.cs" />
-    <Compile Include="PropertyServer\Ui\Converters.cs" />
-    <Compile Include="PropertyServer\Ui\IpPortValidationRule.cs" />
-    <Compile Include="PropertyServer\Ui\RepairShakeItViewModel.cs" />
-    <Compile Include="PropertyServer\Ui\RepairShakeItWindow.xaml.cs">
-      <DependentUpon>RepairShakeItWindow.xaml</DependentUpon>
-    </Compile>
-    <Page Include="PropertyServer\Ui\RepairShakeItWindow.xaml" />
-    <Compile Include="PropertyServer\Ui\SettingsControl.xaml.cs">
-      <DependentUpon>SettingsControl.xaml</DependentUpon>
-    </Compile>
-    <Page Include="PropertyServer\Ui\SettingsControl.xaml" />
-    <Compile Include="PropertyServer\Ui\SettingsViewModel.cs" />
-    <Page Include="PropertyServer\Ui\UpdateConfirmWindow.xaml" />
-    <Compile Include="PropertyServer\Ui\UpdateConfirmWindow.xaml.cs">
-      <DependentUpon>UpdateConfirmWindow.xaml</DependentUpon>
-    </Compile>
-    <Page Include="PreCommon\Ui\IconResources.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="PreCommon\Ui\Util\Converters.cs" />
-    <Compile Include="PreCommon\Ui\Util\ObservableObject.cs" />
-    <Compile Include="PreCommon\Ui\Util\RelayCommand.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include=".gitignore" />
-    <Content Include="PropertyServer\properties.png" />
-    <Content Include="PropertyServer\properties.xcf" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>Dieses Projekt verweist auf mindestens ein NuGet-Paket, das auf diesem Computer fehlt. Verwenden Sie die Wiederherstellung von NuGet-Paketen, um die fehlenden Dateien herunterzuladen. Weitere Informationen finden Sie unter "http://go.microsoft.com/fwlink/?LinkID=322105". Die fehlende Datei ist "{0}".</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.props'))" />
-    <Error Condition="!Exists('..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.targets'))" />
-  </Target>
-  <Import Project="..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.targets" Condition="Exists('..\packages\Nerdbank.GitVersioning.3.5.119\build\Nerdbank.GitVersioning.targets')" />
 </Project>

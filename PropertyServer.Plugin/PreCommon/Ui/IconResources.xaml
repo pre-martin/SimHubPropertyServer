@@ -72,4 +72,43 @@
     </DrawingGroup>
     <DrawingImage Drawing="{StaticResource InfoRounded}" x:Key="DiInfoRounded" />
 
+    <DrawingGroup x:Key="PropertyServer">
+        <DrawingGroup.ClipGeometry>
+            <RectangleGeometry Rect="0.0,0.0,24.0,24.0" />
+        </DrawingGroup.ClipGeometry>
+        <!-- Row 1: hollow circle (bullet) + horizontal line -->
+        <GeometryDrawing Brush="#ffffffff">
+            <GeometryDrawing.Geometry>
+                <GeometryGroup FillRule="EvenOdd">
+                    <EllipseGeometry Center="7.5,7.5" RadiusX="2.75" RadiusY="2.75" />
+                    <EllipseGeometry Center="7.5,7.5" RadiusX="1.5" RadiusY="1.5" />
+                    <RectangleGeometry Rect="11.75,6.5,7.5,2" />
+                </GeometryGroup>
+            </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <!-- Row 2: hollow circle (bullet) + horizontal line -->
+        <GeometryDrawing Brush="#ffffffff">
+            <GeometryDrawing.Geometry>
+                <GeometryGroup FillRule="EvenOdd">
+                    <EllipseGeometry Center="7.5,16.5" RadiusX="2.75" RadiusY="2.75" />
+                    <EllipseGeometry Center="7.5,16.5" RadiusX="1.5" RadiusY="1.5" />
+                    <RectangleGeometry Rect="11.75,15.5,7.5,2" />
+                </GeometryGroup>
+            </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+    </DrawingGroup>
+    <DrawingImage Drawing="{StaticResource PropertyServer}" x:Key="DiPropertyServer" />
+
+    <DrawingGroup x:Key="LanOutlined">
+        <DrawingGroup.ClipGeometry>
+            <RectangleGeometry Rect="0.0,0.0,24.0,24.0"/>
+        </DrawingGroup.ClipGeometry>
+        <GeometryDrawing Brush="#ff000000">
+            <GeometryDrawing.Geometry>
+                <PathGeometry Figures="M 13 22 h 8 v -7 h -3 v -4 h -5 V 9 h 3 V 2 H 8 v 7 h 3 v 2 H 6 v 4 H 3 v 7 h 8 v -7 H 8 v -2 h 8 v 2 h -3 z M 10 7 V 4 h 4 v 3 z M 9 17 v 3 H 5 v -3 z m 10 0 v 3 h -4 v -3 z" FillRule="Nonzero"/>
+            </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+    </DrawingGroup>
+    <DrawingImage Drawing="{StaticResource LanOutlined}" x:Key="DiLanOutlined"/>
+
 </ResourceDictionary>

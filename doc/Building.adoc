@@ -12,6 +12,6 @@
   - Acornima.dll
   - ICSharpCode.AvalonEdit.dll
 . Restore NuGet packages: +
-  `msbuild -t:restore -p:Platform="Any CPU" -p:RestorePackagesConfig=true`
+  `dotnet restore`
 . Build the project: +
-  `msbuild -p:Platform="Any CPU" -p:Configuration=Release`
+  `dotnet build -c Release`
