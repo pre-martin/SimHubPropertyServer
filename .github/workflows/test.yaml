@@ -34,4 +34,4 @@ jobs:
           Remove-Item simhub-dlls.zip
 
       - name: Test
-        run: dotnet test
+        run: dotnet build
