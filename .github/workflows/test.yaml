@@ -1,0 +1,37 @@
+name: Test
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v7
+
+      - name: Download SimHub API DLLs
+        shell: pwsh
+        env:
+          SIMHUB_DEPS_PAT: ${{ secrets.SIMHUB_DEPS_PAT }}
+          SIMHUB_DEPS_REPO: pre-martin/SimHubPropertyServer-ci-deps
+        run: |
+          New-Item -ItemType Directory -Path SimHub -Force | Out-Null
+          $headers = @{
+            Authorization = "Bearer $env:SIMHUB_DEPS_PAT"
+            Accept        = "application/vnd.github+json"
+          }
+          $release = Invoke-RestMethod -Headers $headers -Uri "https://api.github.com/repos/$env:SIMHUB_DEPS_REPO/releases/latest"
+          $asset = $release.assets | Where-Object { $_.name -eq "simhub-dlls.zip" }
+          $headers.Accept = "application/octet-stream"
+          Invoke-WebRequest -Headers $headers -Uri $asset.url -OutFile simhub-dlls.zip
+          Expand-Archive -Path simhub-dlls.zip -DestinationPath SimHub -Force
+          Remove-Item simhub-dlls.zip
+
+      - name: Test
+        run: dotnet test
