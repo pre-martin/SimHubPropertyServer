@@ -24,16 +24,7 @@ The release branch can be used to further stabilize the release. If there are an
 
 When the release is ready, the following steps are taken:
 
-. Merge the release branch into the `main` branch: +
-  - `git switch main`
-  - `git merge --no-ff release/v1.2`
-  - `git push`
-. Create a tag and push it afterward:
-  - `nbgv tag`
-  - `git push origin v1.2.3`
+. Run the "Create Release" GitHub Actions workflow (via `workflow_dispatch`), providing the `releaseBranch` input (e.g. `release/v1.2`).
+  - This merges the release branch into `main`, creates and pushes the version tag via `nbgv tag`, and merges `main` back into `develop`.
 . The "Publish Release" GitHub workflow triggers automatically on the pushed tag. It builds the plugin (see link:Building.adoc[Building.adoc]) and creates a draft GitHub release named "Version 1.2.3" with `PropertyServer.dll` attached.
 . Open the draft release on GitHub, write the release notes, and publish it.
-. Merge the main branch back into the `develop` branch: +
-   `git switch develop` +
-   `git merge --no-ff main` +
-   `git push`
