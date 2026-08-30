@@ -4,6 +4,7 @@ setlocal
 set "SIMHUB_DIR=\Games\SimHub"
 set "SCRIPT_DIR=%~dp0"
 pushd "%SCRIPT_DIR%"
+cd ..
 
 if not exist "%SIMHUB_DIR%\SimHub.Plugins.dll" (
     echo ERROR: SimHub directory not found or incomplete: "%SIMHUB_DIR%"

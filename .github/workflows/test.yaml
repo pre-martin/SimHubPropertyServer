@@ -1,0 +1,26 @@
+name: Test
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Download SimHub API DLLs
+        uses: ./.github/actions/download-simhub-deps
+        with:
+          deps-pat: ${{ secrets.SIMHUB_DEPS_PAT }}
+
+      - name: Test
+        run: dotnet build

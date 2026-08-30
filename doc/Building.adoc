@@ -1,16 +1,12 @@
 = Building
 
 . The project requires .NET Framework 4.8, because SimHub is built with this framework.
-. Copy required DLLs from SimHub to the local directory `SimHub` (see `copyApiFromSimHub.bat`):
-  - SimHub.Plugins.dll
-  - GameReaderCommon.dll
-  - log4net.dll
-  - Newtonsoft.Json.dll
-  - MahApps.Metro.dll
-  - MahApps.Metro.SimpleChildWindow.dll
-  - Jint.dll
-  - Acornima.dll
-  - ICSharpCode.AvalonEdit.dll
+. Copy required DLLs from SimHub to the local directory `SimHub`. +
+  See `tools\copyApiFromSimHub.bat` for the list of required DLLs.
+. CI (GitHub Actions) uses the exact same DLLs: after refreshing `SimHub\` locally,
+  publish them to the private deps repo (`pre-martin/SimHubPropertyServer-ci-deps`)
+  with `tools/publishSimHubDeps.ps1 -Tag <version>` so that
+  `.github/workflows/test.yaml` downloads the identical set of DLLs.
 . Restore NuGet packages: +
   `dotnet restore`
 . Build the project: +
