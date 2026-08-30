@@ -1,0 +1,41 @@
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Download SimHub API DLLs
+        uses: ./.github/actions/download-simhub-deps
+        with:
+          deps-pat: ${{ secrets.SIMHUB_DEPS_PAT }}
+
+      - name: Build
+        run: dotnet build -c Release
+
+      - name: Determine release title
+        id: title
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}" -replace '^v', ''
+          "title=Version $version" >> $env:GITHUB_OUTPUT
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ steps.title.outputs.title }}
+          draft: true
+          files: PropertyServer.Plugin/bin/Release/net48/PropertyServer.dll

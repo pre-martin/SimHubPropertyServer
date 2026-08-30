@@ -11,16 +11,14 @@ The whole development happens on the `develop` branch. New features are started 
 
 When a new version is ready to be released, the following steps are taken:
 
-. Switch to the `develop` branch: +
-   `git switch develop`
-. Create a release branch based on `version.json`: +
-   `nbgv prepare-release`
-. Push the `develop` branch as nbgv updated the version number: +
-   `git push`
-. Switch to the release branch: +
-   `git switch release/v1.2`
-. Push the release branch: +
-   `git push origin release/v1.2`
+. Run the "Prepare Release" GitHub Actions workflow (via `workflow_dispatch`):
+  - Optionally provide a `releaseVersion` input (e.g. `2.0-alpha`) to set the version
+    for the new release branch explicitly, overriding what nbgv would otherwise
+    use (the current version on `develop`). Leave empty to use the current
+    version as-is.
+  - This runs `nbgv prepare-release` on `develop`, pushes the updated `develop`
+    branch (auto-incremented to the next version), and pushes the new
+    `release/vX.Y` branch.
 
 The release branch can be used to further stabilize the release. If there are any changes made to the release branch, they should be merged back into the `develop` branch as well.
 
@@ -33,9 +31,8 @@ When the release is ready, the following steps are taken:
 . Create a tag and push it afterward:
   - `nbgv tag`
   - `git push origin v1.2.3`
-. Build the plugin:
-  - see link:Building.adoc[Building.adoc]
-. Create a release in GitHub from the tag and attach the file `PropertyServer.dll`
+. The "Publish Release" GitHub workflow triggers automatically on the pushed tag. It builds the plugin (see link:Building.adoc[Building.adoc]) and creates a draft GitHub release named "Version 1.2.3" with `PropertyServer.dll` attached.
+. Open the draft release on GitHub, write the release notes, and publish it.
 . Merge the main branch back into the `develop` branch: +
    `git switch develop` +
    `git merge --no-ff main` +
