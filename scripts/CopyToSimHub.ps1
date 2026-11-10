@@ -14,7 +14,7 @@ $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectDir = (Get-Item $ScriptDir).Parent
-$SourceDll = Join-Path $ProjectDir "PropertyServer.Plugin/bin/$Configuration/PropertyServer.dll"
+$SourceDll = Join-Path $ProjectDir "PropertyServer.Plugin/bin/$Configuration/net48/PropertyServer.dll"
 
 if (-not (Test-Path $TargetDir)) {
     Write-Host "Target directory $TargetDir does not exist."
